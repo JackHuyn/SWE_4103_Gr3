@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 
-cred = credentials.Certificate("C:/Users/willm/Documents/SWE 4103/Frontend/swe4103-7b261-firebase-adminsdk-7nzkx-030565ffc5.json")
+cred = credentials.Certificate("C:/Users/willm/Documents/GitHub/SWE_4103_Gr3/swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json")
 firebase_admin.initialize_app(cred)
 ##db = firestore.client()
 
@@ -38,7 +38,7 @@ def validate_token(local_id, id_token):
     if(local_id not in active_sessions):
         return False
     user_session = active_sessions[local_id]
-    if(user_session[id_token] != id_token):
+    if(user_session['idToken'] != id_token):
         return False
     decoded_token = auth.verify_id_token(id_token)
     uid = decoded_token['uid']
