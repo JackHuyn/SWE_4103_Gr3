@@ -15,4 +15,4 @@ For the frontend:
 
 Access:
 -In a browser go to 127.0.0.1:3000 to see webpage
--I test the API using postman, the API is hosted at 127.0.0.1:3001 
+-I test the API using postman, the API is hosted at 127.0.0.1:3001
