@@ -45,7 +45,7 @@ function signupNewEmailUser(fname, lname, email, password)
         })
       }).then(resp => {
         console.log("result:", resp);
-        window.location.href = "/login"
+        window.location.href = "/auth/login"
       })
 }
 

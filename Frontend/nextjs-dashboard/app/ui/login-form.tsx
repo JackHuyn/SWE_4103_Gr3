@@ -7,13 +7,23 @@ import {
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';  
 
+let headers = new Headers();
+
+headers.append('Content-Type', 'application/json');
+headers.append('Accept', 'application/json');
+// headers.append('Origin','http://localhost:3001');
+// headers.append("Access-Control-Allow-Origin", "http://localhost:3001");
+// headers.append("Access-Control-Allow-Headers", "Content-Type, application/json");
+
+
 function loginEmailUser(email, password)
 {
-  fetch("http://127.0.0.1:3001/auth/login-with-email-and-password?email="+email+"&password="+password,
+  fetch("http://localhost:3001/auth/login-with-email-and-password?email="+email+"&password="+password,
     {
-        method: 'POST',
+      method: 'GET',
     }
   ).then(response => {
+    console.log("raw response: ", response)
       if (!response.ok) {
           if (response.status === 404) {
               return {
@@ -24,7 +34,7 @@ function loginEmailUser(email, password)
 
           return response.text().then(text => {
               return {
-                  text: text,
+                  text: response.status + ": " + text,
                   status: "danger"
               };
           })
@@ -36,8 +46,10 @@ function loginEmailUser(email, password)
         };
       })
     }).then(resp => {
-      console.log("result:", resp);
-      window.location.href = "/"
+      let r = JSON.parse(resp.text)
+      document.cookie = "localId="+r['localId']
+      document.cookie = "idToken="+r['idToken']
+      // window.location.href = "/"
     })
 }
 

@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
 import requests
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 
@@ -41,15 +44,19 @@ def validate_token(local_id, id_token):
     if(user_session['idToken'] != id_token):
         return False
     decoded_token = auth.verify_id_token(id_token)
+    print("Decoded Token: ")
+    print(decoded_token)
     uid = decoded_token['uid']
     return True
 
 
 @app.route('/welcome', methods=['GET'])
+@cross_origin()
 def get_welcome():
     return 'Welcome!'
 
 @app.route('/secure', methods=['GET'])
+@cross_origin()
 def get_secure():
     token = request.args.get("sessionId", default = -1, type = str)
     print(token)
@@ -59,6 +66,7 @@ def get_secure():
     return 'Welcome Secure!'
 
 @app.route('/auth/signup-with-email-and-password', methods=['POST'])
+@cross_origin()
 def signup_user():
     fname = request.args.get("fname", default = -1, type = str)
     lname = request.args.get("lname", default = -1, type = str)
@@ -69,7 +77,8 @@ def signup_user():
     print('Login')
     return 'signup'
 
-@app.route('/auth/login-with-email-and-password', methods=['POST'])
+@app.route('/auth/login-with-email-and-password', methods=['GET'])
+@cross_origin()
 def login_user():
     email = request.args.get("email", default = -1, type = str)
     password = request.args.get("password", default = -1, type = str)
@@ -80,8 +89,14 @@ def login_user():
     print('Login')
     active_sessions.update({login_resp['localId']: login_resp})
     #print(active_sessions)
-    print(validate_token(login_resp['localId'], login_resp['idToken']))
-    return json.dumps({'idToken': login_resp['idToken']})
+    # print("Valid Login: "+ str(validate_token(login_resp['localId'], login_resp['idToken'])))
+    response = app.response_class(
+        response=json.dumps({'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+        status=200,
+        mimetype='application/json'
+    )
+    print(response.response)
+    return response
     
 
 if __name__ == '__main__':
