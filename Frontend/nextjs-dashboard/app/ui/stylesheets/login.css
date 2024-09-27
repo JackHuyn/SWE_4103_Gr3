@@ -1,0 +1,39 @@
+@import url('./colors.css');
+
+body {
+    background-color: var(--pageBackground);
+    font-family: var(--regularFont);
+}
+
+.login_form{
+    background-color: var(--formBackground);
+    color: var(--fontColor);
+    margin: auto;
+    width: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.login_form form {
+    display: flex;
+    justify-content: center;
+    padding: 10%;
+}
+
+.login_form form div {
+    text-align: center;
+    padding: 2% 0;
+}
+
+.login_form form input {
+    border-radius: 5px;
+    background-color: gray;
+    color: white;
+}
+
+.login_form form span {
+    font-size: small;
+    color: var(--fontErrorColor);
+}

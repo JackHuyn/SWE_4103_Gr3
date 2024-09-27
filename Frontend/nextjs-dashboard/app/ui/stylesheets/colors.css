@@ -1,0 +1,9 @@
+:root{
+    --regularFont: century-gothic, sans-serif;
+
+    --fontColor: white;
+    --fontErrorColor: red;
+
+    --pageBackground: black;
+    --formBackground: darkgreen;
+}
