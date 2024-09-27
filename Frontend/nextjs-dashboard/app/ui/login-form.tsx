@@ -5,15 +5,7 @@ import {
   ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from './button';  
-
-let headers = new Headers();
-
-headers.append('Content-Type', 'application/json');
-headers.append('Accept', 'application/json');
-// headers.append('Origin','http://localhost:3001');
-// headers.append("Access-Control-Allow-Origin", "http://localhost:3001");
-// headers.append("Access-Control-Allow-Headers", "Content-Type, application/json");
+import { Button } from './button';
 
 
 function loginEmailUser(email, password)
@@ -23,7 +15,6 @@ function loginEmailUser(email, password)
       method: 'GET',
     }
   ).then(response => {
-    console.log("raw response: ", response)
       if (!response.ok) {
           if (response.status === 404) {
               return {
@@ -47,16 +38,18 @@ function loginEmailUser(email, password)
       })
     }).then(resp => {
       let r = JSON.parse(resp.text)
-      document.cookie = "localId="+r['localId']
-      document.cookie = "idToken="+r['idToken']
-      // window.location.href = "/"
+      const expires = new Date(Date.now() + 60 * 60 * 1000)
+      console.log('Expiry date: ', expires.toDateString())
+      document.cookie = "localId="+r['localId']+"; expires="+expires.toDateString()+"; path=/"
+      document.cookie = "idToken="+r['idToken']+"; expires="+expires.toDateString()+"; path=/"
+      console.log("Cookies: ", document.cookie)
+      window.location.href = "/"
     })
 }
 
 export default function LoginForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    console.log("TEST")
     const formData = new FormData(event.currentTarget)
     const email = formData.get('email')
     const password = formData.get('password')

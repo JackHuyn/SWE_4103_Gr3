@@ -25,7 +25,7 @@ def sign_up_with_email_and_password(fname, lname, email, password, return_secure
     password=password,
     display_name=(str(fname) + ' ' + str(lname)),
     disabled=False)
-    return "test"
+    return user
 
 def sign_in_with_email_and_password(email, password, return_secure_token=True):
     payload = json.dumps({"email":email, "password":password, "return_secure_token":return_secure_token})
@@ -39,13 +39,19 @@ def sign_in_with_email_and_password(email, password, return_secure_token=True):
 
 def validate_token(local_id, id_token):
     if(local_id not in active_sessions):
+        print("LOCAL ID NOT FOUND")
         return False
     user_session = active_sessions[local_id]
     if(user_session['idToken'] != id_token):
+        print("ID TOKEN DOES NOT MATCH")
+        active_sessions.pop(local_id)
         return False
-    decoded_token = auth.verify_id_token(id_token)
-    print("Decoded Token: ")
-    print(decoded_token)
+    try:
+        decoded_token = auth.verify_id_token(id_token)
+    except Exception as e:
+        print("INVALID TOKEN")
+        active_sessions.pop(local_id)
+        return False
     uid = decoded_token['uid']
     return True
 
@@ -83,15 +89,23 @@ def login_user():
     email = request.args.get("email", default = -1, type = str)
     password = request.args.get("password", default = -1, type = str)
     login_resp = sign_in_with_email_and_password(email, password)
-    print('Email: ' + str(email))
-    print('Password: ' + str(password))
-    #print(login_resp)
     print('Login')
     active_sessions.update({login_resp['localId']: login_resp})
-    #print(active_sessions)
-    # print("Valid Login: "+ str(validate_token(login_resp['localId'], login_resp['idToken'])))
     response = app.response_class(
         response=json.dumps({'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+        status=200,
+        mimetype='application/json'
+    )
+    print(response.response)
+    return response
+
+@app.route('/auth/validate-session', methods=['GET'])
+@cross_origin()
+def validate_session():
+    local_id = request.args.get("localId", default = -1, type = str)
+    id_token = request.args.get("idToken", default = -1, type = str)
+    response = app.response_class(
+        response=json.dumps({'approved': validate_token(local_id, id_token)}),
         status=200,
         mimetype='application/json'
     )
