@@ -33,7 +33,18 @@ body {
     color: white;
 }
 
+.login_form form input::placeholder {
+    color: lightgrey;
+}
+
 .login_form form span {
     font-size: small;
     color: var(--fontErrorColor);
+}
+
+.login_form form button {
+    width: 100%;
+    border-color: var(--fontColor);
+    background-color: transparent;
+    color: var(--fontColor);
 }
