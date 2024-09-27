@@ -44,16 +44,23 @@ def validate_token(local_id, id_token):
     user_session = active_sessions[local_id]
     if(user_session['idToken'] != id_token):
         print("ID TOKEN DOES NOT MATCH")
-        active_sessions.pop(local_id)
+        end_session(local_id)
         return False
     try:
         decoded_token = auth.verify_id_token(id_token)
     except Exception as e:
         print("INVALID TOKEN")
-        active_sessions.pop(local_id)
+        end_session(local_id)
         return False
     uid = decoded_token['uid']
     return True
+
+def end_session(local_id):
+    try:
+        active_sessions.pop(local_id)
+        return True
+    except KeyError as ke:
+        return False
 
 
 @app.route('/welcome', methods=['GET'])
@@ -110,6 +117,20 @@ def validate_session():
         mimetype='application/json'
     )
     print(response.response)
+    return response
+
+@app.route('/auth/logout', methods=['POST'])
+@cross_origin()
+def logout_user():
+    local_id = request.args.get("localId", default = -1, type = str)
+    print('Num Active Sessions Before: ' + str(len(active_sessions)))
+    end_session(local_id)
+    print('Num Active Sessions After: ' + str(len(active_sessions)))
+    response = app.response_class(
+        response=json.dumps({}),
+        status=200,
+        mimetype='application/json'
+    )
     return response
     
 
