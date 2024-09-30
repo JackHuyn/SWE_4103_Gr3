@@ -1,0 +1,56 @@
+name: Setting up CI pipeline
+
+on: 
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["pypy3.10", "3.11", "3.12"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    
+    # check version
+    - name: Display python version
+      run: |
+        python -c "import sys; print(sys.version)"
+        
+    - name: Install dependencies
+      run: |
+        mkdir logFile
+        python -m pip install --upgrade pip
+        pip install pylint
+
+    - name: Lint with Ruff
+      run: |
+        pip install ruff
+        ruff check --output-format=github
+        continue on error: true
+        
+    # # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
+    # - name: Check code using pytest
+    #   run: |
+    #     pip install pytest pytest-cov
+    #     pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+
+        
+    - name: compress and upload file
+      uses: actions/upload-artifact@v4
+      with:
+        name: log_File
+        path: ${{ github.workspace }}/
+        if-no-files-found: error
+        overwrite: true
