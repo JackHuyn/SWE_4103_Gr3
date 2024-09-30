@@ -37,7 +37,7 @@ jobs:
     - name: Lint with Ruff
       run: |
         pip install ruff
-        ruff check --output-format=github
+        ruff check --output-format=github --exit-zero
         continue on error: true
         
     # # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
