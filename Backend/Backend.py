@@ -5,24 +5,31 @@ from firebase_admin import auth, credentials, firestore
 import json
 import requests
 import Auth as fb_auth
+import os 
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
+credFileName = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
 
-cred = credentials.Certificate("C:/Users/willm/Documents/GitHub/SWE_4103_Gr3/Backend/swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+cred = credentials.Certificate(dir_path + "\\" + credFileName)
 firebase_admin.initialize_app(cred)
 ##db = firestore.client()
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
+@app.route('/', methods=['GET'])
+@cross_origin()
+def get_home():
+    return 'Welcome!'
 
 @app.route('/welcome', methods=['GET'])
 @cross_origin()
 def get_welcome():
-    return 'Welcome!'
+    return get_home()
 
 @app.route('/secure', methods=['GET'])
 @cross_origin()
