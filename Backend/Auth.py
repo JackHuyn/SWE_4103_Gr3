@@ -45,13 +45,13 @@ class FirebaseAuth:
         user_session = self.active_sessions[local_id]
         if(user_session['idToken'] != id_token):
             print("ID TOKEN DOES NOT MATCH")
-            end_session(local_id)
+            self.end_session(local_id)
             return False
         try:
             decoded_token = self.auth.verify_id_token(id_token)
         except Exception as e:
             print("INVALID TOKEN")
-            end_session(local_id)
+            self.end_session(local_id)
             return False
         uid = decoded_token['uid']
         return True

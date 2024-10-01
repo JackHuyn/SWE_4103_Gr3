@@ -12,7 +12,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 
-cred = credentials.Certificate("C:/Users/willm/Documents/GitHub/SWE_4103_Gr3/Backend/swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json")
+cred = credentials.Certificate("C:/Users/willm/Documents/GitHub/SWE_4103_Gr3/Backend/swe4103-7b261-firebase-adminsdk.json")
 firebase_admin.initialize_app(cred)
 ##db = firestore.client()
 

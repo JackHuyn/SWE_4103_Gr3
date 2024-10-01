@@ -62,91 +62,86 @@ export default function SignupForm() {
         }
     }
 
+    async function redirectToLogin() {
+        window.location.href="/auth/login"
+    }
+
     return (
-        <div className="login_form">
-            <form className="space-y-3" onSubmit={handleSubmit}>
-                <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-                    <h1 className={`test mb-3 text-2xl`}>
-                    Sign Up
-                    </h1>
-                    <div className="w-full">
+        <div>
+            <button id="auth_redirect_button" onClick={redirectToLogin}>Sign In</button>
+            <div className="login_form">
+                <form onSubmit={handleSubmit}>
                     <div>
-                        <div className="relative">
-                        <input
-                            className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            id="fname"
-                            type="text"
-                            name="fname"
-                            placeholder="First Name"
-                            onChange={(event) => fname = event.target.value}
-                            required
-                        />
-                        {/* <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" /> */}
+                        <h1>Sign Up</h1>
+                        <div className="login_row">
+                            <div className="login_row_item left">
+                                <input
+                                    id="fname"
+                                    type="text"
+                                    name="fname"
+                                    placeholder="First Name"
+                                    // onChange={(event) => fname = event.target.value}
+                                    required
+                                />
+                            </div>
+                            <div className="login_row_item right">
+                                <input
+                                    id="lname"
+                                    type="text"
+                                    name="lname"
+                                    placeholder="Last Name"
+                                    // onChange={(event) => lname = event.target.value}
+                                    required
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="relative">
-                        <input
-                            className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            id="lname"
-                            type="text"
-                            name="lname"
-                            placeholder="Last Name"
-                            onChange={(event) => lname = event.target.value}
-                            required
-                        />
-                        {/* <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" /> */}
+                        <div className="login_row">
+                            <div className="login_row_item left">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    // onChange={(event) => email = event.target.value}
+                                    required
+                                />
+                            </div>
+                            <div className="login_row_item right">
+                                <input
+                                    id="account_type"
+                                    type="checkbox"
+                                    name="account_type"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="relative">
-                        <input
-                            className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            id="email"
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            onChange={(event) => email = event.target.value}
-                            required
-                        />
-                        {/* <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" /> */}
+                        <div className="login_row">
+                            <div className="login_row_item left">
+                                <input
+                                    id="passwordA"
+                                    type="password"
+                                    name="passwordA"
+                                    placeholder="Password"
+                                    // onChange={(event) => passwordA = event.target.value}
+                                    required
+                                    minLength={6}
+                                />
+                            </div>
+                            <div className="login_row_item right">
+                                <input
+                                    id="passwordB"
+                                    type="password"
+                                    name="passwordB"
+                                    placeholder="Confirm password"
+                                    // onChange={(event) => passwordB = event.target.value}
+                                    required
+                                    minLength={6}
+                                />
+                            </div>
                         </div>
+                        <Button type="submit">Sign Up</Button>
                     </div>
-                    <div className="mt-4">
-                        <div className="relative">
-                        <input
-                            className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            id="passwordA"
-                            type="password"
-                            name="passwordA"
-                            placeholder="Password"
-                            onChange={(event) => passwordA = event.target.value}
-                            required
-                            minLength={6}
-                        />
-                        {/* <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" /> */}
-                        </div>
-                    </div>
-                    <div className="mt-4">
-                        <div className="relative">
-                        <input
-                            className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
-                            id="passwordB"
-                            type="password"
-                            name="passwordB"
-                            placeholder="Confirm password"
-                            onChange={(event) => passwordB = event.target.value}
-                            required
-                            minLength={6}
-                        />
-                        </div>
-                    </div>
-                    </div>
-                    <Button className="mt-4 w-full" type="submit">
-                    Sign Up
-                    </Button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     );
 }
