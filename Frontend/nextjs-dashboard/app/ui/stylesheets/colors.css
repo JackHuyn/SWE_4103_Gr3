@@ -5,7 +5,12 @@
     --fontColorDark: #111;
     --fontErrorColor: red;
 
+    --inputBackgroundGrey: #707070;
+    --inputBackgroundGreyAutofill: #909090;
+    --selectorItemSelected: #2440EE;
+    --selectorItemNotSelected: var(--inputBackgroundGrey);
+
     --lightBackground1: #d9d9d9;
-    --pageBackground: black;
-    --formBackground: darkgreen;
+    --pageBackground: #222;
+    --formBackground: #444;
 }

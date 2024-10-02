@@ -66,6 +66,17 @@ export default function SignupForm() {
         window.location.href="/auth/login"
     }
 
+    async function instructorTypeSelected() {
+        document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
+        document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
+    }
+
+    async function studentTypeSelected() {
+        console.log('student')
+        document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
+        document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
+    }
+
     return (
         <div>
             <button id="auth_redirect_button" onClick={redirectToLogin}>Sign In</button>
@@ -75,6 +86,7 @@ export default function SignupForm() {
                         <h1>Sign Up</h1>
                         <div className="login_row">
                             <div className="login_row_item left">
+                                <label htmlFor="fname">First Name</label>
                                 <input
                                     id="fname"
                                     type="text"
@@ -85,6 +97,7 @@ export default function SignupForm() {
                                 />
                             </div>
                             <div className="login_row_item right">
+                                <label htmlFor="fname">Last Name</label>
                                 <input
                                     id="lname"
                                     type="text"
@@ -97,6 +110,7 @@ export default function SignupForm() {
                         </div>
                         <div className="login_row">
                             <div className="login_row_item left">
+                                <label htmlFor="email">Email</label>
                                 <input
                                     id="email"
                                     type="email"
@@ -107,15 +121,21 @@ export default function SignupForm() {
                                 />
                             </div>
                             <div className="login_row_item right">
-                                <input
+                                <label htmlFor="account_type">I am a</label>
+                                {/* <input
                                     id="account_type"
                                     type="checkbox"
                                     name="account_type"
-                                />
+                                /> */}
+                                <div id="account_type_selector">
+                                    <button id="student_type_selector" onClick={studentTypeSelected}>student</button>
+                                    <button id="instructor_type_selector" onClick={instructorTypeSelected}>instructor</button>
+                                </div>
                             </div>
                         </div>
                         <div className="login_row">
                             <div className="login_row_item left">
+                                <label htmlFor="passwordA">Password</label>
                                 <input
                                     id="passwordA"
                                     type="password"
@@ -127,6 +147,7 @@ export default function SignupForm() {
                                 />
                             </div>
                             <div className="login_row_item right">
+                                <label htmlFor="passwordB">Confirm Password</label>
                                 <input
                                     id="passwordB"
                                     type="password"

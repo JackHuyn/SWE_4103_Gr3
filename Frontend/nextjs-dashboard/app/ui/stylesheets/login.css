@@ -24,31 +24,32 @@ body {
 
 .login_row {
     display: inline-block;
-    margin-bottom: 2%;
-    width: 100%;
+    margin-bottom: 1%;
+    width: 90%;
 }
 
 .login_row_item {
-    display: flex;
+    display: inline-block;
+    margin: 1% 0 0 0;
 }
 
 .left {
     float: left;
-    width: 49%;
+    width: 45%;
 }
 
 .right {
     float: right;
-    width: 49%;
+    width: 45%;
 }
 
 .login_form form input {
     border-radius: 7px;
-    border-color: transparent;
-    background-color: gray;
+    border-style: none !important;
+    background-color: var(--inputBackgroundGrey);
     color: white;
-    width: 100%;
-    height: 30px;
+    width: 95%;
+    height: 32px;
     padding-left: 5%;
     font-size: large;
 }
@@ -64,29 +65,74 @@ body {
     color: lightgrey;
 }
 
-.login_form form span {
+.login_form form input:active {
+    border-color: transparent;
+}
+
+.login_form form input:is(:-webkit-autofill :autofill){
+    font-size: large;
+    background-color: var(--inputBackgroundGreyAutofill);
+}
+
+.login_form form label{
     font-size: small;
+}
+
+.login_form form span {
+    font-size: large;
     color: var(--fontErrorColor);
+    display: none;
 }
 
 .login_form form button {
-    width: 49%;
+    width: 41%;
     border-color: transparent;
     border-radius: 7px;
     background-color: var(--lightBackground1);
     color: var(--fontColorDark);
-    height: 36px;
+    height: 34px;
     font-size: larger;
+    margin-top: 2%;
 }
 
 #auth_redirect_button{
     position: fixed;
-    top: 2%;
-    right: 2%;
-    padding: 0.5% 1.5%;
-    border-radius: 15px;
+    top: 2.5%;
+    right: 2.5%;
+    padding: 1% 2.5%;
+    border-radius: 20px;
     border-color: transparent;
     background-color: var(--lightBackground1);
     font-size: large;
     color: var(--fontColorDark)
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-text-fill-color: var(--fontColorLight);
+    -webkit-background-clip: text;
+    transition: background-color 5000s ease-in-out 0s;
+    box-shadow: inset 0 0 20px 20px var(--inputBackgroundGreyAutofill);
+    font-size: large !important;
+    font-family: var(--regularFont) !important;
+}
+
+#student_type_selector {
+    border-radius: 7px 0 0 7px;
+    background-color: var(--selectorItemSelected);
+    width: 50%;
+    margin-top: 0;
+}
+
+#instructor_type_selector {
+    border-radius: 0 7px 7px 0;
+    background-color: var(--selectorItemNotSelected);
+    width: 50%;
+    margin-top: 0;
+}
+
+#account_type_selector {
+    width: 100%;
 }
