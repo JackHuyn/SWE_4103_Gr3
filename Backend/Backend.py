@@ -12,7 +12,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
-credFileName = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
+credFileName = "swe4103-7b261-firebase-adminsdk.json"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 cred = credentials.Certificate(dir_path + "\\" + credFileName)
@@ -47,9 +47,16 @@ def signup_user():
             mimetype='application/json'
         )
         return response
+    except auth.EmailAlreadyExistsError as eaee:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Account with this Email Already Exists'}),
+            status=(401),
+            mimetype='application/json'
+        )
+        return response
     except Exception as e:
         response = app.response_class(
-            response=json.dumps({'approved': False}),
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
             status=(500),
             mimetype='application/json'
         )
@@ -62,12 +69,14 @@ def login_user():
     password = request.args.get("password", default = -1, type = str)
     try:
         login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
+        print(login_resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
             status=200,
             mimetype='application/json'
         )
     except Exception as e:
+        print(e)
         response = app.response_class(
             response=json.dumps({'approved': False}),
             status=401,
