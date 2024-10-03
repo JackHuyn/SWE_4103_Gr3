@@ -75,7 +75,7 @@ body {
     background-color: var(--inputBackgroundGreyAutofill);
 }
 
-.login_form form label{
+.input_label{
     font-size: small;
 }
 
@@ -138,4 +138,71 @@ input:-webkit-autofill:active{
     color: var(--fontColorLight);
     width: 50%;
     margin-top: 0;
+}
+
+#instructor_key_dialog {
+    display: none;
+    width: 30%;
+    background-color: var(--formBackground);
+    color: var(--fontColorLight);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 5%;
+    align-items: center;
+    justify-content: center;
+    border-color: var(--fontColorLight);
+    border-width: 1px;
+    border-style:solid;
+    border-radius: 15px;
+}
+
+#instructor_key_dialog > h2 {
+    width: 100%;
+    margin: 0 0 5% 0;
+    text-align: center;
+}
+
+#instructor_key_dialog > input {
+    width: 60%;
+    margin: 0 20%;
+    text-align: center;
+    padding: 0;
+    border-radius: 7px;
+    border-style: none !important;
+    background-color: var(--inputBackgroundGrey);
+    color: var(--fontColorLight);
+    height: 32px;
+    font-size: large;
+}
+
+#instructor_key_dialog > input:focus {
+    outline: none;
+}
+
+#instructor_key_dialog > label {
+    width: 60%;
+    margin: 0 20%;
+    text-align: center;
+}
+
+#instructor_key_dialog > button {
+    width: 60%;
+    margin: 5% 20% 0 20%;
+    text-align: center;
+    border-color: transparent;
+    border-radius: 7px;
+    background-color: var(--lightBackground1);
+    color: var(--fontColorDark);
+    height: 34px;
+    font-size: larger;
+}
+
+#dialog_backdrop {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
 }

@@ -34,16 +34,27 @@ def get_welcome():
 @app.route('/auth/signup-with-email-and-password', methods=['POST'])
 @cross_origin()
 def signup_user():
-    fname = request.args.get("fname", default = -1, type = str)
-    lname = request.args.get("lname", default = -1, type = str)
-    email = request.args.get("email", default = -1, type = str)
-    password = request.args.get("password", default = -1, type = str)
+    fname = request.args.get("fname", default = "", type = str)
+    lname = request.args.get("lname", default = "", type = str)
+    email = request.args.get("email", default = "", type = str)
+    password = request.args.get("password", default = "", type = str)
+    account_type = request.args.get("accountType", default = 1, type = int)
+    instructor_key = request.args.get("instructorKey", default = "", type = str)
     try:
+        if(account_type == 1 and not firebase_auth.validate_instructor_key(instructor_key)):
+            raise fb_auth.InvalidInstructorKeyException
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
         print(signup_resp)
         response = app.response_class(
             response=json.dumps({'approved': True}),
             status=(200),
+            mimetype='application/json'
+        )
+        return response
+    except fb_auth.InvalidInstructorKeyException as iike:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Instructor Key Error'}),
+            status=(401),
             mimetype='application/json'
         )
         return response
@@ -55,12 +66,31 @@ def signup_user():
         )
         return response
     except Exception as e:
+        print(e)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Server Error'}),
             status=(500),
             mimetype='application/json'
         )
         return response
+    
+@app.route('/auth/validate-instructor-key', methods=['GET'])
+@cross_origin()
+def validate_instructor_key():
+    key = request.args.get("instructorKey", default = "", type = str)
+    if firebase_auth.validate_instructor_key(key):
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/auth/login-with-email-and-password', methods=['GET'])
 @cross_origin()

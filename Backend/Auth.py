@@ -1,6 +1,9 @@
 import requests
 import json
 
+class InvalidInstructorKeyException(Exception):
+    pass
+
 class FirebaseAuth:
 
     def __init__(self, auth, api_key) -> None:
@@ -55,3 +58,6 @@ class FirebaseAuth:
             return False
         uid = decoded_token['uid']
         return True
+    
+    def validate_instructor_key(self, provided_key):
+        return provided_key == 'D6B74'
