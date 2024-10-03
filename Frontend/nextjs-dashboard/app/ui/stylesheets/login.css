@@ -1,9 +1,5 @@
 @import url('./colors.css');
-
-body {
-    background-color: var(--pageBackground);
-    font-family: var(--regularFont);
-}
+@import url('./default.css');
 
 .login_form{
     background-color: var(--formBackground);
