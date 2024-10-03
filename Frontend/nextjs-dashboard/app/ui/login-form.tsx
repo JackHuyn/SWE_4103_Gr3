@@ -10,41 +10,51 @@ import { Button } from './button';
 
 
 function loginEmailUser(email, password) {
-  fetch("http://localhost:3001/auth/login-with-email-and-password?email=" + email + "&password=" + password,
-    {
-      method: 'GET',
-    }
-  ).then(response => {
-    if (!response.ok) {
-      if (response.status === 404) {
-        return {
-          text: "Server not found!",
-          status: "danger"
-        };
+    fetch("http://localhost:3001/auth/login-with-email-and-password?email=" + email + "&password=" + password,
+      {
+        method: 'GET',
       }
-
+    ).then(response => {
+      if (!response.ok) {
+        if (response.status === 404) {
+          return {
+            text: "Server not found!",
+            status: "danger"
+          };
+        }
+  
+        return response.text().then(text => {
+          return {
+            text: text,
+            status: "danger"
+          };
+        })
+      }
       return response.text().then(text => {
         return {
-          text: response.status + ": " + text,
-          status: "danger"
+          text: text,
+          status: "success"
         };
       })
-    }
-    return response.text().then(text => {
-      return {
-        text: text,
-        status: "success"
-      };
+    }).then(resp => {
+      try {
+        let r = JSON.parse(resp.text)
+        if(!r['approved'])
+          throw 'Invalid Email or Password'
+        const expires = new Date(Date.now() + 60 * 60 * 1000)
+        //console.log('Expiry date: ', expires.toDateString())
+        document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
+        document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
+        //console.log("Cookies: ", document.cookie)
+        window.location.href = "/"  
+      } catch(err) {
+        document.getElementById('login_error_span').style.display = 'block'
+        document.getElementById('login_error_span').innerText = err
+      }
+    }).catch((error) => {
+      document.getElementById('login_error_span').style.display = 'block'
+      document.getElementById('login_error_span').innerText = 'Server Error'
     })
-  }).then(resp => {
-    let r = JSON.parse(resp.text)
-    const expires = new Date(Date.now() + 60 * 60 * 1000)
-    console.log('Expiry date: ', expires.toDateString())
-    document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
-    document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
-    console.log("Cookies: ", document.cookie)
-    window.location.href = "/"
-  })
 }
 
 export default function LoginForm() {
@@ -53,10 +63,8 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget)
     const email = formData.get('email')
     const password = formData.get('password')
-    console.log("SIGN UP BUTTON PRESSED: " + password)
     if (password) // REPLACE PASSWORD LENGTH WITH PASSWORD CRITERIA CHECK
     {
-      console.log("LOGIN USER")
       loginEmailUser(email, password)
     }
   }
@@ -72,7 +80,7 @@ export default function LoginForm() {
         <form onSubmit={handleSubmit}>
           <div>
               <h1>Sign In</h1>
-            <span>Invalid Email or Password</span>
+            <span id="login_error_span">Invalid Email or Password</span>
             <div className="login_row">
               <div className="login_row_item left">
                 <input

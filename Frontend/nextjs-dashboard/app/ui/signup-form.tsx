@@ -9,9 +9,11 @@ import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
 
 
+let account_type = 0
+
 function signupNewEmailUser(fname, lname, email, password)
 {
-    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password,
+    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password+"&account_type="+account_type,
         {
             method: 'POST'
         }
@@ -39,20 +41,31 @@ function signupNewEmailUser(fname, lname, email, password)
         })
       }).then(resp => {
         console.log("result:", resp);
-        window.location.href = "/auth/login"
+        try {
+            let r = JSON.parse(resp.text)
+            if(!r['approved'])
+                throw r['reason']
+            window.location.href = "/auth/login"
+        } catch(err) {
+            document.getElementById('login_error_span').style.display = 'block'
+            document.getElementById('login_error_span').innerText = err
+        }
+      }).catch((error) => {
+        document.getElementById('login_error_span').style.display = 'block'
+        document.getElementById('login_error_span').innerText = 'Server Error'
       })
 }
 
   
-export default function SignupForm() {
-    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+export default function SignupForm() 
+{
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) 
+    {
         event.preventDefault()
-        console.log("TEST")
         const formData = new FormData(event.currentTarget)
         const email = formData.get('email')
         const passwordA = formData.get('passwordA')
         const passwordB = formData.get('passwordB')
-        console.log("SIGN UP BUTTON PRESSED: " + passwordA + " " + passwordB)
         if(passwordA == passwordB) // REPLACE PASSWORD LENGTH WITH PASSWORD CRITERIA CHECK
         {
             console.log("SIGN UP USER")
@@ -60,21 +73,30 @@ export default function SignupForm() {
             const lname = formData.get('lname')
             signupNewEmailUser(fname, lname, email, passwordA)
         }
+        else
+        {
+            document.getElementById('login_error_span').style.display = 'block'
+      document.getElementById('login_error_span').innerText = 'Passwords Do Not Match'
+        }
     }
 
-    async function redirectToLogin() {
+    async function redirectToLogin() 
+    {
         window.location.href="/auth/login"
     }
 
-    async function instructorTypeSelected() {
+    async function instructorTypeSelected() 
+    {
         document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
         document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
+        account_type = 1
     }
 
-    async function studentTypeSelected() {
-        console.log('student')
+    async function studentTypeSelected() 
+    {
         document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
         document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
+        account_type = 0
     }
 
     return (
@@ -84,6 +106,7 @@ export default function SignupForm() {
                 <form onSubmit={handleSubmit}>
                     <div>
                         <h1>Sign Up</h1>
+                        <span id="login_error_span">Err</span>
                         <div className="login_row">
                             <div className="login_row_item left">
                                 <label htmlFor="fname">First Name</label>
@@ -128,8 +151,8 @@ export default function SignupForm() {
                                     name="account_type"
                                 /> */}
                                 <div id="account_type_selector">
-                                    <button id="student_type_selector" onClick={studentTypeSelected}>student</button>
-                                    <button id="instructor_type_selector" onClick={instructorTypeSelected}>instructor</button>
+                                    <button id="student_type_selector" onClick={studentTypeSelected} type="button">student</button>
+                                    <button id="instructor_type_selector" onClick={instructorTypeSelected} type="button">instructor</button>
                                 </div>
                             </div>
                         </div>

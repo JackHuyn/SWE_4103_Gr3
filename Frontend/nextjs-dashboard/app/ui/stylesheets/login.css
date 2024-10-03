@@ -78,7 +78,7 @@ body {
     font-size: small;
 }
 
-.login_form form span {
+#login_error_span {
     font-size: large;
     color: var(--fontErrorColor);
     display: none;
@@ -121,18 +121,20 @@ input:-webkit-autofill:active{
 
 #student_type_selector {
     border-radius: 7px 0 0 7px;
-    background-color: var(--selectorItemSelected);
-    width: 50%;
-    margin-top: 0;
+    background-color: var(--selectorItemSelected) ;
 }
 
 #instructor_type_selector {
     border-radius: 0 7px 7px 0;
     background-color: var(--selectorItemNotSelected);
-    width: 50%;
-    margin-top: 0;
 }
 
 #account_type_selector {
     width: 100%;
+}
+
+#account_type_selector > button {
+    color: var(--fontColorLight);
+    width: 50%;
+    margin-top: 0;
 }
