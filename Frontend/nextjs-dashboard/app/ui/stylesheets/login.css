@@ -65,8 +65,9 @@ body {
     color: lightgrey;
 }
 
-.login_form form input:active {
-    border-color: transparent;
+.login_form form input:active,
+.login_form form input:focus {
+    outline: none;
 }
 
 .login_form form input:is(:-webkit-autofill :autofill){
