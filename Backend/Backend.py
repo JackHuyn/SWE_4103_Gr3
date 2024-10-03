@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
+from firebase import firebase
 import json
 import requests
 import Auth as fb_auth
+import Database as Database
 import os 
 
 app = Flask(__name__)
@@ -17,7 +19,9 @@ credFileName = "swe4103-7b261-firebase-adminsdk.json"
 dir_path = os.path.dirname(os.path.realpath(__file__))
 cred = credentials.Certificate(dir_path + "\\" + credFileName)
 firebase_admin.initialize_app(cred)
-##db = firestore.client()
+
+db = firestore.client()
+firebase = firebase.FirebaseApplication('https://SWE4103.firebaseio.com', None)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
@@ -55,6 +59,7 @@ def signup_user():
         )
         return response
     except Exception as e:
+        print(e)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Server Error'}),
             status=(500),
@@ -114,4 +119,17 @@ def logout_user():
 
 if __name__ == '__main__':
     print("Start")
+
+    # db = Database.Database(app)
+    # doc = db.collection('userdata').document('TEMPLATE').get()
+    # print(doc)
+    # docs = db.collection('userdata').stream()
+    # for doc in docs:
+    #     stock = doc.to_dict()
+    #     print(stock)
+    # doc_dict = doc.get().to_dict()
+    # print('User Template:')
+    # print(doc_dict)
+    print('db done')
+
     app.run(port=3001, debug=True)
