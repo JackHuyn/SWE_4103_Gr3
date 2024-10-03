@@ -121,8 +121,8 @@ if __name__ == '__main__':
     print("Start")
 
     # db = Database.Database(app)
-    # doc = db.collection('userdata').document('TEMPLATE').get()
-    # print(doc)
+    doc = db.collection('userdata').document('TEMPLATE').get()
+    print(doc.to_dict())
     # docs = db.collection('userdata').stream()
     # for doc in docs:
     #     stock = doc.to_dict()
