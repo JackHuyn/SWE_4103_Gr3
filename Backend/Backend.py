@@ -5,31 +5,31 @@ from firebase_admin import auth, credentials, firestore
 import json
 import requests
 import Auth as fb_auth
-import os
-
-# Get the directory where the current script is located
-script_directory = os.path.dirname(os.path.abspath(__file__))
-# Get the full path to the file
-file_name = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
-file_path = os.path.join(script_directory, file_name)
+import os 
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
+credFileName = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
 
-cred = credentials.Certificate(file_path)
+dir_path = os.path.dirname(os.path.realpath(__file__))
+cred = credentials.Certificate(dir_path + "\\" + credFileName)
 firebase_admin.initialize_app(cred)
-db = firestore.client()
+##db = firestore.client()
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
+@app.route('/', methods=['GET'])
+@cross_origin()
+def get_home():
+    return 'Welcome!'
 
 @app.route('/welcome', methods=['GET'])
 @cross_origin()
 def get_welcome():
-    return 'Welcome!'
+    return get_home()
 
 @app.route('/secure', methods=['GET'])
 @cross_origin()
@@ -91,34 +91,6 @@ def logout_user():
         mimetype='application/json'
     )
     return response
-
-# Jack Huynh _ Show courses
-@app.route('/auth/show_courses', methods= ["GET"])
-@cross_origin()
-def show_courses():
-    # get student id
-    student_id = request.args.get("studentId", default = -1, type = int)
-    print("id")
-    if not student_id:
-        return "Need student id"
-    try:  
-        student_ref = db.collection('student').document(student_id)
-        student_doc = student_ref.get()
-
-        if student_doc.exists:
-
-            student_data = student_doc.to_dict()
-            print("data")
-            courses = student_data.get('courses',[])
-
-            return "courses"
-        
-        else:
-            return "student data not found"
-        
-    except Exception as e:
-        return "error, student not found"
-            
     
 
 if __name__ == '__main__':
