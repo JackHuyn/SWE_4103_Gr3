@@ -92,7 +92,33 @@ def logout_user():
     )
     return response
     
+# Jack Huynh _ Show courses
+@app.route('/show_courses', methods= ["GET"])
+@cross_origin()
+def show_courses():
+    # get student id
+    student_id = request.args.get("studentId", default = -1, type = int)
+    print("id")
+    if not student_id:
+        return "Need student id"
+    try:  
+        student_ref = db.collection('student').document(student_id)
+        student_doc = student_ref.get()
 
+        if student_doc.exists:
+
+            student_data = student_doc.to_dict()
+            print("data")
+            courses = student_data.get('courses',[])
+
+            return "courses"
+        
+        else:
+            return "student data not found"
+        
+    except Exception as e:
+        return "error, student not found"
+    
 if __name__ == '__main__':
     print("Start")
     app.run(port=3001, debug=True)
