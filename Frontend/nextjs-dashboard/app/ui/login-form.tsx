@@ -74,38 +74,45 @@ export default function LoginForm() {
   }
 
   return (
-    <div>
-      <button id="auth_redirect_button" onClick={redirectToSignUp}>Sign Up</button>
+    <div className="page_wrapper">
       <div className="login_form">
         <form onSubmit={handleSubmit}>
           <div>
-              <h1>Sign In</h1>
+              <h1>Sign In.</h1>
             <span id="login_error_span">Invalid Email or Password</span>
             <div className="login_row">
               <div className="login_row_item left">
+                <p>email: </p>
                 <input
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="you@company.com"
                   required
                 />
               </div>
+              
               <div className="login_row_item right">
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  required
-                  minLength={6}
-                />
+                <p>password: </p>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    placeholder="●●●●●●●"
+                    required
+                    minLength={6}
+                  />
+                  
               </div>
+              <Button type="submit" id="login_button">Sign in</Button>
             </div>
-            <Button type="submit">Log in</Button>
           </div>
         </form>
+
       </div>
+      <button id="auth_redirect_button" onClick={redirectToSignUp}>Sign Up</button>
     </div>
+    
+
   );
 }

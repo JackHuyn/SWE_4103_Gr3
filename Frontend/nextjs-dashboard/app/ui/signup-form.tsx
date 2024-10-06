@@ -216,7 +216,7 @@ export default function SignupForm()
                                 <div id="account_type_selector">
                                     <button id="student_type_selector" onClick={studentTypeSelected} type="button">student</button>
                                     <button id="instructor_type_selector" onClick={instructorTypeSelected} type="button">instructor</button>
-                                </div>
+                                </div>.
                             </div>
                         </div>
                         <div className="login_row">

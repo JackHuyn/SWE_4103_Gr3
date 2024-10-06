@@ -52,6 +52,7 @@ def signup_user():
         )
         return response
     except fb_auth.InvalidInstructorKeyException as iike:
+        print(iike)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Instructor Key Error'}),
             status=(401),

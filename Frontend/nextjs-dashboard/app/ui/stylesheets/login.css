@@ -1,54 +1,99 @@
 @import url('./colors.css');
 @import url('./default.css');
 
-.login_form{
-    background-color: var(--formBackground);
+
+
+.page_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure the wrapper takes the full viewport height */
+    margin: 0;
+    padding: 0;
+}
+
+.login_form {
+
     color: var(--fontColorLight);
-    margin: auto;
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+    height:100vh;
+    padding: 20px;
+
 }
 
 .login_form form {
     display: flex;
     justify-content: center;
-    padding: 10%;
+    text-align: center;
+    width:100%; 
+       
+}
+
+.login_form h1{
+    font-size:50px;
+
 }
 
 .login_row {
-    display: inline-block;
-    margin-bottom: 1%;
-    width: 90%;
+    display: flex;
+    flex-direction: column;
+    width:40vh;
+    margin-bottom: 10%;
+    min-width:400px;
+
 }
 
 .login_row_item {
     display: inline-block;
-    margin: 1% 0 0 0;
+    margin: 5% 0 0 0;
+    width:100%;
+
 }
 
-.left {
-    float: left;
-    width: 45%;
-}
-
-.right {
-    float: right;
-    width: 45%;
+.login_row_item p{
+    margin: 5px;
+    text-align: left;
+    font-family: Jura;
+    
 }
 
 .login_form form input {
     border-radius: 7px;
     border-style: none !important;
     background-color: var(--inputBackgroundGrey);
-    color: white;
-    width: 95%;
-    height: 32px;
-    padding-left: 5%;
+    color: var(--fontColorDark);
+    width: 100%;
+    height: 40px;
+    padding-left:6%;
     font-size: large;
+    font-family: "Jura";
+    box-sizing: border-box; /* fixes literally everything */
+    
 }
+
+.right{
+    width:100%;
+}
+
+#login_button{
+    background-color: rgb(183, 132, 251);
+    font-family: "Jura";
+    font-weight: bolder;
+    min-width: 400px;
+    margin-top:10px;
+    color:white;
+    height:42px;
+    font-size:medium;
+} 
+
+#login_button:hover{
+    background-color: rgb(166, 102, 249);
+}
+
+
 
 .login_form form input[type=password]:not(:placeholder-shown){
     font-family: caption;
@@ -58,12 +103,13 @@
 }
 
 .login_form form input::placeholder {
-    color: lightgrey;
+    color: rgb(182, 182, 182);
 }
 
 .login_form form input:active,
 .login_form form input:focus {
     outline: none;
+    color:#121212;
 }
 
 .login_form form input:is(:-webkit-autofill :autofill){
@@ -92,26 +138,34 @@
     margin-top: 2%;
 }
 
+
+
+
 #auth_redirect_button{
-    position: fixed;
-    top: 2.5%;
-    right: 2.5%;
-    padding: 1% 2.5%;
-    border-radius: 20px;
+    position: absolute;
+    top:1.5%;
+    right:1.0%;
+    padding: 0.5% 1.5%;
+    border-radius:10px;
+    font-family: Jura;
     border-color: transparent;
     background-color: var(--lightBackground1);
     font-size: large;
     color: var(--fontColorDark)
 }
 
+#auth_redirect_button:hover{
+    background-color: var(--lightBackground2);
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active{
-    -webkit-text-fill-color: var(--fontColorLight);
+    -webkit-text-fill-color: var(--fontColorDark);
     -webkit-background-clip: text;
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 20px 20px var(--inputBackgroundGreyAutofill);
+    box-shadow: inset 0 0 20px 20px #fff;
     font-size: large !important;
     font-family: var(--regularFont) !important;
 }
@@ -202,3 +256,4 @@ input:-webkit-autofill:active{
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
 }
+
