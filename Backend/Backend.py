@@ -6,6 +6,7 @@ import json
 import requests
 import Auth as fb_auth
 import os 
+from testList import student_list
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -93,28 +94,33 @@ def logout_user():
     return response
     
 # Jack Huynh _ Show courses
-@app.route('/show_courses', methods= ["GET"])
+@app.route('/students/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
     # get student id
     student_id = request.args.get("studentId", default = -1, type = int)
     print("id")
-    if not student_id:
+    if student_id == -1:
         return "Need student id"
     try:  
-        student_ref = db.collection('student').document(student_id)
-        student_doc = student_ref.get()
+        # student_ref = db.collection('student').document(student_id)
+        # student_doc = student_ref.get()
+        # Find student in the doubly linked list
 
-        if student_doc.exists:
-
-            student_data = student_doc.to_dict()
-            print("data")
-            courses = student_data.get('courses',[])
-
-            return "courses"
-        
+        # if student_doc.exists:
+        #     student_data = student_doc.to_dict()
+        #     print("data")
+        #     courses = student_data.get('courses',[])
+        #     return "courses"
+        # else:
+        #     return "student data not found"
+        student_node = student_list.find_student(student_id)
+        if student_node:
+            courses = student_node.courses
+            print("Courses:", courses)
+            return jsonify({"studentId": student_id, "courses": courses}), 200
         else:
-            return "student data not found"
+            return "Student data not found", 404
         
     except Exception as e:
         return "error, student not found"
