@@ -5,7 +5,7 @@ import '@/app/ui/stylesheets/login.css'
 import {redirect} from 'next/navigation'
 import { cookies } from 'next/headers';
 
-function validate_token()
+async function validate_token()
 {
     let getCookieValue = (cookies, name) =>
         {
