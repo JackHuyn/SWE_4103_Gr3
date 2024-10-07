@@ -79,7 +79,7 @@
 }
 
 #login_button{
-    background-color: rgb(183, 132, 251);
+    background-color: var(--secondaryColor);
     font-family: "Jura";
     font-weight: bolder;
     min-width: 400px;
@@ -90,7 +90,7 @@
 } 
 
 #login_button:hover{
-    background-color: rgb(166, 102, 249);
+    background-color: var(--secondaryColorHover);
 }
 
 

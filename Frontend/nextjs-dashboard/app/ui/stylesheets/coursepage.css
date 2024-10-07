@@ -1,0 +1,144 @@
+@import url('./colors.css');
+@import url('./default.css');
+@import url('./fonts.css');
+
+
+.page_wrapper {
+    justify-content: center;  
+    align-items: center;
+    min-height: 100vh; /* Ensure the wrapper takes the full viewport height */
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center; /* Vertically center all items */
+    justify-content: space-between; /* Space between the sections */
+    margin-top: 10%;
+    height: 10vh;
+    padding: 0 5%;
+}
+
+.header_left {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adds space between the toggle button and the title */
+}
+
+h1 {
+    font-family: Jura;
+    margin: 0; /* Remove margin to keep it aligned with the button */
+}
+
+.addCourse {
+    border: none;
+    background-color: var(--secondaryColor);
+    color: white;
+    font-size: 30px;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    border-radius: 5px;
+    font-family: Jura;
+    width: 50px;
+    height: 50px; /* Adjusted height to make it more balanced */
+    cursor: pointer;
+    line-height: 0; /* Ensures the text isn't pushed down */
+}
+
+
+
+.coursepage{
+    margin-top: 2%;
+    background-color: #35353547;
+    backdrop-filter: blur(8px);
+    border-radius:30px;
+    margin-left:10%;
+    margin-right:10%;
+    min-height:80px;
+}
+
+.courses {
+    color: var(--fontColorLight);
+    display: grid;
+    width: 70%; 
+    height: 100vh;
+    padding: 20px;
+    margin: 10% auto; /* Center the grid horizontally */
+    grid-template-columns: 33% 33% 33%;
+    grid-template-rows: 33% 33% 33%;
+    justify-content: center; /* Aligns grid items in the center */
+}
+
+@media screen and (max-width:900px){
+    .courses{
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 33% 33% 33%;
+    }
+}
+
+
+.toggleCourses{
+    background: none;
+    border: none;
+    color:white;
+    margin-top: 0.5%;
+    cursor:pointer;
+}
+
+.addCourse:hover{
+    background-color: var(--secondaryColorHover);
+}
+
+.course{
+    min-width:100px;    
+
+    border: none;
+    background-color: #5b5b5b;
+    margin:10%;
+    border-radius: 20px;
+    color:white;
+    font-size:30px;
+    cursor:pointer;
+}
+
+.course:hover{
+    background-color: #525252;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.636); /* Semi-transparent background */
+  }
+  
+  .popup_content {
+    background-color: #121212;
+    height:30%;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-family:jura;
+  }
+  
+  .popup_button {
+    margin: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5b5b5b;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .popup_button:hover {
+    background-color: #525252;
+  }
+  

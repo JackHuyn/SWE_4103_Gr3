@@ -36,6 +36,8 @@ function loginEmailUser(email, password) {
           status: "success"
         };
       })
+
+
     }).then(resp => {
       try {
         let r = JSON.parse(resp.text)
@@ -46,7 +48,7 @@ function loginEmailUser(email, password) {
         document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
         document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
         //console.log("Cookies: ", document.cookie)
-        window.location.href = "/"  
+        window.location.href = "/auth/courses"  
       } catch(err) {
         document.getElementById('login_error_span').style.display = 'block'
         document.getElementById('login_error_span').innerText = err
