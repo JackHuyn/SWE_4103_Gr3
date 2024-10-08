@@ -8,15 +8,19 @@ import Auth as fb_auth
 import os 
 from testList import student_list
 
+
+# Get the directory where the current script is located
+script_directory = os.path.dirname(os.path.abspath(__file__))
+# Get the full path to the file
+file_name = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
+file_path = os.path.join(script_directory, file_name)
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
-credFileName = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(dir_path + "\\" + credFileName)
+cred = credentials.Certificate(file_path)
 firebase_admin.initialize_app(cred)
 ##db = firestore.client()
 
@@ -105,7 +109,6 @@ def show_courses():
     try:  
         # student_ref = db.collection('student').document(student_id)
         # student_doc = student_ref.get()
-        # Find student in the doubly linked list
 
         # if student_doc.exists:
         #     student_data = student_doc.to_dict()
@@ -114,6 +117,7 @@ def show_courses():
         #     return "courses"
         # else:
         #     return "student data not found"
+
         student_node = student_list.find_student(student_id)
         if student_node:
             courses = student_node.courses
