@@ -20,8 +20,10 @@ function signupNewEmailUser(fname, lname, email, password)
         }
     ).then(response => {
         if (!response.ok) {
+            alert("404 something went wrong here")
             if (response.status === 404) {
                 return {
+                    
                     text: "Server not found!",
                     status: "danger"
                 };
@@ -95,6 +97,7 @@ async function validateInstructorKey(key) {
             document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
             document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
             account_type = 1
+            //alert("we are ok the instructor key has been accepted ? ")
         } catch(err) {
             document.getElementById('instructor_key_error').style.display = 'block'
             document.getElementById('instructor_key_error').innerText = err
