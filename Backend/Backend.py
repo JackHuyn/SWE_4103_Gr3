@@ -12,7 +12,7 @@ from testList import student_list
 # Get the directory where the current script is located
 script_directory = os.path.dirname(os.path.abspath(__file__))
 # Get the full path to the file
-file_name = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
+file_name = "swe4103-7b261-firebase-adminsdk.json"
 file_path = os.path.join(script_directory, file_name)
 
 app = Flask(__name__)
