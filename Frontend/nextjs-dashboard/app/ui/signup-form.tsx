@@ -3,7 +3,7 @@ import {
     KeyIcon,
     ExclamationCircleIcon,
   } from '@heroicons/react/24/outline';
-import '@/app/ui/stylesheets/login.css'
+import '@/app/ui/stylesheets/signup.css'
 import { FormEvent } from 'react'
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
@@ -172,23 +172,23 @@ export default function SignupForm()
                         <span id="login_error_span">Err</span>
                         <div className="login_row">
                             <div className="login_row_item left">
-                                <label htmlFor="fname" className='input_label'>First Name</label>
+                                <label htmlFor="fname" className='input_label'>first name</label>
                                 <input
                                     id="fname"
                                     type="text"
                                     name="fname"
-                                    placeholder="First Name"
+                                    placeholder=""
                                     // onChange={(event) => fname = event.target.value}
                                     required
                                 />
                             </div>
                             <div className="login_row_item right">
-                                <label htmlFor="fname" className='input_label'>Last Name</label>
+                                <label htmlFor="fname" className='input_label'>last name</label>
                                 <input
                                     id="lname"
                                     type="text"
                                     name="lname"
-                                    placeholder="Last Name"
+                                    placeholder=""
                                     // onChange={(event) => lname = event.target.value}
                                     required
                                 />
@@ -196,12 +196,12 @@ export default function SignupForm()
                         </div>
                         <div className="login_row">
                             <div className="login_row_item left">
-                                <label htmlFor="email" className='input_label'>Email</label>
+                                <label htmlFor="email" className='input_label'>email</label>
                                 <input
                                     id="email"
                                     type="email"
                                     name="email"
-                                    placeholder="Email"
+                                    placeholder="you@company.com"
                                     // onChange={(event) => email = event.target.value}
                                     required
                                 />
@@ -216,36 +216,36 @@ export default function SignupForm()
                                 <div id="account_type_selector">
                                     <button id="student_type_selector" onClick={studentTypeSelected} type="button">student</button>
                                     <button id="instructor_type_selector" onClick={instructorTypeSelected} type="button">instructor</button>
-                                </div>.
+                                </div>
                             </div>
                         </div>
                         <div className="login_row">
                             <div className="login_row_item left">
-                                <label htmlFor="passwordA" className='input_label'>Password</label>
+                                <label htmlFor="passwordA" className='input_label'>password</label>
                                 <input
                                     id="passwordA"
                                     type="password"
                                     name="passwordA"
-                                    placeholder="Password"
+                                    placeholder="●●●●●●●"
                                     // onChange={(event) => passwordA = event.target.value}
                                     required
                                     minLength={6}
                                 />
                             </div>
                             <div className="login_row_item right">
-                                <label htmlFor="passwordB" className='input_label'>Confirm Password</label>
+                                <label htmlFor="passwordB" className='input_label'>confirm password</label>
                                 <input
                                     id="passwordB"
                                     type="password"
                                     name="passwordB"
-                                    placeholder="Confirm password"
+                                    placeholder="●●●●●●●"
                                     // onChange={(event) => passwordB = event.target.value}
                                     required
                                     minLength={6}
                                 />
                             </div>
                         </div>
-                        <Button type="submit">Sign Up</Button>
+                        <Button id = "signup_button" type="submit">Sign Up</Button>
                     </div>
                 </form>
             </div>

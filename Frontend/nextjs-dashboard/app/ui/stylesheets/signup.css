@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300;400;700&display=swap');
+@import url('./colors.css');
+@import url('./default.css');
+
+
+body {
+    font-family: 'Jura', sans-serif;
+    color: #ffffff;
+    
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #0a0a0a, #1c1c1c);
+    position: relative;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+    margin-bottom: 0.7rem;
+    color: #ffffff;
+    font-family: "Julius Sans one"
+}
+
+.subheading {
+    font-size: 1.2rem;
+    color: #bbbbbb;
+    margin-bottom: 3rem;
+}
+
+.login_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.login_form form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.login_row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.login_row_item {
+    width: 48%;
+}
+
+.login_row_item label {
+    display: block;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #bbbbbb;
+    margin-bottom: 0.3rem;
+}
+
+.login_row_item input {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: #333333;
+    color: white;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.login_form form input::placeholder {
+    color: #bbbbbb;
+    font-family: Jura;
+}
+#login_error_span {
+    font-size: large;
+    color: var(--fontErrorColor);
+    display: none;
+}
+
+#login_button {
+    background-color: #6c63ff;
+    font-family: 'Jura', sans-serif;
+    font-weight: bolder;
+    width: 100%;
+    height: 42px;
+    font-size: large;
+    color: white;
+    margin-top: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#login_button:hover {
+    background-color: #5753e6;
+}
+
+#auth_redirect_button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    font-size: large;
+    color: #333;
+    cursor: pointer;
+    border: none;
+}
+
+#auth_redirect_button:hover {
+    background-color: #dddddd;
+}
+
+#account_type_selector {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#student_type_selector, #instructor_type_selector {
+    width: 50%;
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: 'Jura', sans-serif;
+}
+
+#student_type_selector {
+    background-color: #9c88ff;
+    color: white;
+}
+
+#instructor_type_selector {
+    background-color: #ff7675;
+    color: white;
+}
+
+#student_type_selector:hover, #instructor_type_selector:hover {
+    opacity: 0.85;
+}
+
+/* Dialog styles */
+#dialog_backdrop {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+#instructor_key_dialog {
+    display: none;
+    width: 30%;
+    background-color: var(--formBackground);
+    color: var(--fontColorLight);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 5%;
+    text-align: center;
+    z-index: 11;
+    border-radius: 10px;
+    border: 1px solid var(--fontColorLight);
+}
+
+#instructor_key_dialog input {
+    width: 80%;
+    margin: 10px auto;
+    border-radius: 7px;
+    border: none;
+    background-color: #333333;
+    color: white;
+    height: 40px;
+    font-size: 1rem;
+    padding: 0 10px;
+}
+
+#instructor_key_dialog button {
+    width: 50%;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    font-size: large;
+    color: #333;
+    cursor: pointer;
+    border: none;
+}
+
+#instructor_key_dialog button:hover {
+    background-color: #dddddd;
+}
+
+#signup_button{
+    width: 100%;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    font-size: large;
+    color: #333;
+    cursor: pointer;
+    border: none;
+}
