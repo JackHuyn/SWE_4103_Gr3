@@ -11,6 +11,7 @@ export default function Courses() {
                 const res = await fetch('http://localhost:3001/students/courses?studentId=3713652');
                 if (!res.ok) {
                     throw new Error('Failed to fetch data');
+                   
                 }
                 const result = await res.json();
                 setData(result);
