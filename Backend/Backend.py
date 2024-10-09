@@ -107,7 +107,7 @@ def logout_user():
 def show_courses():
     # get student id from the current login
     # student_id = request.args.get("studentId", default = -1, type = int)
-    student_id = 3713652
+    student_id = 3708644
     # handle wrong student id case
     if student_id == -1:
         response = app.response_class(
@@ -119,11 +119,16 @@ def show_courses():
     try:  
         # get student data
         # Add courses to test
+        dbWrapper.addUser(1,"test@unb.ca","Test","Account","3708644")
+        dbWrapper.addUser(1,"test@unb.ca","Test","Account","3713653")
         print("Adding courses for student:", student_id)
-        dbWrapper.addStudentToCourse("3713652", "TestCourse")
+        dbWrapper.addStudentToCourse("3708644", "TestCourse")
+        dbWrapper.addStudentToCourse("3708644", "TestCourse2")
+        dbWrapper.addStudentToCourse("3708644", "TestCourse3")
+        dbWrapper.addStudentToCourse("3713653", "TestCourse4")
+        dbWrapper.addStudentToCourse("3713653", "TestCourse2")
+        dbWrapper.addStudentToCourse("3713653", "TestCourse2")
         dbWrapper.addStudentToCourse("3713652", "TestCourse2")
-        dbWrapper.addStudentToCourse("3713652", "TestCourse3")
-        dbWrapper.addStudentToCourse("3713652", "TestCourse4")
 
         # Fetch student courses
         print("Fetching courses for student:", student_id)
