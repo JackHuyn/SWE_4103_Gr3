@@ -8,6 +8,8 @@ import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
 import {useState} from 'react'
 
+
+//Author: Raphael Ferreira
 export default function FileUpload() {
     const [file,setFile] = useState<File>()
 
@@ -20,7 +22,8 @@ export default function FileUpload() {
             alert('fileUpload of nextjs')
             const data = new FormData()
             data.set('file',file)
-
+            
+            //Posts the uploaded file to the backend
             const res = await fetch('http://localhost:3001/upload_file',{
                 method:'POST',
                 body:data

@@ -187,7 +187,7 @@ def upload():
 
         )
 
-        #return response  
+        return response  
        # return render_template('upload.html') 
     
     else:
@@ -209,7 +209,7 @@ def upload():
             mimetype='application/json'
         )
 
-       # return response
+        return response
         #return render_template('upload.html') 
 
     if file and fp.allowed_file(file.filename):
@@ -219,7 +219,7 @@ def upload():
             status = 200,
             mimetype = 'application/json'
         )
-        #return response
+        return response
     #return render_template('upload.html') 
 
     
