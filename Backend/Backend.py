@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, redirect, url_for
+from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import file_upload as fp
 import firebase_admin
@@ -8,46 +8,24 @@ import requests
 import Auth as fb_auth
 import os 
 from DbWrapper.DbWrapper import DbWrapper
-
-
-# app = Flask(__name__)
-# cors = CORS(app)
-# app.config['CORS_HEADERS'] = 'Content-Type'
-
-# FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
-# credFileName = "swe4103-7b261-firebase-adminsdk.json"
-
-# dir_path = os.path.dirname(os.path.realpath(__file__))
-# #cred = credentials.Certificate(dir_path + "\\" + credFileName)
-# firebase_admin.initialize_app(cred)
-##db = firestore.client()
-
-
-
-# Get the directory where the current script is located
-script_directory = os.path.dirname(os.path.abspath(__file__))
-# Get the full path to the file
-file_name = "swe4103-7b261-firebase-adminsdk.json"
-file_path = os.path.join(script_directory, file_name)
-
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
-<<<<<<< HEAD
-cred = credentials.Certificate(file_path)
-firebase_admin.initialize_app(cred)
-=======
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
+# Get the directory where the current script is located
+dir_path = os.path.dirname(os.path.abspath(__file__))
+# Get the full path to the file
+file_path = os.path.join(dir_path, credFileName)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(dir_path + "\\" + credFileName)
+
+
+
+cred = credentials.Certificate(file_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 dbWrapper = DbWrapper(db)
->>>>>>> main
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
@@ -175,17 +153,6 @@ def logout_user():
     return response
 
 
-'''ALLOWED_EXTENSIONS = set(['csv'])
-
-def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
-
-def save_file(file):
-    file.save(os.path.join('Uploads',file.filename))'''
-    
-
-
 #Author: Raphael Ferreira
 #Handles routing for file uploads 
 @app.route('/upload_file', methods=['GET','POST'])
@@ -200,7 +167,7 @@ def upload():
         )
 
         return response  
-       # return render_template('upload.html') 
+       
     
     else:
         file = request.files['file']
@@ -213,7 +180,7 @@ def upload():
 
         )
 
-    #need to revisit what the following code snippet should do
+    
     if file.filename == '':
         response = app.response_class(
             response = json.dumps({'approved': False}),
@@ -222,7 +189,7 @@ def upload():
         )
 
         return response
-        #return render_template('upload.html') 
+        
 
     if file and fp.allowed_file(file.filename):
         fp.save_file(file)
@@ -232,7 +199,7 @@ def upload():
             mimetype = 'application/json'
         )
         return response
-    #return render_template('upload.html') 
+    
 
     
     
