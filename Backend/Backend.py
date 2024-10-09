@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
-import file_upload as fp
+import FileUpload as fp
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
