@@ -18,14 +18,14 @@ file_path = os.path.join(script_directory, file_name)
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
+app.config['CORS_HEADERS'] = 'Content-Type'
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 
 cred = credentials.Certificate(file_path)
 firebase_admin.initialize_app(cred)
-db = firestore.client()
 
+db = firestore.client()
 dbWrapper = DbWrapper(db)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
@@ -120,6 +120,7 @@ def show_courses():
         # get student data
         student_ref = db.collection('student').document(student_id)
         student_doc = student_ref.get()
+
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
@@ -128,15 +129,18 @@ def show_courses():
 
         # if data exist?
         if student_doc.exists:
+            # get data by convert to python dictionary
             student_data = student_doc.to_dict()
 
+            # Convert dictionary to JSON for dictionary
             response = app.response_class(
-              response=json.dumps({'approved':True, 'data': "Exist"}),
-              status = 200,
-              mimetype='applicaion/json'
-              )
-            print("data")
-            courses = student_data.get('courses',[])
+                response=json.dumps({
+                    'approved': True,
+                    'courses': student_data.get('courses', [])
+                }),
+                status=200,
+                mimetype='application/json'
+            )
             return response
         else:
             # handle no data exist
@@ -144,7 +148,7 @@ def show_courses():
               response=json.dumps({'approved':False, 'reason':'No data found'}),
               status = 401,
               mimetype='applicaion/json'
-              )
+            )
             return response
 
         # student_node = student_list.find_student(student_id)
@@ -157,9 +161,9 @@ def show_courses():
         
     except Exception as e:
         response = app.response_class(
-                response=json.dumps({'approved':False, 'reason': 'invalid id'}),
-                status = 500,
-                mimetype='applicaion/json'
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
         )
         return response
     
