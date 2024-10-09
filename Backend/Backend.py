@@ -111,17 +111,17 @@ def show_courses():
     # handle wrong student id case
     if student_id == -1:
         response = app.response_class(
-            response=json.dumps({}),
+            response=json.dumps({'id': 'invalid'}),
             status = 401,
             mimetype='applicaion/json'
         )
-        return "Need student id"
+        return response
     try:  
         # get student data
         student_ref = db.collection('student').document(student_id)
         student_doc = student_ref.get()
         response = app.response_class(
-            response=json.dumps({'approved': True}),
+            response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
             mimetype='applicaion/json'
         )
@@ -131,14 +131,13 @@ def show_courses():
             student_data = student_doc.to_dict()
 
             response = app.response_class(
-              response=json.dumps({'approved':True}),
+              response=json.dumps({'approved':True, 'data': "Exist"}),
               status = 200,
               mimetype='applicaion/json'
               )
             print("data")
-
             courses = student_data.get('courses',[])
-            return "courses"
+            return response
         else:
             # handle no data exist
             response = app.response_class(
@@ -146,7 +145,7 @@ def show_courses():
               status = 401,
               mimetype='applicaion/json'
               )
-            return "student data not found"
+            return response
 
         # student_node = student_list.find_student(student_id)
         # if student_node:
@@ -158,11 +157,11 @@ def show_courses():
         
     except Exception as e:
         response = app.response_class(
-                response=json.dumps({'approved':False}),
+                response=json.dumps({'approved':False, 'reason': 'invalid id'}),
                 status = 500,
                 mimetype='applicaion/json'
         )
-        return "error, student not found"
+        return response
     
 if __name__ == '__main__':
     print("Start")
