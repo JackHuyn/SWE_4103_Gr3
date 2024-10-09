@@ -7,6 +7,7 @@ import json
 import requests
 import Auth as fb_auth
 import os 
+from DbWrapper.DbWrapper import DbWrapper
 
 
 # app = Flask(__name__)
@@ -34,8 +35,19 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
+<<<<<<< HEAD
 cred = credentials.Certificate(file_path)
 firebase_admin.initialize_app(cred)
+=======
+credFileName = "swe4103-7b261-firebase-adminsdk.json"
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+cred = credentials.Certificate(dir_path + "\\" + credFileName)
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+dbWrapper = DbWrapper(db)
+>>>>>>> main
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
