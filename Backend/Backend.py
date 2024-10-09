@@ -100,7 +100,7 @@ def logout_user():
         mimetype='application/json'
     )
     return response
-    
+
 # Jack Huynh _ Show courses
 @app.route('/students/courses', methods= ["GET"])
 @cross_origin()
@@ -118,10 +118,19 @@ def show_courses():
         return response
     try:  
         # get student data
-        print(student_id)
+        # Add courses to test
+        print("Adding courses for student:", student_id)
+        dbWrapper.addStudentToCourse("3713652", "TestCourse")
+        dbWrapper.addStudentToCourse("3713652", "TestCourse2")
+        dbWrapper.addStudentToCourse("3713652", "TestCourse3")
+        dbWrapper.addStudentToCourse("3713652", "TestCourse4")
+
+        # Fetch student courses
+        print("Fetching courses for student:", student_id)
         student_data = dbWrapper.getStudentCourses(student_id)
-        print("pass getting data")
-        print(student_data)
+
+        # Debug output
+        print("Student data retrieved:", student_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,

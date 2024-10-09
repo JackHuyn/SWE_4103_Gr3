@@ -8,7 +8,7 @@ export default function Courses() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch('http://localhost:3001/students/courses?studentId=3713652');
+                const res = await fetch('http://localhost:3001/students/courses');
                 if (!res.ok) {
                     throw new Error('Failed to fetch data');
                    
