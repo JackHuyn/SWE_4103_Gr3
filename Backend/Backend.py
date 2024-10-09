@@ -105,17 +105,37 @@ def show_courses():
     student_id = request.args.get("studentId", default = -1, type = int)
     print("id")
     if student_id == -1:
+        response = app.response_class(
+            response=json.dumps({}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
         return "Need student id"
     try:  
         # student_ref = db.collection('student').document(student_id)
         # student_doc = student_ref.get()
+        # response = app.response_class(
+        #     response=json.dumps({'approved': True}),
+        #     status = 200,
+        #     mimetype='applicaion/json'
+        # )
 
         # if student_doc.exists:
         #     student_data = student_doc.to_dict()
+        #     response = app.response_class(
+        #       response=json.dumps({'approved':True}),
+        #       status = 200,
+        #       mimetype='applicaion/json'
+        #       )
         #     print("data")
         #     courses = student_data.get('courses',[])
         #     return "courses"
         # else:
+        #     response = app.response_class(
+    #           response=json.dumps({'approved':False, 'reason':'No data found'}),
+        #       status = 401,
+        #       mimetype='applicaion/json'
+        #       )
         #     return "student data not found"
 
         student_node = student_list.find_student(student_id)
@@ -127,6 +147,11 @@ def show_courses():
             return "Student data not found", 404
         
     except Exception as e:
+        response = app.response_class(
+                response=json.dumps({'approved':False}),
+                status = 500,
+                mimetype='applicaion/json'
+        )
         return "error, student not found"
     
 if __name__ == '__main__':
