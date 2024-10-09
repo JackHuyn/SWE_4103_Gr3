@@ -48,6 +48,7 @@ class DbWrapper:
         template["first_name"] = first_name
         template["last_name"] = last_name
         template["uid"] = uid
+        template["github_personal_access_token"] = github_personal_access_token
         self.db.collection(USERS).document(uid).set(template)
         return True
     def addStudentToCourse(self, student_id:str, course_id:str) -> bool:
