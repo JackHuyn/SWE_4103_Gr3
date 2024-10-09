@@ -41,3 +41,5 @@ Note:   status - 0 is active, 1 is archived (0 is default)
 Note:   accType - 0 is student, 1 is a prof
         uid - Derived from Authentication
         github_personal_access_token - Optional for now. May become mandatory in future sprints. (Default is empty string)
+
+`removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
