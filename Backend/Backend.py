@@ -7,7 +7,7 @@ import requests
 import Auth as fb_auth
 import os 
 from DbWrapper.DbWrapper import DbWrapper
-from testList import student_list
+
 
 
 # Get the directory where the current script is located
@@ -105,22 +105,23 @@ def logout_user():
 @app.route('/students/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
-    # get student id
-    student_id = request.args.get("studentId", default = -1, type = int)
-
+    # get student id from the current login
+    # student_id = request.args.get("studentId", default = -1, type = int)
+    student_id = 3713652
     # handle wrong student id case
     if student_id == -1:
         response = app.response_class(
-            response=json.dumps({'id': 'invalid'}),
+            response=json.dumps({'error': 'No/wrong id'}),
             status = 401,
             mimetype='applicaion/json'
         )
         return response
     try:  
         # get student data
-        student_ref = db.collection('student').document(student_id)
-        student_doc = student_ref.get()
-
+        print(student_id)
+        student_data = dbWrapper.getStudentCourses(student_id)
+        print("pass getting data")
+        print(student_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
@@ -128,15 +129,13 @@ def show_courses():
         )
 
         # if data exist?
-        if student_doc.exists:
-            # get data by convert to python dictionary
-            student_data = student_doc.to_dict()
-
-            # Convert dictionary to JSON for dictionary
+        if student_data:
+            # Convert dictionary to JSON for frontend use
+            print("converting")
             response = app.response_class(
                 response=json.dumps({
                     'approved': True,
-                    'courses': student_data.get('courses', [])
+                    'courses': student_data
                 }),
                 status=200,
                 mimetype='application/json'
@@ -144,21 +143,14 @@ def show_courses():
             return response
         else:
             # handle no data exist
+            print("no data")
             response = app.response_class(
               response=json.dumps({'approved':False, 'reason':'No data found'}),
               status = 401,
               mimetype='applicaion/json'
             )
             return response
-
-        # student_node = student_list.find_student(student_id)
-        # if student_node:
-        #     courses = student_node.courses
-        #     print("Courses:", courses)
-        #     return jsonify({"studentId": student_id, "courses": courses}), 200
-        # else:
-        #     return "Student data not found", 404
-        
+    # error
     except Exception as e:
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
