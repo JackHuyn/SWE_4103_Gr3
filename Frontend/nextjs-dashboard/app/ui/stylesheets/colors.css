@@ -1,9 +1,16 @@
 :root{
     --regularFont: century-gothic, sans-serif;
 
-    --fontColor: white;
+    --fontColorLight: white;
+    --fontColorDark: #111;
     --fontErrorColor: red;
 
-    --pageBackground: black;
-    --formBackground: darkgreen;
+    --inputBackgroundGrey: #707070;
+    --inputBackgroundGreyAutofill: #909090;
+    --selectorItemSelected: #2440EE;
+    --selectorItemNotSelected: var(--inputBackgroundGrey);
+
+    --lightBackground1: #d9d9d9;
+    --pageBackground: #222;
+    --formBackground: #444;
 }

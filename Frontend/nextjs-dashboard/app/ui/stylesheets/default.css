@@ -1,0 +1,5 @@
+body {
+    background-color: var(--pageBackground);
+    font-family: var(--regularFont);
+    color: var(--fontColorLight)
+}

@@ -5,31 +5,40 @@ from firebase_admin import auth, credentials, firestore
 import json
 import requests
 import Auth as fb_auth
-import os
+import os 
+from DbWrapper.DbWrapper import DbWrapper
+
+
 
 # Get the directory where the current script is located
 script_directory = os.path.dirname(os.path.abspath(__file__))
 # Get the full path to the file
-file_name = "swe4103-7b261-firebase-adminsdk-7nzkx-e88172454d.json"
+file_name = "swe4103-7b261-firebase-adminsdk.json"
 file_path = os.path.join(script_directory, file_name)
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
+app.config['CORS_HEADERS'] = 'Content-Type'
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 
 cred = credentials.Certificate(file_path)
 firebase_admin.initialize_app(cred)
+
 db = firestore.client()
+dbWrapper = DbWrapper(db)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
+@app.route('/', methods=['GET'])
+@cross_origin()
+def get_home():
+    return 'Welcome!'
 
 @app.route('/welcome', methods=['GET'])
 @cross_origin()
 def get_welcome():
-    return 'Welcome!'
+    return get_home()
 
 @app.route('/secure', methods=['GET'])
 @cross_origin()
@@ -91,36 +100,65 @@ def logout_user():
         mimetype='application/json'
     )
     return response
-
+    
 # Jack Huynh _ Show courses
-@app.route('/auth/show_courses', methods= ["GET"])
+@app.route('/students/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
-    # get student id
-    student_id = request.args.get("studentId", default = -1, type = int)
-    print("id")
-    if not student_id:
-        return "Need student id"
+    # get student id from the current login
+    # student_id = request.args.get("studentId", default = -1, type = int)
+    student_id = 3713652
+    # handle wrong student id case
+    if student_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'No/wrong id'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
     try:  
-        student_ref = db.collection('student').document(student_id)
-        student_doc = student_ref.get()
+        # get student data
+        print(student_id)
+        student_data = dbWrapper.getStudentCourses(student_id)
+        print("pass getting data")
+        print(student_data)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
 
-        if student_doc.exists:
-
-            student_data = student_doc.to_dict()
-            print("data")
-            courses = student_data.get('courses',[])
-
-            return "courses"
-        
+        # if data exist?
+        if student_data:
+            # Convert dictionary to JSON for frontend use
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': student_data
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
         else:
-            return "student data not found"
-        
+            # handle no data exist
+            print("no data")
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    # error
     except Exception as e:
-        return "error, student not found"
-            
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
     
-
 if __name__ == '__main__':
     print("Start")
     app.run(port=3001, debug=True)
