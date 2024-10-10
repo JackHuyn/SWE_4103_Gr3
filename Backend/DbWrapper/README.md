@@ -71,3 +71,5 @@ Note:
 - github_personal_access_token - Optional for now. May become mandatory in future sprints. (Default is empty string)
 
 `removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
+
+`findUser(email)` - Given an email, returns a user entry in the database. Returns None if entry is not found.
