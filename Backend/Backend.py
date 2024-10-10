@@ -208,7 +208,7 @@ def upload():
 
 
 # Jack Huynh _ Show courses
-@app.route('/students/courses', methods= ["GET"])
+@app.route('/auth/students/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
     # get student id from the current login
@@ -225,11 +225,8 @@ def show_courses():
     try:  
         # get student data
         # Fetch student courses
-        print("Fetching courses for student:", student_id)
         student_data = dbWrapper.getStudentCourses(student_id)
 
-        # Debug output
-        print("Student data retrieved:", student_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
