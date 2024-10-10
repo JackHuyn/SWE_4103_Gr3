@@ -1,13 +1,18 @@
+#Third Party Libraries
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
-import FileUpload as fp
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
 import requests
-import Auth as fb_auth
 import os 
+
+#First Party Libraries
+import Auth as fb_auth
+import FileUpload as fp
 from DbWrapper.DbWrapper import DbWrapper
+
+
 
 app = Flask(__name__)
 cors = CORS(app)
