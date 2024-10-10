@@ -26,6 +26,7 @@ class FirebaseAuth:
                     params={"key": self.api_key},
                     data=payload)
         login_resp = r.json()
+        print(login_resp)
 
         self.active_sessions.update({login_resp['localId']: login_resp})
 
