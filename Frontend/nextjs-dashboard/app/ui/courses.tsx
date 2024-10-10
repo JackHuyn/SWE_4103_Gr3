@@ -16,7 +16,7 @@ export default function Courses() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch('http://localhost:3001/students/courses');
+                const res = await fetch('http://localhost:3001/auth/students/courses');
                 if (!res.ok) {
                     throw new Error('Failed to fetch data');
                 }

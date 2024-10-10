@@ -150,7 +150,7 @@ def logout_user():
     return response
 
 # Jack Huynh _ Show courses
-@app.route('/students/courses', methods= ["GET"])
+@app.route('/auth/students/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
     # get student id from the current login
