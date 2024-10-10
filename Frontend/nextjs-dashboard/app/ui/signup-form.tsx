@@ -14,14 +14,16 @@ let instructor_key = ""
 
 function signupNewEmailUser(fname, lname, email, password)
 {
-    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password+"&account_type="+account_type+"&instructorKey="+instructor_key,
+    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password+"&accountType="+account_type+"&instructorKey="+instructor_key,
         {
             method: 'POST'
         }
     ).then(response => {
         if (!response.ok) {
+            
             if (response.status === 404) {
                 return {
+                    
                     text: "Server not found!",
                     status: "danger"
                 };
@@ -95,6 +97,7 @@ async function validateInstructorKey(key) {
             document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
             document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
             account_type = 1
+            
         } catch(err) {
             document.getElementById('instructor_key_error').style.display = 'block'
             document.getElementById('instructor_key_error').innerText = err
