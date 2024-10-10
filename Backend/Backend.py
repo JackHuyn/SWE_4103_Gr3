@@ -17,7 +17,7 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(dir_path + "/" + credFileName)
+cred = credentials.Certificate(os.path.join(dir_path, credFileName))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -71,6 +71,7 @@ def signup_user():
         )
         return response
     except fb_auth.InvalidInstructorKeyException as iike:
+        print(iike)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Instructor Key Error'}),
             status=(401),
@@ -116,14 +117,23 @@ def validate_instructor_key():
 def login_user():
     email = request.args.get("email", default = -1, type = str)
     password = request.args.get("password", default = -1, type = str)
-    login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
-    response = app.response_class(
-        response=json.dumps({'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
-        status=200,
-        mimetype='application/json'
-    )
-    print(response.response)
+    try:
+        login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
+        print(login_resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
     return response
+    
 
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
