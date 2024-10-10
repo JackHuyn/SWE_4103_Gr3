@@ -167,11 +167,8 @@ def show_courses():
     try:  
         # get student data
         # Fetch student courses
-        print("Fetching courses for student:", student_id)
         student_data = dbWrapper.getStudentCourses(student_id)
 
-        # Debug output
-        print("Student data retrieved:", student_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
