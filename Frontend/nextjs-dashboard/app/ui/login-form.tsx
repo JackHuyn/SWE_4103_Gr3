@@ -36,12 +36,9 @@ function loginEmailUser(email, password) {
           status: "success"
         };
       })
-
-
     }).then(resp => {
       try {
         let r = JSON.parse(resp.text)
-        console.log(r)
         if(!r['approved'])
           throw 'Invalid Email or Password'
         const expires = new Date(Date.now() + 60 * 60 * 1000)
@@ -49,7 +46,7 @@ function loginEmailUser(email, password) {
         document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
         document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
         //console.log("Cookies: ", document.cookie)
-        window.location.href = "/auth/courses"  
+        window.location.href = "/"  
       } catch(err) {
         document.getElementById('login_error_span').style.display = 'block'
         document.getElementById('login_error_span').innerText = err
@@ -77,45 +74,38 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="page_wrapper">
+    <div>
+      <button id="auth_redirect_button" onClick={redirectToSignUp}>Sign Up</button>
       <div className="login_form">
         <form onSubmit={handleSubmit}>
           <div>
-              <h1>Sign In.</h1>
+              <h1>Sign In</h1>
             <span id="login_error_span">Invalid Email or Password</span>
             <div className="login_row">
               <div className="login_row_item left">
-                <p>email: </p>
                 <input
                   id="email"
                   type="email"
                   name="email"
-                  placeholder="you@company.com"
+                  placeholder="Email"
                   required
                 />
               </div>
-              
               <div className="login_row_item right">
-                <p>password: </p>
-                  <input
-                    id="password"
-                    type="password"
-                    name="password"
-                    placeholder="●●●●●●●"
-                    required
-                    minLength={6}
-                  />
-                  
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  minLength={6}
+                />
               </div>
-              <Button type="submit" id="login_button">Sign in</Button>
             </div>
+            <Button type="submit">Log in</Button>
           </div>
         </form>
-
       </div>
-      <button id="auth_redirect_button" onClick={redirectToSignUp}>Sign Up</button>
     </div>
-    
-
   );
 }

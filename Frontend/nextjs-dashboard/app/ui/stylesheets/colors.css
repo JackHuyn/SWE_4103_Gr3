@@ -1,24 +1,16 @@
-@import url('./fonts.css');
-
 :root{
-    --regularFont: "Julius Sans One";
-    --secondaryFont: "Jura";
+    --regularFont: century-gothic, sans-serif;
 
     --fontColorLight: white;
-    --fontColorDark: #121212;
+    --fontColorDark: #111;
     --fontErrorColor: red;
 
-    --inputBackgroundGrey: #fff;
+    --inputBackgroundGrey: #707070;
     --inputBackgroundGreyAutofill: #909090;
     --selectorItemSelected: #2440EE;
     --selectorItemNotSelected: var(--inputBackgroundGrey);
 
     --lightBackground1: #d9d9d9;
-    --lightBackground2: #bdbdbd;
-    --pageBackground: #121212;
-    --formBackground: #121212;
-    --imageBackground: url("background.png");
-
-    --secondaryColor: rgb(183, 132, 251);
-    --secondaryColorHover: rgb(166, 102, 249);
+    --pageBackground: #222;
+    --formBackground: #444;
 }
