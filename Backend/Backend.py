@@ -119,7 +119,7 @@ def login_user():
     password = request.args.get("password", default = -1, type = str)
     login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
     response = app.response_class(
-        response=json.dumps({'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+        response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
         status=200,
         mimetype='application/json'
     )
