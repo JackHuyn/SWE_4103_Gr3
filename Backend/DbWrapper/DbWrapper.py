@@ -38,7 +38,7 @@ class DbWrapper:
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str=None)->bool:
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     print(docs)
     print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test@unb.ca","Test","Account","some_prof"))
+    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
     print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
     print(test.activateCourse("TestCourseAgain"))
     #print(test.removeCourse("TestCourseAgain"))
