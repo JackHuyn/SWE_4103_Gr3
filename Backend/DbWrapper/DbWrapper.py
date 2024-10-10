@@ -94,6 +94,11 @@ class DbWrapper:
         except:
             return False
         return True
+    def findUser(self, email:str)->dict|None:
+        docs = self.db.collection(USERS).where(filter=FieldFilter("email", "==", email)).stream()
+        for doc in docs:
+            return doc.to_dict()
+        return None
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
