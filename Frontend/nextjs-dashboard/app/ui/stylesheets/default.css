@@ -1,0 +1,9 @@
+body {
+    background-color: #121212;
+    background-image: url("background.png");
+    background-position: top right;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    font-family: var(--regularFont);
+    color: var(--fontColorLight);
+}

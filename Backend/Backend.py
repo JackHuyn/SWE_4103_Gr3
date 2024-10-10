@@ -1,6 +1,7 @@
 #Third Party Libraries
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
+import FileUpload as fp
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
@@ -29,6 +30,7 @@ db = firestore.client()
 dbWrapper = DbWrapper(db)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
+
 
 
 @app.route('/', methods=['GET'])
@@ -68,6 +70,7 @@ def signup_user():
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
         
+        
         print(signup_resp)
         response = app.response_class(
             response=json.dumps({'approved': True}),
@@ -91,6 +94,7 @@ def signup_user():
         )
         return response
     except Exception as e:
+        print(e)
         print(e)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Server Error'}),
@@ -139,13 +143,14 @@ def login_user():
         )
     return response
     
+    
 
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
 def validate_session():
     local_id = request.args.get("localId", default = -1, type = str)
     id_token = request.args.get("idToken", default = -1, type = str)
-    valid = firebase_auth.validate_token(local_id, id_token)
+    valid = fb_auth.validate_token(local_id, id_token)
     response = app.response_class(
         response=json.dumps({'approved': valid}),
         status=200 if valid else 401,
@@ -279,6 +284,7 @@ def show_courses():
             mimetype='application/json'
         )
         return response
+    
     
 if __name__ == '__main__':
     print("Start")
