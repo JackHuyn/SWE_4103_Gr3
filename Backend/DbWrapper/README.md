@@ -23,11 +23,36 @@ db - Database Client object given by the Firestore client method.
 
 `getUserData(uid)` - Given an uid, returns a dict of that user's data.
 
+Note:
+
+- A user's uid is obtained from the Authentication side of things.
+
 `getCourseData(course_id)` - Given a specific course, returns a dict of that courses entry.
 
 `getStudentCourses(student_id)` - Given a student ID, returns a list of dict containing all courses the student is in.
 
+Note:
+
+- student_id is a user uid
+
+`getInstructorCourses(instructor_id)` - Given an instructor ID, returns a list of dict containing all courses the instructor teaches.
+
+Note:
+
+- instructor_id is a user uid
+
+
 `addStudentToCourse(student_id, course_id)` - Given a student ID and course ID, add a student to a course. Returns True if successful.
+
+Note:
+
+- student_id is a user uid
+
+`addInstructorToCourse(instructor_id, course_id)` - Given an instructor ID and a course ID, add an instructor to a course. Returns True is successful.
+
+Note:
+
+- instructor_id is a user uid
 
 `addCourse(course_description, course_id, instructor_ids, section, term, project_ids: optional, student_ids: optional, status: options)` - Given data points, create a course entry in the database. Returns True if successful.
 
