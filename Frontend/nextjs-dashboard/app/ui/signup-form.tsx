@@ -14,7 +14,7 @@ let instructor_key = ""
 
 function signupNewEmailUser(fname, lname, email, password)
 {
-    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password+"&account_type="+account_type+"&instructorKey="+instructor_key,
+    fetch("http://127.0.0.1:3001/auth/signup-with-email-and-password?fname="+fname+"&lname="+lname+"&email="+email+"&password="+password+"&accountType="+account_type+"&instructorKey="+instructor_key,
         {
             method: 'POST'
         }

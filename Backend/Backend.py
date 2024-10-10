@@ -16,7 +16,7 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(dir_path + "\\" + credFileName)
+cred = credentials.Certificate(dir_path + "/" + credFileName)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -41,11 +41,13 @@ def signup_user():
     lname = request.args.get("lname", default = "", type = str)
     email = request.args.get("email", default = "", type = str)
     password = request.args.get("password", default = "", type = str)
-    account_type = request.args.get("accountType", default = 1, type = int)
+    account_type = request.args.get("accountType", default = -1, type = int)
     instructor_key = request.args.get("instructorKey", default = "", type = str)
     try:
         if(account_type == 1 and not firebase_auth.validate_instructor_key(instructor_key)):
             raise fb_auth.InvalidInstructorKeyException
+        if (account_type == -1):
+            raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
         print(signup_resp)
         response = app.response_class(
