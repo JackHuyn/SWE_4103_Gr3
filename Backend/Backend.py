@@ -117,14 +117,23 @@ def validate_instructor_key():
 def login_user():
     email = request.args.get("email", default = -1, type = str)
     password = request.args.get("password", default = -1, type = str)
-    login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
-    response = app.response_class(
-        response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
-        status=200,
-        mimetype='application/json'
-    )
-    print(response.response)
+    try:
+        login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
+        print(login_resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
     return response
+    
 
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
