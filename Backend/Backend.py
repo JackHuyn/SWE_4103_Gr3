@@ -9,8 +9,6 @@ import Auth as fb_auth
 import os 
 from DbWrapper.DbWrapper import DbWrapper
 
-
-
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -19,7 +17,7 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(dir_path + "/" + credFileName)
+cred = credentials.Certificate(dir_path + "\\" + credFileName)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -51,7 +49,7 @@ def get_secure():
 @app.route('/auth/signup-with-email-and-password', methods=['POST'])
 @cross_origin()
 def signup_user():
-    print('sign up user')
+    
     fname = request.args.get("fname", default = "", type = str)
     lname = request.args.get("lname", default = "", type = str)
     email = request.args.get("email", default = "", type = str)
@@ -64,7 +62,7 @@ def signup_user():
         if (account_type == -1):
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
-        print('here')
+        
         print(signup_resp)
         response = app.response_class(
             response=json.dumps({'approved': True}),
