@@ -64,6 +64,13 @@ class DbWrapper:
         except:
             return False
         return True
+    def addInstructorToCourse(self, instructor_id:str, course_id:str) -> bool:
+        doc = self.db.collection(COURSES).document(course_id)
+        try:
+            doc.update({"instructor_ids": ArrayUnion([instructor_id])})
+        except:
+            return False
+        return True
     def addCourse(self, course_description:str, course_id:str, instructor_ids:list[str], section:str, term:str, project_ids=[], student_ids=[], status=0)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         if len(x) > 0:

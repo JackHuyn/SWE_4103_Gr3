@@ -44,6 +44,16 @@ Note:
 
 `addStudentToCourse(student_id, course_id)` - Given a student ID and course ID, add a student to a course. Returns True if successful.
 
+Note:
+
+- student_id is a user uid
+
+`addInstructorToCourse(instructor_id, course_id)` - Given an instructor ID and a course ID, add an instructor to a course. Returns True is successful.
+
+Note:
+
+- instructor_id is a user uid
+
 `addCourse(course_description, course_id, instructor_ids, section, term, project_ids: optional, student_ids: optional, status: options)` - Given data points, create a course entry in the database. Returns True if successful.
 
 Note:
