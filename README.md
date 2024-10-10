@@ -11,7 +11,7 @@ Note from Will:
 - Install Node.js
 - Navigate to `Frontend/nextjs-dashboard` in a terminal
 - Run `npm i` to install node modules (dependencies)
-- Run `npm dev` to start server
+- Run `npm run dev` to start server
 
 #### Demo/Testing:
 - In a browser, go to `127.0.0.1:3000` to see webpage
