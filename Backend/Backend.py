@@ -4,8 +4,10 @@ import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
 import requests
-import Auth as fb_auth
 import os 
+
+import Auth as fb_auth
+import GitHub as git
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -110,6 +112,32 @@ def logout_user():
         mimetype='application/json'
     )
     return response
+
+@app.route('/metrics/contributions', methods=['GET'])
+@cross_origin()
+def get_github_contributions():
+    try:
+        print('1')
+        repo = git.GitHubManager('JackHuyn/SWE_4103_Gr3')
+        print('2')
+        resp = repo.get_contributions()
+        # print(resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'contributions': resp}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        print('whyyy')
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+
+    return response
+
     
 
 if __name__ == '__main__':

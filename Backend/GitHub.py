@@ -13,8 +13,8 @@ class GitHubManager:
 
     def __init__(self, repo_address) -> None:
         self.repo_address = repo_address
-        auth = Auth.Token("")
-        self.github = Github(auth = auth, base_url=GITHUB_BASE_URL)
+        # auth = Auth.Token("")
+        self.github = Github(base_url=GITHUB_BASE_URL)
         self.repo = self.github.get_repo(self.repo_address)
 
     def get_commit_data(self):
@@ -51,6 +51,20 @@ class GitHubManager:
             }
             
         return issues
+    
+    def get_contributions(self):
+        stats = self.repo.get_stats_contributors()
+        contributions = []
+        for s in stats:
+            con = {}
+            print("-", s.author)
+            con['author'] = s.author.login
+            con['contributions'] = []
+            for week in s.weeks:
+                print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
+                con['contributions'].append({'week': str(week.w), 'additions': week.a, 'deletions': week.d, 'commits': week.c})
+            contributions.append(con)
+        return contributions
 
 
 if __name__ == '__main__':
@@ -74,12 +88,20 @@ if __name__ == '__main__':
     # for c in contributors:
     #     print(c)
 
-    repo_obj = GitHubManager('JackHuyn/SWE_4103_Gr3')
+    # repo_obj = GitHubManager('JackHuyn/SWE_4103_Gr3')
+
+    # print(swe_repo.get_rate_limit())
+
+    activity = swe_repo.get_stats_contributors()
+    for a in activity:
+        print("-", a.author)
+        for week in a.weeks:
+            print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
 
 
-    print("---------------------------")
-    pprint(commit_counts)
-    print("---------------------------")
+    # print("---------------------------")
+    # pprint(commit_counts)
+    # print("---------------------------")
 
 
     g.close()
