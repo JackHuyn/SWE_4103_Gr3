@@ -1,6 +1,8 @@
 #Author : Raphael Ferreira 
 #Helper functions for file uploads
 import os
+import csv
+import re
 
 ALLOWED_EXTENSIONS = set(['csv'])
 
@@ -21,4 +23,20 @@ def save_file(file):
 
     file.save(os.path.join(uploads_folder,file.filename))
 
-    
+#Author: Sarun Weerakul
+#Helper function: extract email from csv file
+def extract_email(file_path):
+    emails = []
+    with open(file_path, 'r') as csvfile:
+        csvreader = csv.reader(csvfile)
+
+        for row in csvreader:
+            for token in row:
+                if is_email(token):
+                    emails.append(token)
+    return emails
+
+#Helper function: check email format
+def is_email(input):
+    email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(email_pattern, input)
