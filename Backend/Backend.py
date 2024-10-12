@@ -63,6 +63,8 @@ def signup_user():
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
         
+        dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid)
+        
         print(signup_resp)
         response = app.response_class(
             response=json.dumps({'approved': True}),
@@ -200,7 +202,19 @@ def upload():
         
 
     if file and fp.allowed_file(file.filename):
-        fp.save_file(file)
+        saved_file_path = fp.save_file(file) 
+        list_of_emails = fp.extract_email(saved_file_path)
+        print(list_of_emails)
+
+        #Send emails to backend and retrieve their student id's
+        for email in list_of_emails:
+            user_dict = dbWrapper.findUser(email)
+            user_id = user_dict['uid']
+            dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+
+
+        
+        
         response = app.response_class(
             response = json.dumps({'approved': True}),
             status = 200,

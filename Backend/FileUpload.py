@@ -21,7 +21,9 @@ def save_file(file):
     if not os.path.exists(uploads_folder):
         os.makedirs(uploads_folder)
 
-    file.save(os.path.join(uploads_folder,file.filename))
+    save_file_path = (os.path.join(uploads_folder,file.filename)) 
+    file.save(save_file_path)
+    return save_file_path
 
 #Author: Sarun Weerakul
 #Helper function: extract email from csv file
@@ -40,3 +42,13 @@ def extract_email(file_path):
 def is_email(input):
     email_pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     return re.match(email_pattern, input)
+
+if __name__ == "__main__":
+    
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    uploads_folder = os.path.join(dir_path,'Uploads')
+    emails = extract_email(os.path.join(uploads_folder,'another.csv'))
+    print(emails)
+
+    
