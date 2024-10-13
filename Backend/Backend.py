@@ -210,10 +210,78 @@ def upload():
     
 
     
-    
+# Author: Namneet, Raphael, Sarun
+# handles adding courses    
 
+@app.route('/add-course', methods=['POST'])
+@cross_origin()  # Enable CORS for this route
+def add_course():
+    try:
+        # Extract course details from the request JSON body
+        data = request.args
 
-    
+      
+        
+        # Extract the fields from the JSON object
+        course_name = data.get("courseName", "")
+        course_description = data.get("courseDescription", "")
+        course_term = data.get("courseTerm", "")
+        course_section = data.get("courseSection", "")
+        instructor_ids = data.get("instructor_ids", [])
+
+        print(course_name)
+        print(course_description)
+        print(course_term)
+        print(course_section)
+
+        # Check if all required fields are provided
+        if not (course_name and course_description and course_term and course_section):
+            raise ValueError("Missing required fields")
+
+        # Call the `addCourse` function from `DbWrapper`
+        success = dbWrapper.addCourse(
+            course_description=course_description,
+            course_id=course_name,
+            instructor_ids=[],
+            section=course_section,
+            term=course_term,
+            project_ids=[],
+            student_ids=[]
+        )
+
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Course added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add course'}),
+                status=500,
+                mimetype='application/json'
+            )
+
+        return response
+
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+
     
 
 
