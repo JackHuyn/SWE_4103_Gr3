@@ -62,7 +62,7 @@ def signup_user():
         if (account_type == -1):
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
-        
+
         dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid)
         
         print(signup_resp)
@@ -205,12 +205,19 @@ def upload():
         saved_file_path = fp.save_file(file) 
         list_of_emails = fp.extract_email(saved_file_path)
         print(list_of_emails)
+        users_not_found = []
 
         #Send emails to backend and retrieve their student id's
         for email in list_of_emails:
             user_dict = dbWrapper.findUser(email)
-            user_id = user_dict['uid']
-            dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+            if user_dict != None:
+                user_id = user_dict['uid']
+                dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+            else:
+                # add not found emails to a not found list
+                users_not_found.append(email)
+
+        print('No accounts were found for the following email addresses: ', users_not_found)
 
 
         
