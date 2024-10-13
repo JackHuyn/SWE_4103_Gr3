@@ -41,6 +41,7 @@ function loginEmailUser(email, password) {
     }).then(resp => {
       try {
         let r = JSON.parse(resp.text)
+        console.log(r)
         if(!r['approved'])
           throw 'Invalid Email or Password'
         const expires = new Date(Date.now() + 60 * 60 * 1000)
