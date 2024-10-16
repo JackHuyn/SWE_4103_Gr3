@@ -40,11 +40,11 @@ jobs:
         ruff check --output-format=github --exit-zero
         continue on error: true
         
-    # # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
-    # - name: Check code using pytest
-    #   run: |
-    #     pip install pytest pytest-cov
-    #     pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+    # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
+    - name: Check code using pytest
+      run: |
+        pip install pytest pytest-cov
+        pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
 
         
     - name: compress and upload file
