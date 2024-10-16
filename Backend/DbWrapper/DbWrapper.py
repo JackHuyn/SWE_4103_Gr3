@@ -38,7 +38,13 @@ class DbWrapper:
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str=None)->bool:
+    def getInstructorCourses(self, instructor_id:str) -> list[dict]:
+        docs = self.db.collection(COURSES).where(filter=FieldFilter("instructor_ids", "array_contains", instructor_id)).stream()
+        docList = []
+        for doc in docs:
+            docList.append(doc.to_dict())
+        return docList
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False
@@ -48,12 +54,20 @@ class DbWrapper:
         template["first_name"] = first_name
         template["last_name"] = last_name
         template["uid"] = uid
+        template["github_personal_access_token"] = github_personal_access_token
         self.db.collection(USERS).document(uid).set(template)
         return True
     def addStudentToCourse(self, student_id:str, course_id:str) -> bool:
         doc = self.db.collection(COURSES).document(course_id)
         try:
             doc.update({"student_ids": ArrayUnion([student_id])})
+        except:
+            return False
+        return True
+    def addInstructorToCourse(self, instructor_id:str, course_id:str) -> bool:
+        doc = self.db.collection(COURSES).document(course_id)
+        try:
+            doc.update({"instructor_ids": ArrayUnion([instructor_id])})
         except:
             return False
         return True
@@ -72,11 +86,19 @@ class DbWrapper:
         self.db.collection(COURSES).document(course_id).set(template)
         return True
     def removeCourse(self, course_id:str)->bool:
+        x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
+        if len(x) == 0:
+            return False
         try:
             db.collection(COURSES).document(course_id).delete()
         except:
             return False
         return True
+    def findUser(self, email:str)->dict|None:
+        docs = self.db.collection(USERS).where(filter=FieldFilter("email", "==", email)).stream()
+        for doc in docs:
+            return doc.to_dict()
+        return None
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
@@ -91,7 +113,8 @@ if __name__ == "__main__":
     print(docs)
     print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test@unb.ca","Test","Account","some_prof"))
+    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
     print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
     print(test.activateCourse("TestCourseAgain"))
+    print(test.getInstructorCourses("some_prof"))
     #print(test.removeCourse("TestCourseAgain"))
