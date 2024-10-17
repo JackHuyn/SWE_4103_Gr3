@@ -9,28 +9,28 @@ on:
       - '*'
 
 jobs:
-  # Job 1: Encrypt the secret
-  github-secrets:
-    runs-on: ubuntu-latest
-    name: A Job to encrypt a secret
-    steps:
-      - id: read-secret
-        shell: bash
-        run: |
-          # Read the secret from GitHub secrets
-          OUR_SECRET=${{ secrets.SECRET_KEY }};
-          # Encrypt the secret using OpenSSL
-          BINARY_ENCRYPTED_SECRET=$(echo -n "$OUR_SECRET" | openssl enc -aes-256-cbc -pbkdf2 -salt -k "${{ secrets.ENCRYPTION_PASSWORD }}");
-          # Encode the encrypted binary as base64
-          ENCRYPTED_SECRET=$(echo -n "$BINARY_ENCRYPTED_SECRET" | base64);
-          # Output the encrypted secret
-          echo "our-secret=$ENCRYPTED_SECRET" >> $GITHUB_OUTPUT
-    outputs:
-      encrypted-secret: ${{ steps.read-secret.outputs.our-secret }}
+  # # Job 1: Encrypt the secret
+  # github-secrets:
+  #   runs-on: ubuntu-latest
+  #   name: A Job to encrypt a secret
+  #   steps:
+  #     - id: read-secret
+  #       shell: bash
+  #       run: |
+  #         # Read the secret from GitHub secrets
+  #         OUR_SECRET=${{ secrets.SECRET_KEY }};
+  #         # Encrypt the secret using OpenSSL
+  #         BINARY_ENCRYPTED_SECRET=$(echo -n "$OUR_SECRET" | openssl enc -aes-256-cbc -pbkdf2 -salt -k "${{ secrets.ENCRYPTION_PASSWORD }}");
+  #         # Encode the encrypted binary as base64
+  #         ENCRYPTED_SECRET=$(echo -n "$BINARY_ENCRYPTED_SECRET" | base64);
+  #         # Output the encrypted secret
+  #         echo "our-secret=$ENCRYPTED_SECRET" >> $GITHUB_OUTPUT
+  #   outputs:
+  #     encrypted-secret: ${{ steps.read-secret.outputs.our-secret }}
 
   # Job 2: Build with encrypted secret
   build:
-    needs: github-secrets
+    # needs: github-secrets
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -45,18 +45,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Decrypt the encrypted secret from Job 1
-      - id: decrypt-secret
-        shell: bash
-        run: |
-          # Retrieve the encrypted secret from the previous job
-          ENCRYPTED_SECRET=${{ needs.github-secrets.outputs.encrypted-secret }};
-          # Decode the base64-encoded encrypted secret
-          BINARY_ENCRYPTED_SECRET=$(echo -n "$ENCRYPTED_SECRET" | base64 --decode);
-          # Decrypt the secret using OpenSSL and the encryption password
-          OUR_SECRET=$(echo -n "$BINARY_ENCRYPTED_SECRET" | openssl enc -aes-256-cbc -pbkdf2 -d -salt -k "${{ secrets.ENCRYPTION_PASSWORD }}");
-          # Save the decrypted secret to an environment variable or use it directly
-          echo "our-secret=$OUR_SECRET" >> $GITHUB_ENV
+      # # Decrypt the encrypted secret from Job 1
+      # - id: decrypt-secret
+      #   shell: bash
+      #   run: |
+      #     # Retrieve the encrypted secret from the previous job
+      #     ENCRYPTED_SECRET=${{ needs.github-secrets.outputs.encrypted-secret }};
+      #     # Decode the base64-encoded encrypted secret
+      #     BINARY_ENCRYPTED_SECRET=$(echo -n "$ENCRYPTED_SECRET" | base64 --decode);
+      #     # Decrypt the secret using OpenSSL and the encryption password
+      #     OUR_SECRET=$(echo -n "$BINARY_ENCRYPTED_SECRET" | openssl enc -aes-256-cbc -pbkdf2 -d -salt -k "${{ secrets.ENCRYPTION_PASSWORD }}");
+      #     # Save the decrypted secret to an environment variable or use it directly
+      #     echo "our-secret=$OUR_SECRET" >> $GITHUB_ENV
 
       # Check Python version
       - name: Display python version
