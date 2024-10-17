@@ -49,7 +49,6 @@ class FirebaseAuth:
             print("LOGOUT UNSUCCESSFUL")
             return False
 
-
     def validate_token(self, local_id, id_token):
         if(local_id not in self.active_sessions):
             print("LOCAL ID NOT FOUND")
