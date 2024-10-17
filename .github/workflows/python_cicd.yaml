@@ -71,9 +71,9 @@ jobs:
           pip install pylint Flask flask_cors firebase_admin
 
       # Firebase setup
-      # - name: Install Firebase CLI
-      #   run: |
-      #     npm install -g firebase-tools
+      - name: Install Firebase CLI
+        run: |
+          npm install -g firebase-tools
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
