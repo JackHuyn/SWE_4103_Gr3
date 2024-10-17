@@ -96,18 +96,19 @@ class TestDbWrapper(unittest.TestCase):
         self.assertEqual(result, [{"course_id": "course123"}])
 
     def test_removeCourse(self):
-        # Simulate a course found in the database
+        # Simulate a course found in the database by returning a mock document
         mock_course = MagicMock()
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_course]
 
-        # Call the method
+        # Call the removeCourse method
         result = self.db_wrapper.removeCourse("course123")
 
-        # Verify the document was deleted
+        # Verify that the document was deleted
         self.mock_db.collection.return_value.document.return_value.delete.assert_called_once()
 
         # Check that the function returns True
         self.assertTrue(result)
+
 
     def test_removeCourse_not_found(self):
         # Simulate no courses found in the database
