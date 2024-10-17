@@ -1,13 +1,16 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from DbWrapper import DbWrapper  
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from DbWrapper.DbWrapper import DbWrapper  
 
 class TestDbWrapper(unittest.TestCase):
 
     def setUp(self):
         # Mock the Firestore client
         self.mock_db = MagicMock()
-        self.db_wrapper = DbWrapper(self.mock_db)
+        self.db_wrapper = DbWrapper(self.mock_db)  
 
     def test_archiveCourse(self):
         # Mock the Firestore document and its update method

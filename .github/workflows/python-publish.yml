@@ -43,8 +43,9 @@ jobs:
     # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
     - name: Check code using pytest
       run: |
-        pip install pytest pytest-cov
-        pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        pip install Flask pytest pytest-cov pytest-flask pytest-repeat
+        pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
+    
 
         
     - name: compress and upload file

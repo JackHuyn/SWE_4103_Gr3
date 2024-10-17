@@ -1,5 +1,10 @@
 import unittest
-from app import app  # import the Flask app from your app module
+import sys
+import os
+from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Backend import app
 import json
 
 class TestFlaskApp(unittest.TestCase):
@@ -13,11 +18,11 @@ class TestFlaskApp(unittest.TestCase):
     def test_signup_user(self):
         # Mock request arguments
         signup_data = {
-            "fname": "John",
-            "lname": "Doe",
-            "email": "johndoe@example.com",
-            "password": "password123",
-            "accountType": 1,
+            "fname": "Test",
+            "lname": "Account",
+            "email": "test111@unb.ca",
+            "password": "test123",
+            "accountType": 0,
             "instructorKey": "valid_key"
         }
         
@@ -37,12 +42,12 @@ class TestFlaskApp(unittest.TestCase):
     # Test case for invalid instructor key scenario
     def test_signup_user_invalid_instructor_key(self):
         signup_data = {
-            "fname": "John",
-            "lname": "Doe",
-            "email": "johndoe@example.com",
-            "password": "password123",
+            "fname": "Test",
+            "lname": "Account",
+            "email": "test@unb.ca",
+            "password": "test123",
             "accountType": 1,
-            "instructorKey": "invalid_key"
+            "instructorKey": "valid_key"
         }
         
         response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
@@ -56,8 +61,8 @@ class TestFlaskApp(unittest.TestCase):
     # Test case for login_user endpoint
     def test_login_user(self):
         login_data = {
-            "email": "johndoe@example.com",
-            "password": "password123"
+            "email": "test@unb.ca",
+            "password": "test123"
         }
         
         response = self.app.get('/auth/login-with-email-and-password', query_string=login_data)
