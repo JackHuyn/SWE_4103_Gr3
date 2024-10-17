@@ -1,8 +1,6 @@
 import unittest
 import sys
 import os
-from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Backend import app
 import json
