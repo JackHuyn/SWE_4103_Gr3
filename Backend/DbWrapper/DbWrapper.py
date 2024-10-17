@@ -85,15 +85,17 @@ class DbWrapper:
         template["student_ids"] = student_ids
         self.db.collection(COURSES).document(course_id).set(template)
         return True
+    
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         if len(x) == 0:
             return False
         try:
-            db.collection(COURSES).document(course_id).delete()
+            self.db.collection(COURSES).document(course_id).delete()
         except:
             return False
         return True
+    
     def findUser(self, email:str)->dict|None:
         docs = self.db.collection(USERS).where(filter=FieldFilter("email", "==", email)).stream()
         for doc in docs:
