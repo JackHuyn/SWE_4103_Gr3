@@ -32,7 +32,7 @@ jobs:
       run: |
         mkdir logFile
         python -m pip install --upgrade pip
-        pip install pylint
+        pip install pylint Flask flask_cors firebase_admin
 
     - name: Lint with Ruff
       run: |
@@ -43,7 +43,7 @@ jobs:
     # note pytest will run all files of the form test_*.py or *_test.py in the current directory and its subdirectories
     - name: Check code using pytest
       run: |
-        pip install Flask pytest pytest-cov pytest-flask pytest-repeat flask_cors firebase_admin
+        pip install pytest pytest-cov pytest-flask pytest-repeat 
         pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
     
 
