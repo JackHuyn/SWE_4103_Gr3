@@ -18,10 +18,10 @@ class TestFlaskApp(unittest.TestCase):
         signup_data = {
             "fname": "Test",
             "lname": "Account",
-            "email": "test111@unb.ca",
+            "email": "test1111@unb.ca",
             "password": "test123",
-            "accountType": 0,
-            "instructorKey": "valid_key"
+            "accountType": 1,
+            "instructorKey": "D6B74"
         }
         
         # Send a POST request to the /auth/signup-with-email-and-password route
