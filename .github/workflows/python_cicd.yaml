@@ -74,8 +74,7 @@ jobs:
       - name: Install Firebase CLI
         run: |
           npm install -g firebase-tools
-          firebase login:ci
-          firebase init
+          firebase init hosting:github
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
