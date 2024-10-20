@@ -13,10 +13,15 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
+#Potential fix to actual let the test code running 
+#
 #Saves file to the Uploads folder -> Need to check if the folder exists or not before saving
-def save_file(file):
+def save_file(file, uploads_folder=None):
     dir_path = os.path.dirname(os.path.abspath(__file__))
-    uploads_folder = os.path.join(dir_path,'Uploads')
+    
+    # Allow the uploads folder to be passed in for testing
+    if uploads_folder is None:
+        uploads_folder = os.path.join(dir_path, 'Uploads')
 
     if not os.path.exists(uploads_folder):
         os.makedirs(uploads_folder)
