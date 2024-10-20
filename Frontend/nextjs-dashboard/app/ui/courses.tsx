@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
 import { Button } from './button';
+import Cookies from 'js-cookie';
 
 export default function Courses() {
+
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [showCourses, setShowCourses] = useState(true); // Track whether to show/hide courses
@@ -13,22 +15,57 @@ export default function Courses() {
     const [newCourseDescription, setNewCourseDescription] = useState(''); // Store the new course description
     const [newCourseTerm, setNewCourseTerm] = useState(''); // Store the new course term
     const [newCourseSection, setNewCourseSection] = useState(''); // Store the new course section
+    const [userRole, setUserRole] = useState('')
     const inputRef = useRef(null); // Create a ref for the input field
 
     // Fetch courses data when the component mounts
     useEffect(() => {
         async function fetchData() {
+            
             try {
-                const res = await fetch('http://localhost:3001/auth/students/courses');
-                if (!res.ok) {
-                    throw new Error('Failed to fetch data');
+                console.log('Courses .tsx is displayed')
+                
+                const localId = Cookies.get('localId')
+                
+                if(localId) {
+
+                    const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
+
+                    //check if instructor role ? If not show student display
+                    if(!role_response.ok){
+                        setUserRole('0')
+                    }
+
+                    else {
+                        //fetching same for instructor
+                        setUserRole('1')
+                    }
+
+
+                    const res = await fetch('http://localhost:3001/auth/courses?localId=' + localId)
+                        if (!res.ok) {
+
+                            throw new Error('Failed to fetch data');
+                        }
+                        const result = await res.json();
+                        setData(result);
+                        // Set the initial courses to the state if the response is approved
+                        if (result.approved && result.courses) {
+                            setCourseList(result.courses);
+                        }
+
+                    
+
+                   
                 }
-                const result = await res.json();
-                setData(result);
-                // Set the initial courses to the state if the response is approved
-                if (result.approved && result.courses) {
-                    setCourseList(result.courses);
+
+                else{
+                    
+                    window.location.href = "/auth/login"
+
+
                 }
+                
             } catch (error) {
                 console.error('Error fetching courses:', error);
                 setError('Error loading courses. Please try again later.');
@@ -45,19 +82,30 @@ export default function Courses() {
     // Handle adding a new course with name, description, and term
     const handleAddCourse = async () => {
         if (newCourseName && newCourseDescription && newCourseTerm && newCourseSection) {
+            
+            //Ensure localId cookie is valid
+            const localId  = Cookies.get('localId')
+
+            if (!localId){
+                window.location.href = "/auth/login"
+            }
             const courseData = {
                 course_name: newCourseName,
                 course_description: newCourseDescription,
                 course_term: newCourseTerm,
                 course_section: newCourseSection,
-                instructor_ids: ["some_instructor_id"],  // Adjust this based on how you manage instructors
+                instructor_ids: [localId]
             };
     
             try {
-                const response = await fetch('http://localhost:3001/add-course?courseName=' + newCourseName + "&courseDescription=" + newCourseDescription + "&courseTerm=" + newCourseTerm + "&courseSection=" + newCourseSection, {
+                
+                
+                //Need to have checks to ensure that the instructor is valid 
+                const response = await fetch('http://localhost:3001/add-course' , {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        
                     },
                     body: JSON.stringify(courseData),  // Send JSON data in request body
                 });
@@ -141,9 +189,11 @@ export default function Courses() {
                         </div>
 
                         {/* Right Section: Add Course Button */}
+                        {userRole=='1' &&
                         <Button className="addCourse" onClick={addCourse}>
                             +
-                        </Button>
+                        </Button> }
+                        
                     </div>
 
                     {/* Conditionally render courses */}
@@ -214,7 +264,15 @@ export default function Courses() {
 
             </main>
         );
-    } else {
+    } 
+
+    //else if(courseList.length == 0 && userRole == '0')
+    //{
+        //return <p>You have not yet been added to any courses. Contact your Instructor for information.</p>
+    //}
+
+    
+    else {
         return <p>Loading...</p>;
     }
 }
