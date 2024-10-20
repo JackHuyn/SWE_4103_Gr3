@@ -290,7 +290,7 @@ def add_course():
 @cross_origin()
 def show_courses():
     # get student id from the current login
-    # student_id = request.args.get("studentId", default = -1, type = int)
+    #student_id = request.args.get("studentId", default = -1, type = int)
     student_id = "3708644"
     # handle wrong student id case
     if student_id == -1:
