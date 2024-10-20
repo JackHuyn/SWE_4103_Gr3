@@ -26,13 +26,9 @@ def save_file(file, uploads_folder=None):
     if not os.path.exists(uploads_folder):
         os.makedirs(uploads_folder)
 
-<<<<<<< HEAD
     save_file_path = (os.path.join(uploads_folder,file.filename)) 
     file.save(save_file_path)
     return save_file_path
-=======
-    file.save(os.path.join(uploads_folder, file.filename))
->>>>>>> main
 
 #Author: Sarun Weerakul
 #Helper function: extract email from csv file
