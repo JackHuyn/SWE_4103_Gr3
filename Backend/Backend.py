@@ -121,12 +121,12 @@ def login_user():
     password = request.args.get("password", default = -1, type = str)
     try:
         login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
-        print(login_resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
             status=200,
             mimetype='application/json'
         )
+        response.set_cookie('idToken', login_resp['idToken'], httponly=True, secure=True, samesite='Strict', path='/')
     except Exception as e:
         print(e)
         response = app.response_class(
@@ -135,6 +135,38 @@ def login_user():
             mimetype='application/json'
         )
     return response
+
+#Helper to access user role 
+def getUserRole(local_id):
+    user_data = dbWrapper.getUserData(local_id)
+    return user_data['account_type']
+
+
+
+#Author: Raphael Ferreira 
+@app.route('/check-instructor',methods=['GET'])
+@cross_origin()
+def check_instructor_role():
+    local_id = request.args.get("localId", default=-1,type=str)
+    user_data = dbWrapper.getUserData(local_id) #If any errors, ensure that this user exists in firestore users document
+    
+    if(user_data['account_type'] == 1):
+        response = app.response_class(
+        response=json.dumps({'approved': True}),
+        status=200,
+        mimetype='application/json'
+    )
+        
+    else:
+        #This is a student account
+        response = app.response_class(
+            response = json.dumps({'approved': False}),
+            status = 401,
+            mimetype = 'application/json'
+        )
+
+    return response
+
     
 
 @app.route('/auth/validate-session', methods=['GET'])
@@ -238,22 +270,22 @@ def upload():
 @cross_origin()  # Enable CORS for this route
 def add_course():
     try:
+        
         # Extract course details from the request JSON body
-        data = request.args
-
-      
+        data = request.get_json()
         
         # Extract the fields from the JSON object
-        course_name = data.get("courseName", "")
-        course_description = data.get("courseDescription", "")
-        course_term = data.get("courseTerm", "")
-        course_section = data.get("courseSection", "")
-        instructor_ids = data.get("instructor_ids", [])
+        course_name = data.get('course_name', "")
+        course_description = data.get('course_description', "")
+        course_term = data.get('course_term', "")
+        course_section = data.get('course_section', "")
+        instructor_ids = data.get('instructor_ids',[])
 
         print(course_name)
         print(course_description)
         print(course_term)
         print(course_section)
+        print(instructor_ids)
 
         # Check if all required fields are provided
         if not (course_name and course_description and course_term and course_section):
@@ -263,7 +295,7 @@ def add_course():
         success = dbWrapper.addCourse(
             course_description=course_description,
             course_id=course_name,
-            instructor_ids=[],
+            instructor_ids=instructor_ids,
             section=course_section,
             term=course_term,
             project_ids=[],
@@ -306,15 +338,15 @@ def add_course():
     
 
 
-# Jack Huynh _ Show courses
-@app.route('/auth/students/courses', methods= ["GET"])
+# Jack Huynh _ Show courses 
+@app.route('/auth/courses', methods= ["GET"])
 @cross_origin()
 def show_courses():
     # get student id from the current login
-    # student_id = request.args.get("studentId", default = -1, type = int)
-    student_id = "3708644"
+    local_id = request.args.get("localId", default = -1, type = str)
+    print('user ID is : ', local_id)
     # handle wrong student id case
-    if student_id == -1:
+    if local_id == -1:
         response = app.response_class(
             response=json.dumps({'error': 'No/wrong id'}),
             status = 401,
@@ -322,9 +354,15 @@ def show_courses():
         )
         return response
     try:  
-        # get student data
-        # Fetch student courses
-        student_data = dbWrapper.getStudentCourses(student_id)
+        # get user data by role
+        role = getUserRole(local_id)
+
+        if (role == 1):
+            # Fetch instructor courses
+            user_data_courses = dbWrapper.getInstructorCourses(local_id)
+        else:
+            # Fetch student courses
+            user_data_courses = dbWrapper.getStudentCourses(local_id)
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
@@ -333,21 +371,32 @@ def show_courses():
         )
 
         # if data exist?
-        if student_data:
+        if user_data_courses:
             # Convert dictionary to JSON for frontend use
             print("converting")
             response = app.response_class(
                 response=json.dumps({
                     'approved': True,
-                    'courses': student_data
+                    'courses': user_data_courses
                 }),
                 status=200,
                 mimetype='application/json'
             )
             return response
+        
+        elif user_data_courses == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+
+
+
         else:
-            # handle no data exist
-            print("no data")
+            # handle any other unexpected exist
+            
             response = app.response_class(
               response=json.dumps({'approved':False, 'reason':'No data found'}),
               status = 401,
