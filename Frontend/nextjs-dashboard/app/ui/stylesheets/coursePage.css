@@ -91,7 +91,7 @@ h1 {
     background-color: var(--secondaryColorHover);
 }
 
-.course{
+/**.course{
     min-width:100px;    
 
     border: none;
@@ -101,21 +101,38 @@ h1 {
     color:white;
     font-size:30px;
     cursor:pointer;
-}
+}**/
 
-.course:hover{
+/* SIBLING FADE: fade out siblings around a hovered item */
+
+.test { visibility: hidden; }
+/* Prevents :hover from triggering in the gaps between items */
+
+.test > * { visibility: visible; }
+/* Brings the child items back in, even though the parent is `hidden` */
+
+.test > * { transition: opacity 150ms linear 100ms, transform 150ms ease-in-out 100ms; }
+/* Makes the fades smooth with a slight delay to prevent jumps as the mouse moves between items */
+
+.test > * { opacity: 0.4; transform: scale(0.9); }
+/* Fade out all items when the parent is hovered */
+
+.test > *:hover { opacity: 1; transform: scale(1); transition-delay: 0ms, 0ms; }
+/* Fade in the currently hovered item */
+
+/**.course:hover{
     background-color: #525252;
-}
+}**/
 
-.course-title {
-    font-size: 1.5rem; /* Adjust to your liking */
+/**.course-title {
+    font-size: 1.5rem; 
     font-weight: bold;
-}
+}**/
 
-.course-detail {
-    font-size: 1rem; /* Adjust to your liking */
-    color: #ffffff; /* Same as Tailwind's 'text-gray-600' */
-}
+/**.course-detail {
+    font-size: 1rem; 
+    color: #ffffff; 
+}**/
 
 
 .popup {

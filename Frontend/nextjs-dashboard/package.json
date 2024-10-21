@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.4",
+    "@nextui-org/card": "^2.0.34",
     "@tailwindcss/forms": "^0.5.7",
     "@vercel/postgres": "^0.8.0",
     "autoprefixer": "10.4.19",
