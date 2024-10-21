@@ -8,8 +8,10 @@ class StudentMetrics:
     def __init__(self, db) -> None:
         self.db = db
 
-    def get_student_joy_ratings(self, project_id, anonymous=True):
-        raw_ratings = self.db.getStudentJoyRatings(project_id)
+    def get_avg_team_joy_ratings(self, project_id, anonymous=True): # Return Most Recent Joy Rating for each Student
+        pass
+    def get_student_joy_ratings(self, project_id): # Return Most Recent Joy Rating for each Student
+        raw_ratings = self.db.getTeamJoy(project_id)
         if anonymous is False:
             return raw_ratings
         ratings = []
