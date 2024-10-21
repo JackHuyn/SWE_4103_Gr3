@@ -86,13 +86,19 @@ class DbWrapper:
         self.db.collection(COURSES).document(course_id).set(template)
         return True
     def removeCourse(self, course_id:str)->bool:
+        course_id = "abc"
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
+        print(course_id)
+        print(x)
         if len(x) == 0:
             return False
         try:
+            print("testsetsetset")
             db.collection(COURSES).document(course_id).delete()
         except:
+            print("BBBBBBBBB")
             return False
+        print("AAAAAAAAAA")
         return True
     def findUser(self, email:str)->dict|None:
         docs = self.db.collection(USERS).where(filter=FieldFilter("email", "==", email)).stream()
@@ -117,4 +123,4 @@ if __name__ == "__main__":
     print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
     print(test.activateCourse("TestCourseAgain"))
     print(test.getInstructorCourses("some_prof"))
-    #print(test.removeCourse("TestCourseAgain"))
+    #print(test.removeCourse("SWE"))
