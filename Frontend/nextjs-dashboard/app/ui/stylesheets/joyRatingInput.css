@@ -1,0 +1,37 @@
+@import url('./colors.css');
+@import url('./default.css');
+
+#joy-rating-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 30%;
+    background-color: black;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0;
+    padding: auto;
+}
+
+#joy-rating-dialog > h1 {
+    margin: 2% 0;
+}
+
+#joy-stars > button {
+    background-color: transparent;
+    border-style: none;
+    margin: 1% 1%;
+    padding: 0;
+
+    font-size: 3.25em;
+    color: whitesmoke;
+}
+
+#submit-joy-rating-button {
+    padding: 1% 2%;
+    margin: 0;
+}

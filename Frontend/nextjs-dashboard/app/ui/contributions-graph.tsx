@@ -4,7 +4,7 @@ import { groupEnd } from 'console';
 async function getChart() {
     console.log('GET CHART CALLED')
     let contributions = []
-    return fetch("http://127.0.0.1:3001/metrics/contributions",
+    return fetch("http://127.0.0.1:3001/metrics/contributions?projectId=TEMPLATE",
         {
             method: 'GET'
         }
@@ -101,11 +101,6 @@ async function getChart() {
     }).catch((error) => {
         console.log(error)
     })
-}
-
-async function loadAdditions()
-{
-
 }
 
 export default function ContributionsGraph()

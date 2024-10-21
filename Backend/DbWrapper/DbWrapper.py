@@ -3,6 +3,7 @@ from firebase_admin import auth, credentials, firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
 from google.cloud.firestore_v1 import ArrayUnion
 import os
+import datetime
 
 COURSES = "coursedata"
 GROUPS = "groupdata"
@@ -99,6 +100,40 @@ class DbWrapper:
         for doc in docs:
             return doc.to_dict()
         return None
+    
+    # Project Access Functions
+    def getStudentJoyRatings(self, project_id:str) -> dict:
+        docs = self.db.collection(PROJECTS).document(project_id).get()
+        return docs.to_dict()['joy_data']
+    
+    def addStudentJoyRatings(self, project_id:str, uid:str, rating:int) -> bool:
+        doc = self.db.collection(PROJECTS).document(project_id)
+        try:
+            doc.update(
+                {
+                    "joy_data": ArrayUnion(
+                        [
+                            {
+                                "uid": uid,
+                                "joy_rating": rating,
+                                "date": datetime.datetime.now()
+                            }
+                        ]
+                    )
+                }
+            )
+        except Exception as e:
+            print(e)
+            return False
+        return True
+    
+    def getGithubRepoAddress(self, project_id:str):
+        docs = self.db.collection(PROJECTS).document(project_id).get()
+        return docs.to_dict()['github_repo_address']
+
+
+
+    
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
@@ -109,12 +144,14 @@ if __name__ == "__main__":
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     test = DbWrapper(db)
-    docs = test.getStudentCourses("3713652")
-    print(docs)
-    print(test.addStudentToCourse("3713652", "TestCourse"))
-    print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
-    print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
-    print(test.activateCourse("TestCourseAgain"))
-    print(test.getInstructorCourses("some_prof"))
+    print(test.addStudentJoyRatings('TEMPLATE', 'python_test', 4))
+    print(test.getStudentJoyRatings('TEMPLATE'))
+    # docs = test.getStudentCourses("3713652")
+    # print(docs)
+    # print(test.addStudentToCourse("3713652", "TestCourse"))
+    # print(test.getUserData("TestUser"))
+    # print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+    # print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
+    # print(test.activateCourse("TestCourseAgain"))
+    # print(test.getInstructorCourses("some_prof"))
     #print(test.removeCourse("TestCourseAgain"))

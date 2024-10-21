@@ -12,6 +12,7 @@ import os
 import Auth as fb_auth
 import FileUpload as fp
 from DbWrapper.DbWrapper import DbWrapper
+import StudentMetrics as StudentMetrics
 
 
 
@@ -28,6 +29,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 dbWrapper = DbWrapper(db)
+metrics = StudentMetrics.StudentMetrics(dbWrapper)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
@@ -285,6 +287,37 @@ def show_courses():
         )
         return response
     
+
+@app.route('/metrics/get-joy-ratings', methods=['GET'])
+@cross_origin()
+def get_student_soy_atings():
+    project_id = request.args.get("projectId", default = "", type = str)
+    return metrics.getStudentJoyRatings(project_id)
+
+@app.route('/metrics/submit-joy-rating', methods=['POST'])
+
+@app.route('/metrics/contributions', methods=['GET'])
+@cross_origin()
+def get_github_contribution_stats():
+    project_id = request.args.get("projectId", default = "", type = str)
+    try:
+        resp = metrics.get_github_contribution_stats(project_id)
+        # print(resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'contributions': resp}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+
     
 if __name__ == '__main__':
     print("Start")
