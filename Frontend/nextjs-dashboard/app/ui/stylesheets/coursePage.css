@@ -127,28 +127,79 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.636); /* Semi-transparent background */
-  }
-  
-  .popup_content {
-    background-color: #121212;
-    height:30%;
-    padding: 20px;
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.75); /* Darker, semi-transparent background */
+    z-index: 9999; /* Ensures the popup is above all other elements */
+}
+
+.popup_content {
+    background-color: #1c1c1c;
+    width: 400px;
+    padding: 30px;
+    border-radius: 15px;
     text-align: center;
-    font-family:jura;
-  }
-  
-  .popup_button {
-    margin: 10px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #5b5b5b;
+    font-family: 'Jura', sans-serif;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative; /* Allows us to position child elements */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers all elements inside the popup */
+    gap: 20px; /* Adds spacing between form fields */
+}
+
+.popup_content h2 {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.popup_content input {
+    width: 100%; /* Ensure inputs take the full width of the popup */
+    max-width: 350px; /* Optionally limit the width for smaller screens */
+    padding: 12px;
+    border: 1px solid #5b5b5b;
+    border-radius: 8px;
+    background-color: #2d2d2d;
     color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.popup_content input:focus {
+    border-color: #888888; /* Lighter border on focus */
+}
+
+.popup_buttons {
+    display: flex;
+    justify-content: center; /* Center the buttons horizontally */
+    gap: 15px; /* Space between the buttons */
+    margin-top: 20px; /* Add some space above the buttons */
+}
+
+.desc{
+
+    height: 100px;
+}
+
+.popup_button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
     cursor: pointer;
-  }
-  
-  .popup_button:hover {
-    background-color: #525252;
-  }
+    transition: background-color 0.3s;
+}
+
+.popup_button:hover {
+    background-color: #0056b3;
+}
+
+.cancel_button {
+    background-color: #dc3545;
+}
+
+.cancel_button:hover {
+    background-color: #c82333;
+}
