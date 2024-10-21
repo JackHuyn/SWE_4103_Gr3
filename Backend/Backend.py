@@ -426,11 +426,16 @@ def show_courses():
         return response
     
 
-@app.route('/metrics/get-joy-ratings', methods=['GET'])
+@app.route('/metrics/get-team-joy-ratings', methods=['GET'])
 @cross_origin()
-def get_student_soy_atings():
+def get_team_joy_ratings(): # Avg Joy Ratings per Day
     project_id = request.args.get("projectId", default = "", type = str)
     return metrics.getStudentJoyRatings(project_id)
+
+@app.route('/metrics/get-student-joy-ratings', methods=['GET'])
+@cross_origin()
+def get_student_joy_ratings(): # Avg Joy Ratings per Day
+    pass
 
 @app.route('/metrics/submit-joy-rating', methods=['POST'])
 
