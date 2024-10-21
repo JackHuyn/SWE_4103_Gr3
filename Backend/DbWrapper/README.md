@@ -41,6 +41,13 @@ Note:
 
 - instructor_id is a user uid
 
+`getProjectData(project_id)` - Given a project ID, returns a dict containing project data.
+
+`getGroupData(group_id)` - Given a group ID, returns a dict containing group data.
+
+`getStudentGroups(student_id)` - Given a student ID, returns a list of dict containing all groups a student is in.
+
+`getTeamJoy(group_id)` - Given a group ID, returns a list of dict containing all joy data for a given team.
 
 `addStudentToCourse(student_id, course_id)` - Given a student ID and course ID, add a student to a course. Returns True if successful.
 
@@ -54,7 +61,7 @@ Note:
 
 - instructor_id is a user uid
 
-`addCourse(course_description, course_id, instructor_ids, section, term, project_ids: optional, student_ids: optional, status: options)` - Given data points, create a course entry in the database. Returns True if successful.
+`addCourse(course_description, course_id, instructor_ids, section, term, project_ids: optional, student_ids: optional, status: optional)` - Given data points, create a course entry in the database. Returns True if successful.
 
 Note:
 - status - 0 is active, 1 is archived (0 is default)
@@ -69,6 +76,41 @@ Note:
 - accType - 0 is student, 1 is a prof
 - uid - Derived from Authentication
 - github_personal_access_token - Optional for now. May become mandatory in future sprints. (Default is empty string)
+
+`addProject(course_id, project_id, project_name, max_group_size, github_repo_address: optional, group_ids: optional)` - Given data points, create a project entry in the database. Returns True if successful.
+
+Note:
+- project_id - This *should* be user defined, however it can be anything so long as it is unique.
+- github_repo_address - Optional for now. May become mandatory in future sprints. (Default is empty string)
+- group_ids - Optional. These should not be predefined, however if they are, you may add them here. (Default is empty list)
+
+`addProjectToCourse(project_id, course_id)` - Given a project ID and a course ID, add the project to the course. Returns True if successful.
+
+`addGroup(group_id, group_name, project_id, student_ids: optional)` - Given data points, create a group entry in the database. Returns True if successful.
+
+Note:
+- group_id - This can either be created as a combination of the project ID and some incrementing integer or user defined, so long as the ID is unique.
+- student_ids - Should be an array of user IDs. These may not be predefined, however if they are, you may add them here. (Default is empty list)
+
+`addStudentToGroup(group_id, student_id)` - Given a group ID and a student ID, add a student to a group. Returns True if successful.
+
+`addJoyRating/updateJoyRating(student_id, group_id, joy_rating, timestamp)` - For now, addJoyRating incorporates the functionality of updateJoyRating if the entry already exists. It is recommended to use addJoyRating for all joy rating operations. Returns True if successful.
+
+Note:
+- joy_rating - Should be an int between 1-5
+- timestamp - Should be an int. See below for guidance on timestamps.
+
+### Sidenote about Timestamps in Python
+
+Timestamps can be a little wonky in Python. The easiest way to approach this is to use the built-in datetime library. Consider the following Python code:
+
+```python
+import datetime
+
+datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp() # This returns a float
+```
+
+The addJoyRating function expects a timestamp. However, we do not care about the time of day the rating occurred (mainly to avoid database clutter and avoid input abuse): we only need a day, month, and year. The above code will provide the timestamp we need (albeit, in a not very elegant statement). This value should also be cast to an int (although we get a float, the floating point portion is never used since this is reserved for microseconds). <b>NOT CASTING TO AN INT WILL CAUSE UNDEFINED BEHAVIOUR WHEN INTERACTING WITH THE DATABASE!</b>
 
 `removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
 
