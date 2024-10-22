@@ -27,12 +27,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Install dependencies (including type declarations)
+      # Step 3: Install dependencies (including js-cookie and its type definitions with --force)
       - name: Install dependencies
         working-directory: Frontend/nextjs-dashboard
         run: |
           npm install --force
-          npm install --save-dev @types/js-cookie
+          npm install --save js-cookie --force
+          npm install --save-dev @types/js-cookie --force
 
       # Step 4: Build the Next.js app
       - name: Build Next.js app
