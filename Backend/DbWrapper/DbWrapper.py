@@ -135,8 +135,9 @@ class DbWrapper:
         group_n = len(x)
         template = {}
         group_id = f"{project_id}_gr{group_n}"
+        projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        template["group_name"] = f"{project_id} Group {group_n}"
+        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
         inserted = False
