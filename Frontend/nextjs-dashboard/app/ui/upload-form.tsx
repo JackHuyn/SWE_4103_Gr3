@@ -22,6 +22,7 @@ export default function FileUpload({localId, courseId}: {localId: string, course
             alert('fileUpload of nextjs')
             const data = new FormData()
             data.set('file',file)
+            data.set('course_id', courseId)
             
             //Posts the uploaded file to the backend
             const res = await fetch('http://localhost:3001/upload_file',{

@@ -141,7 +141,10 @@ def getUserRole(local_id):
     user_data = dbWrapper.getUserData(local_id)
     return user_data['account_type']
 
-
+#Helper to get student list in course
+def getStudentList(local_id):
+    course_data = dbWrapper.getCourseData(local_id)
+    return course_data['student_ids']
 
 #Author: Raphael Ferreira 
 @app.route('/check-instructor',methods=['GET'])
@@ -205,34 +208,25 @@ def upload():
             response=json.dumps({}),
             status=401,
             mimetype='application/json'
-
         )
-
         return response  
-       
     
-    else:
-        file = request.files['file']
+    file = request.files['file']
+    course_id = request.form.get('course_id')
         #would need to confirm that I am logged in using validate_session or firebase_auth.validate_token ? 
         #valid = True
-        response = app.response_class(
-            response=json.dumps({'approved': True }),
-            status = 200, 
-            mimetype = 'application/json'
-
-        )
-
-    
+    response = app.response_class(
+        response=json.dumps({'approved': True }),
+        status = 200, 
+        mimetype = 'application/json'
+    )
     if file.filename == '':
         response = app.response_class(
             response = json.dumps({'approved': False}),
             status=401,
             mimetype='application/json'
         )
-
         return response
-        
-
     if file and fp.allowed_file(file.filename):
         saved_file_path = fp.save_file(file) 
         list_of_emails = fp.extract_email(saved_file_path)
@@ -244,7 +238,10 @@ def upload():
             user_dict = dbWrapper.findUser(email)
             if user_dict != None:
                 user_id = user_dict['uid']
-                dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+                if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
+                    print(user_id + ':\tDone')
+                else:
+                    print(user_id + ':\tFail')
             else:
                 # add not found emails to a not found list
                 users_not_found.append(email)
@@ -389,28 +386,7 @@ def remove_course():
             status=500,
             mimetype='application/json'
         )
-        return response
-
-
-# Author: Sarun Weerakul
-# get student list from course
-@app.route('/auth/courses/course', methods= ['GET','POST'])
-@cross_origin()
-def students_list_in_course():
-    local_id = request.args.get("localId", default = -1, type = str)
-    course_data = dbWrapper.getCourseData(local_id)
-    student_list = course_data['student_ids']
-    return student_list
-
-# get project list from course owner
-@app.route('/auth/courses/course', methods= ['GET','POST'])
-@cross_origin()
-def projects_list_in_course():
-    local_id = request.args.get("localId", default = -1, type = str)
-    course_data = dbWrapper.getCourseData(local_id)
-    project_list = course_data['project_ids']
-    return project_list
-    
+        return response    
 
 @app.route('/auth/course_home_page', methods = ["GET"])
 @cross_origin()
@@ -432,7 +408,6 @@ def get_course_data():
 
     try: 
         course_data = dbWrapper.getCourseData(course_id)
-
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
@@ -482,7 +457,60 @@ def get_course_data():
         return response
 
     
-
+#Author: Sarun Weerakul
+#print student email from course list
+@app.route('/auth/student_list_in_courses', methods= ["GET"])
+@cross_origin()
+def student_List():
+    local_id = request.args.get("localId", default = -1, type = str)
+    print('course ID is : ', local_id)
+    if local_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course ID'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    try:  
+        students = getStudentList(local_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+        if students:
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': students
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response      
+        elif students == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+        else:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
 
 
 
