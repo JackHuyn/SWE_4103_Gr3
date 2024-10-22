@@ -89,11 +89,11 @@ Note:
 
 `addGroup(project_id, student_ids: optional)` - Given data points, create a group entry in the database. Returns True if successful. Auto-IDs projects
 
-`addNGroups(project_id:str, n:int)` - Given a project and some integer, batch add N number of groups to a project. Returns True if successful.
-
 Note:
 - group_id - This can either be created as a combination of the project ID and some incrementing integer or user defined, so long as the ID is unique.
 - student_ids - Should be an array of user IDs. These may not be predefined, however if they are, you may add them here. (Default is empty list)
+
+`addNGroups(project_id:str, n:int)` - Given a project and some integer, batch add N number of groups to a project. Returns True if successful.
 
 `addStudentToGroup(group_id, student_id)` - Given a group ID and a student ID, add a student to a group. Returns True if successful.
 
