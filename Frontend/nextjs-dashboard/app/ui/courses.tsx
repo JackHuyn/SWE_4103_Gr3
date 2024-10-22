@@ -122,13 +122,14 @@ export default function Courses() {
     
                 if (response.ok) {
                     alert('Course added successfully!');
-                    setCourseList([...courseList, courseData]); // Add the new course to the list
+                    window.location.reload();
+                    //setCourseList([...courseList, courseData]); // Add the new course to the list
                     // Reset form and close popup
-                    setNewCourseName('');
+                    /**setNewCourseName('');
                     setNewCourseDescription('');
                     setNewCourseTerm('');
                     setNewCourseSection('');
-                    setIsPopupVisible(false);
+                    setIsPopupVisible(false);**/
                 } else {
                     alert(`Error adding course: ${result.reason}`);
                 }
@@ -262,7 +263,8 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
-                                //<Link href ={course.course_id}>
+                                
+                                <Link href ={course.course_id}>
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
                                     <p className="course-detail">Description: {course.course_description}</p>
@@ -270,7 +272,7 @@ export default function Courses() {
                                     <p className="course-detail">Term: {course.term}</p>
                                     
                                 </div>
-                                //</Link>
+                                </Link>
                             ))}
                         </div>
                     )}
