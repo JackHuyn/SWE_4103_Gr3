@@ -295,7 +295,6 @@ def add_course():
             instructor_ids=instructor_ids,
             section=course_section,
             term=course_term,
-            project_ids=[],
             student_ids=[]
         )  
 
@@ -459,7 +458,7 @@ def get_course_data():
     
 #Author: Sarun Weerakul
 #print student email from course list
-@app.route('/auth/student_list_in_courses', methods= ["GET"])
+@app.route('/auth/student_list_in_courses', methods= ['GET','POST'])
 @cross_origin()
 def student_List():
     local_id = request.args.get("localId", default = -1, type = str)
