@@ -335,6 +335,25 @@ def add_course():
         )
         return response
 
+
+# Author: Sarun Weerakul
+# get student list from course
+@app.route('/auth/courses/course', methods= ['GET','POST'])
+@cross_origin()
+def students_list_in_course():
+    local_id = request.args.get("localId", default = -1, type = str)
+    course_data = dbWrapper.getCourseData(local_id)
+    student_list = course_data['student_ids']
+    return student_list
+
+# get project list from course owner
+@app.route('/auth/courses/course', methods= ['GET','POST'])
+@cross_origin()
+def projects_list_in_course():
+    local_id = request.args.get("localId", default = -1, type = str)
+    course_data = dbWrapper.getCourseData(local_id)
+    project_list = course_data['project_ids']
+    return project_list
     
 
 
