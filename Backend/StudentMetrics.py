@@ -22,14 +22,19 @@ class StudentMetrics:
 
         # Create dictionary with date as key and average joy as value
         avg_joy_by_date = {}
-        for date, docs in documents_by_date.items():
-            joy_values = [] 
-            for doc in docs:
-                joy_values.append(doc['joydata'] )
-            average_joy = sum(joy_values) / len(joy_values)
-            avg_joy_by_date[date] = average_joy
+        for date in documents_by_date.keys():
+            current_docs = documents_by_date[date]
+            sum = 0
+            ctr = 0
+            for doc in current_docs:
+                sum += doc['joy_rating']
+                ctr += 1
 
-        return avg_joy_by_date           
+            if ctr == 0: continue 
+            avg = sum/ctr 
+            avg_joy_by_date[date] = avg
+        return avg_joy_by_date
+
         
 
     def get_student_joy_ratings(self, project_id, anonymous=True): # Return Most Recent Joy Rating for each Student
@@ -41,6 +46,8 @@ class StudentMetrics:
             ratings.append({'joy_rating': r['joy_rating'], 'date': r['date']})
         return ratings
     
+
+
     def add_student_joy_ratings(self, project_id, uid, joy_rating):
         return self.db.addStudentJoyRatings(project_id, uid, joy_rating)
     
