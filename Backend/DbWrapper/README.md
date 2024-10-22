@@ -49,6 +49,10 @@ Note:
 
 `getTeamJoy(group_id)` - Given a group ID, returns a list of dict containing all joy data for a given team.
 
+`getProjectGroups(project_id:str)` - Given a project ID, return a list of dict containing all groups.
+
+`getCourseProjects(course_id:str)` - Given a course ID, return a list of dict containing all projects.
+
 `addStudentToCourse(student_id, course_id)` - Given a student ID and course ID, add a student to a course. Returns True if successful.
 
 Note:
@@ -61,7 +65,7 @@ Note:
 
 - instructor_id is a user uid
 
-`addCourse(course_description, course_id, instructor_ids, section, term, project_ids: optional, student_ids: optional, status: optional)` - Given data points, create a course entry in the database. Returns True if successful.
+`addCourse(course_description, course_id, instructor_ids, section, term, student_ids: optional, status: optional)` - Given data points, create a course entry in the database. Returns True if successful.
 
 Note:
 - status - 0 is active, 1 is archived (0 is default)
@@ -77,16 +81,15 @@ Note:
 - uid - Derived from Authentication
 - github_personal_access_token - Optional for now. May become mandatory in future sprints. (Default is empty string)
 
-`addProject(course_id, project_id, project_name, max_group_size, github_repo_address: optional, group_ids: optional)` - Given data points, create a project entry in the database. Returns True if successful.
+`addProject(course_id, project_id, project_name, github_repo_address: optional)` - Given data points, create a project entry in the database. Returns True if successful.
 
 Note:
 - project_id - This *should* be user defined, however it can be anything so long as it is unique.
 - github_repo_address - Optional for now. May become mandatory in future sprints. (Default is empty string)
-- group_ids - Optional. These should not be predefined, however if they are, you may add them here. (Default is empty list)
 
-`addProjectToCourse(project_id, course_id)` - Given a project ID and a course ID, add the project to the course. Returns True if successful.
+`addGroup(project_id, student_ids: optional)` - Given data points, create a group entry in the database. Returns True if successful. Auto-IDs projects
 
-`addGroup(group_id, group_name, project_id, student_ids: optional)` - Given data points, create a group entry in the database. Returns True if successful.
+`addNGroups(project_id:str, n:int)` - Given a project and some integer, batch add N number of groups to a project. Returns True if successful.
 
 Note:
 - group_id - This can either be created as a combination of the project ID and some incrementing integer or user defined, so long as the ID is unique.
@@ -113,5 +116,9 @@ datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/
 The addJoyRating function expects a timestamp. However, we do not care about the time of day the rating occurred (mainly to avoid database clutter and avoid input abuse): we only need a day, month, and year. The above code will provide the timestamp we need (albeit, in a not very elegant statement). This value should also be cast to an int (although we get a float, the floating point portion is never used since this is reserved for microseconds). <b>NOT CASTING TO AN INT WILL CAUSE UNDEFINED BEHAVIOUR WHEN INTERACTING WITH THE DATABASE!</b>
 
 `removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
+
+`removeProject(project_id)` - Given a project ID, deletes the project entry and any associated group entries from the database. Returns True if successful.
+
+`removeGroup(group_id)` - Given a group ID, deletes the group entry from the database. Returns True if successful.
 
 `findUser(email)` - Given an email, returns a user entry in the database. Returns None if entry is not found.
