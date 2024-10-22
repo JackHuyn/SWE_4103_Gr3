@@ -3,6 +3,8 @@ import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
 import { Button } from './button';
 import Cookies from 'js-cookie';
+import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
+
 
 
 export default function Courses() {
@@ -260,13 +262,25 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
+                                //<Link href ={course.course_id}>
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
-                                    <h3 className="course-title">{course.course_id}</h3>
+
+                                     
+                                    <Card shadow="sm" key={index} isPressable onPress={() => console.log(course.course_id)}>
+                                    
+                                    <CardHeader className="justify-between">
+                                        
+                                    <h3 className="course-title">{course.course_name}</h3>
+                                    </CardHeader>
+                                    
+                                    <CardBody className="overflow-visible p-0">
                                     <p className="course-detail">Description: {course.course_description}</p>
                                     <p className="course-detail">Section: {course.section}</p>
                                     <p className="course-detail">Term: {course.term}</p>
-                                    
+                                    </CardBody>
+                                    </Card>
                                 </div>
+                                //</Link>
                             ))}
                         </div>
                     )}

@@ -393,6 +393,81 @@ def remove_course():
 
     
 
+@app.route('/auth/course_home_page', methods = ["GET"])
+@cross_origin()
+def get_course_data():
+    local_id = request.args.get("localId", default = '-1', type=str)
+    course_id = request.args.get("courseId", default= '-1', type=str)
+    print('We have the course_id of : ', course_id)
+    if local_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'No/wrong id'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    
+    
+    #To Do: Get projects data
+    #To Do: Check Role ?
+
+    try: 
+        course_data = dbWrapper.getCourseData(course_id)
+
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+        print(course_data)
+
+        if course_data:
+            # Convert dictionary to JSON for frontend use
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': course_data
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
+        
+        elif course_data == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+
+
+
+        else:
+            # handle any other unexpected exist
+            
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    # error
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+
+    
+
+
+
+
+
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])
