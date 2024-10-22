@@ -176,7 +176,6 @@ class DbWrapper:
             return False
         return True
     def removeCourse(self, course_id:str)->bool:
-        course_id = "abc"
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         print(course_id)
         print(x)
@@ -185,9 +184,9 @@ class DbWrapper:
         try:
             self.db.collection(COURSES).document(course_id).delete()
         except:
-            print("BBBBBBBBB")
+            
             return False
-        print("AAAAAAAAAA")
+     
         return True
     
     def findUser(self, email:str)->dict|None:
