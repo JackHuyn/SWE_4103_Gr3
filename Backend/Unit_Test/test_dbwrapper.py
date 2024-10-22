@@ -6,6 +6,7 @@ from google.cloud.firestore_v1 import ArrayUnion
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DbWrapper.DbWrapper import DbWrapper  
 
+#Version 2 with new update 
 class TestDbWrapper(unittest.TestCase):
 
     def setUp(self):
@@ -13,6 +14,7 @@ class TestDbWrapper(unittest.TestCase):
         self.mock_db = MagicMock()
         self.db_wrapper = DbWrapper(self.mock_db)  
 
+# Test archive
     def test_archiveCourse(self):
         # Mock the Firestore document and its update method
         mock_doc = MagicMock()
@@ -38,7 +40,7 @@ class TestDbWrapper(unittest.TestCase):
 
         # Check that the function returns False on error
         self.assertFalse(result)
-
+# Get user Data
     def test_getUserData(self):
         # Mock Firestore document
         mock_doc = MagicMock()
@@ -51,7 +53,7 @@ class TestDbWrapper(unittest.TestCase):
         # Verify that the document was accessed and data was returned
         mock_doc.get.assert_called_once()
         self.assertEqual(result, {"uid": "testuser", "email": "test@example.com"})
-
+## Add user data
     def test_addUser(self):
         # Mock Firestore query and document creation
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
@@ -83,7 +85,7 @@ class TestDbWrapper(unittest.TestCase):
 
         # Verify that the document was not created because the user already exists
         self.assertFalse(result)
-
+# Get student courses
     def test_getStudentCourses(self):
         # Mock Firestore stream query for courses
         mock_course_doc = MagicMock()
@@ -95,7 +97,7 @@ class TestDbWrapper(unittest.TestCase):
 
         # Verify that the query was made and the correct data was returned
         self.assertEqual(result, [{"course_id": "course123"}])
-
+# Remove courses
     def test_removeCourse(self):
         # Simulate a course found in the database by returning a mock document
         mock_course = MagicMock()
@@ -121,7 +123,7 @@ class TestDbWrapper(unittest.TestCase):
         self.assertFalse(result)
 
     # Additional tests from the new methods
-
+# Joy rating
     def test_addJoyRating(self):
         # Simulate no existing joy rating
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
@@ -160,7 +162,7 @@ class TestDbWrapper(unittest.TestCase):
 
         # Check that the function returns True
         self.assertTrue(result)
-
+# Addgroup to project
     def test_addGroupToProject(self):
         # Mock Firestore document
         mock_doc = MagicMock()
@@ -189,7 +191,7 @@ class TestDbWrapper(unittest.TestCase):
 
         # Check that the function returns False on error
         self.assertFalse(result)
-
+# Add project to course
     def test_addProjectToCourse(self):
         # Mock Firestore document
         mock_doc = MagicMock()
