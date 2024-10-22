@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-
+import FileUpload from '@/app/ui/upload-form'
 export default function CourseDetails() {
   const router = useRouter();
   const { courseid } = router.query; // destructuring to get courseid
@@ -35,6 +35,11 @@ export default function CourseDetails() {
         <pre>{JSON.stringify(courseDetails, null, 2)}</pre>
       ) : (
         <p>Loading...</p>
+      )}
+
+      {/* Reuse FileUpload Component */}
+      {localId && courseid && (
+        <FileUpload localId={localId} courseId={courseid as string} />
       )}
     </div>
   );
