@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]
+        node-version: [22.x, 20.x]
 
     steps:
       # Step 1: Checkout the repository
@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       # Step 3: Change directory to the frontend folder (nextjs-dashboard)
       - name: Navigate to Frontend/nextjs-dashboard
@@ -35,7 +34,7 @@ jobs:
       # Step 4: Install dependencies (npm ci requires package-lock.json)
       - name: Install dependencies
         working-directory: Frontend/nextjs-dashboard
-        run: npm ci
+        run: npm install ci
 
       # Step 5: Build the Next.js app
       - name: Build Next.js app
