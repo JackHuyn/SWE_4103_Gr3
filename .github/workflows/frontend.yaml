@@ -34,7 +34,7 @@ jobs:
       # Step 4: Install dependencies (npm ci requires package-lock.json)
       - name: Install dependencies
         working-directory: Frontend/nextjs-dashboard
-        run: npm install i 
+        run: npm install 
 
 
       # Step 5: Build the Next.js app
