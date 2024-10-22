@@ -32,7 +32,7 @@ jobs:
         working-directory: Frontend/nextjs-dashboard
         run: |
           npm install --force
-          npm install js-cookie
+          npm install js-cookie --force
 
       # Step 4: Build the Next.js app
       - name: Build Next.js app
