@@ -27,12 +27,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Install dependencies (npm install requires package-lock.json)
+      # Step 3: Install dependencies (including type declarations)
       - name: Install dependencies
         working-directory: Frontend/nextjs-dashboard
         run: |
           npm install --force
-          npm install js-cookie --force
+          npm install --save-dev @types/js-cookie
 
       # Step 4: Build the Next.js app
       - name: Build Next.js app
