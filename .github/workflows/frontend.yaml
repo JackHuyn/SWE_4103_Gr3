@@ -15,44 +15,40 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]  # Compatible Node.js versions
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       # Step 1: Checkout the repository
       - uses: actions/checkout@v4
 
       # Step 2: Set up Node.js and cache dependencies
-      - name: Set up Node.js ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      # Step 3: Install dependencies
+      # Step 3: Change directory to the frontend folder (nextjs-dashboard)
+      - name: Navigate to Frontend/nextjs-dashboard
+        run: cd Frontend/nextjs-dashboard
+
+      # Step 4: Install dependencies (npm ci requires package-lock.json)
       - name: Install dependencies
+        working-directory: Frontend/nextjs-dashboard
         run: npm ci
 
-
-      # Step 4: Build the Next.js app
+      # Step 5: Build the Next.js app
       - name: Build Next.js app
+        working-directory: Frontend/nextjs-dashboard
         run: npm run build
 
-      # Step 5: Run tests (Jest, React Testing Library, etc.)
+      # Step 6: Run tests (optional)
       - name: Run tests
+        working-directory: Frontend/nextjs-dashboard
         run: npm test
 
-      # Step 6: Cache build output (optional)
-      # This step caches the Next.js build output (e.g., .next) to speed up subsequent builds
-      - name: Cache Next.js build output
-        uses: actions/cache@v3
-        with:
-          path: .next/cache
-          key: ${{ runner.os }}-nextjs-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ matrix.node-version }}-
-
-
-      # Optional: Upload artifact (for logs or build outputs)
+        
+         # Optional: Upload artifact (for logs or build outputs)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -60,5 +56,3 @@ jobs:
             path: ${{ github.workspace }}/
             if-no-files-found: error
             overwrite: true
-
-
