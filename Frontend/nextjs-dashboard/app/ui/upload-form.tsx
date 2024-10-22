@@ -10,7 +10,7 @@ import {useState} from 'react'
 
 
 //Author: Raphael Ferreira
-export default function FileUpload() {
+export default function FileUpload({localId, courseId}: {localId: string, courseId: string}) {
     const [file,setFile] = useState<File>()
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
