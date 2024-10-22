@@ -171,6 +171,7 @@ export default function Courses() {
     
                 if (response.ok) {
                     alert('Course removed successfully!');
+                    window.location.reload();
                     // Reset form and close popup
                     setNewCourseName('');
                     setIsPopup2Visible(false);

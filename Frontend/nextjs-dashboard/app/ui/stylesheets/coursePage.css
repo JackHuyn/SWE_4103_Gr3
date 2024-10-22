@@ -83,6 +83,10 @@ h1 {
     transform: scale(1.05);
 }
 
+.addCourse:active{
+    background-color: #2b2b2b;
+}
+
 .courses {
     display: grid;
     width: 70%;
