@@ -27,33 +27,28 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Change directory to the frontend folder (nextjs-dashboard)
-      - name: Navigate to Frontend/nextjs-dashboard
-        run: cd Frontend/nextjs-dashboard
-
-      # Step 4: Install dependencies (npm ci requires package-lock.json)
+      # Step 3: Install dependencies (npm install requires package-lock.json)
       - name: Install dependencies
         working-directory: Frontend/nextjs-dashboard
-        run: npm install --force
-             npm i
+        run: |
+          npm install --force
+          npm install js-cookie
 
-
-      # Step 5: Build the Next.js app
+      # Step 4: Build the Next.js app
       - name: Build Next.js app
         working-directory: Frontend/nextjs-dashboard
         run: npm run build
 
-      # Step 6: Run tests (optional)
+      # Step 5: Run tests (optional)
       - name: Run tests
         working-directory: Frontend/nextjs-dashboard
         run: npm test
 
-        
-         # Optional: Upload artifact (for logs or build outputs)
+      # Step 6: Upload build artifacts (Optional)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-            name: log_File
-            path: ${{ github.workspace }}/
-            if-no-files-found: error
-            overwrite: true
+          name: log_File
+          path: ${{ github.workspace }}/
+          if-no-files-found: error
+          overwrite: true
