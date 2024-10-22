@@ -49,9 +49,9 @@ Note:
 
 `getTeamJoy(group_id)` - Given a group ID, returns a list of dict containing all joy data for a given team.
 
-`getProjectGroups(project_id:str)` - Given a project ID, return a list of dict containing all groups.
+`getProjectGroups(project_id)` - Given a project ID, return a list of dict containing all groups.
 
-`getCourseProjects(course_id:str)` - Given a course ID, return a list of dict containing all projects.
+`getCourseProjects(course_id)` - Given a course ID, return a list of dict containing all projects.
 
 `addStudentToCourse(student_id, course_id)` - Given a student ID and course ID, add a student to a course. Returns True if successful.
 
@@ -93,7 +93,7 @@ Note:
 - group_id - This can either be created as a combination of the project ID and some incrementing integer or user defined, so long as the ID is unique.
 - student_ids - Should be an array of user IDs. These may not be predefined, however if they are, you may add them here. (Default is empty list)
 
-`addNGroups(project_id:str, n:int)` - Given a project and some integer, batch add N number of groups to a project. Returns True if successful.
+`addNGroups(project_id, n)` - Given a project ID and some integer, batch add N number of groups to a project. Returns True if successful.
 
 `addStudentToGroup(group_id, student_id)` - Given a group ID and a student ID, add a student to a group. Returns True if successful.
 
