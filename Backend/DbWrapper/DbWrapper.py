@@ -184,9 +184,7 @@ class DbWrapper:
         try:
             self.db.collection(COURSES).document(course_id).delete()
         except:
-            
             return False
-     
         return True
     
     def findUser(self, email:str)->dict|None:
