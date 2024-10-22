@@ -173,7 +173,7 @@ export default function Courses() {
                     alert('Course removed successfully!');
                     // Reset form and close popup
                     setNewCourseName('');
-                    setIsPopupVisible(false);
+                    setIsPopup2Visible(false);
                 } else {
                     alert(`Error removing course: ${result.reason}`);
                 }
