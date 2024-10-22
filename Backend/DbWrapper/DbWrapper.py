@@ -59,8 +59,11 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
-        return self.db.collection(JOY).where(filter=FieldFilter("group_id", "==",  group_id))
-    
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==",  group_id))
+        docList = []
+        for doc in docs:
+            docList.append(doc.to_dict())
+        return docList
     def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
