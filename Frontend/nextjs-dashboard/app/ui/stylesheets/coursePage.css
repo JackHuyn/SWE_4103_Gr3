@@ -4,6 +4,7 @@
 
 .page_wrapper {
     display: flex;
+    
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -12,11 +13,39 @@
     background-color: #1a1a1a; /* Clean, dark background */
 }
 
+#logout {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d; /* Bright red color for attention */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jura', sans-serif;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#logout:hover {
+    background-color: #e63946;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#logout:active {
+    background-color: #c32f33;
+    transform: scale(0.98);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}  
+
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 3%;
+    margin-top: 4%;
     height: 10vh;
     padding: 0 5%;
     background-color: #2b2b2b;
@@ -86,6 +115,8 @@ h1 {
 .addCourse:active{
     background-color: #2b2b2b;
 }
+
+
 
 .courses {
     display: grid;

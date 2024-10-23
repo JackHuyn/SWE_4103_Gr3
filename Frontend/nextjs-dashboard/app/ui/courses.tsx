@@ -4,6 +4,7 @@ import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
 import { Button } from './button';
 import Cookies from 'js-cookie';
 import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
+import { Router } from 'next/router';
 
 
 
@@ -39,12 +40,10 @@ export default function Courses() {
                     if(!role_response.ok){
                         setUserRole('0')
                     }
-
                     else {
                         //fetching same for instructor
                         setUserRole('1')
                     }
-
 
                     const res = await fetch('http://localhost:3001/auth/courses?localId=' + localId)
                         if (!res.ok) {
@@ -56,18 +55,10 @@ export default function Courses() {
                         // Set the initial courses to the state if the response is approved
                         if (result.approved && result.courses) {
                             setCourseList(result.courses);
-                        }
-
-                    
-
-                   
+                        }  
                 }
-
                 else{
-                    
                     window.location.href = "/auth/login"
-
-
                 }
                 
             } catch (error) {
@@ -77,6 +68,17 @@ export default function Courses() {
         }
         fetchData();
     }, []);
+
+    const handleLogout = async() =>{
+        const localId = Cookies.get('localId')
+        if (localId) {
+            Cookies.remove('localId');  
+            Cookies.remove('idToken');  
+            window.location.href = "/auth/login";  
+        } else {
+            alert("You are already logged out.");
+        }
+    }
 
     // Show popup for adding a course
     const addCourse = () => {
@@ -227,6 +229,7 @@ export default function Courses() {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
+                <button id="logout" onClick={handleLogout}>Log Out</button>
                     <div className="header">
                         {/* Left Section: Toggle Button and Title */}
                         <div className="header_left">
@@ -255,6 +258,8 @@ export default function Courses() {
                                 
                             </div>
                         )}
+
+                        
                     </div>
 
 
