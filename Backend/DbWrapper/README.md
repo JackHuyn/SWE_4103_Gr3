@@ -97,23 +97,10 @@ Note:
 
 `addStudentToGroup(group_id, student_id)` - Given a group ID and a student ID, add a student to a group. Returns True if successful.
 
-`addJoyRating/updateJoyRating(student_id, group_id, joy_rating, timestamp)` - For now, addJoyRating incorporates the functionality of updateJoyRating if the entry already exists. It is recommended to use addJoyRating for all joy rating operations. Returns True if successful.
+`addJoyRating/updateJoyRating(student_id, group_id, joy_rating)` - For now, addJoyRating incorporates the functionality of updateJoyRating if the entry already exists. It is recommended to use addJoyRating for all joy rating operations. Returns True if successful.
 
 Note:
 - joy_rating - Should be an int between 1-5
-- timestamp - Should be an int. See below for guidance on timestamps.
-
-### Sidenote about Timestamps in Python
-
-Timestamps can be a little wonky in Python. The easiest way to approach this is to use the built-in datetime library. Consider the following Python code:
-
-```python
-import datetime
-
-datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp() # This returns a float
-```
-
-The addJoyRating function expects a timestamp. However, we do not care about the time of day the rating occurred (mainly to avoid database clutter and avoid input abuse): we only need a day, month, and year. The above code will provide the timestamp we need (albeit, in a not very elegant statement). This value should also be cast to an int (although we get a float, the floating point portion is never used since this is reserved for microseconds). <b>NOT CASTING TO AN INT WILL CAUSE UNDEFINED BEHAVIOUR WHEN INTERACTING WITH THE DATABASE!</b>
 
 `removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
 
