@@ -426,16 +426,44 @@ def show_courses():
         return response
     
 
-@app.route('/metrics/get-team-joy-ratings', methods=['GET'])
+@app.route('/metrics/get-avg-team-joy-ratings', methods=['GET'])
 @cross_origin()
 def get_team_joy_ratings(): # Avg Joy Ratings per Day
-    project_id = request.args.get("projectId", default = "", type = str)
-    return metrics.getStudentJoyRatings(project_id)
+    #project_id = request.args.get("projectId", default = "", type = str)
+    try:
+        joy_data = metrics.get_avg_team_joy_ratings("", "")
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/metrics/get-student-joy-ratings', methods=['GET'])
 @cross_origin()
 def get_student_joy_ratings(): # Avg Joy Ratings per Day
-    pass
+    try:
+        joy_data = metrics.get_student_joy_ratings("")
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/metrics/submit-joy-rating', methods=['POST'])
 

@@ -214,8 +214,8 @@ class DbWrapper:
             return False
         return True
     
-    def getGithubRepoAddress(self, project_id:str):
-        docs = self.db.collection(PROJECTS).document(project_id).get()
+    def getGithubRepoAddress(self, group_id:str):
+        docs = self.db.collection(GROUPS).document(group_id).get()
         return docs.to_dict()['github_repo_address']
 
 
