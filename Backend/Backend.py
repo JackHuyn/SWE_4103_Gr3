@@ -429,15 +429,16 @@ def show_courses():
 @app.route('/metrics/get-avg-team-joy-ratings', methods=['GET'])
 @cross_origin()
 def get_team_joy_ratings(): # Avg Joy Ratings per Day
-    #project_id = request.args.get("projectId", default = "", type = str)
+    group_id = request.args.get("groupId", default = "", type = str)
     try:
-        joy_data = metrics.get_avg_team_joy_ratings("", "")
+        joy_data = metrics.get_avg_team_joy_ratings(group_id)
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
             mimetype='application/json'
         )
     except Exception as e:
+        print('BACKEND ERROR')
         print(e)
         response = app.response_class(
             response=json.dumps({'approved': False}),

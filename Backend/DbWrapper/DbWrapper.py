@@ -59,11 +59,13 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==",  group_id))
-        docList = []
-        for doc in docs:
-            docList.append(doc.to_dict())
-        return docList
+        try:
+            doc = self.db.collection(GROUPS).document(group_id).get()
+            return doc.to_dict()['avg_joy']
+        except Exception as e:
+            print('DB WRAPPER ERROR')
+            print(e)
+            return []
     def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
@@ -192,9 +194,13 @@ class DbWrapper:
         return None
     
     # Project Access Functions
-    def getStudentJoyRatings(self, project_id:str) -> dict:
-        docs = self.db.collection(PROJECTS).document(project_id).get()
-        return docs.to_dict()['joy_data']
+    def getStudentJoyRatings(self, group_id:str) -> dict:
+        docs = self.db.collection(JOY).document(group_id).get().stream()
+        for doc in docs:
+            print (doc.to_dict())
+            return doc.to_dict()
+        return None
+    
     
     def addStudentJoyRatings(self, project_id:str, uid:str, rating:int) -> bool:
         doc = self.db.collection(PROJECTS).document(project_id)

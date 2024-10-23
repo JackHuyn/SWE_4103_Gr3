@@ -1,9 +1,11 @@
 import Chart from 'chart.js/auto'
 
+const groupId = 'TEMPLATE'
+
 async function getChart() {
     console.log('GET CHART CALLED')
     let contributions = []
-    return fetch("http://127.0.0.1:3001/metrics/get-avg-team-joy-ratings",
+    return fetch("http://127.0.0.1:3001/metrics/get-avg-team-joy-ratings?groupId="+groupId,
         {
             method: 'GET'
         }

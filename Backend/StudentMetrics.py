@@ -10,27 +10,39 @@ class StudentMetrics:
         self.db = db
 
     def get_avg_team_joy_ratings(self, group_id): #get avg of a given group per day and dict
-        all_ratings = self.db.getTeamJoy(group_id)
-        documents_by_date = {}
+        try:
+            all_ratings = self.db.getTeamJoy(group_id)
+            # print('Ratings: ', all_ratings)
+            ratings = []
+            for rating in all_ratings:
+                ratings.append({
+                    'avg': rating['rating'],
+                    'date': str(rating['date'])
+                })
+            print(ratings)
+            # documents_by_date = {}
 
-        for doc in all_ratings:
-            created_at = doc['timestamp'].timestamp() 
-            date = dt.fromtimestamp(created_at).date()
+            # for doc in all_ratings:
+            #     created_at = doc['timestamp'].timestamp() 
+            #     date = dt.fromtimestamp(created_at).date()
 
-            if date not in documents_by_date:
-                documents_by_date[date] = []
-            documents_by_date[date].append(doc)
+            #     if date not in documents_by_date:
+            #         documents_by_date[date] = []
+            #     documents_by_date[date].append(doc)
 
-        # Create dictionary with date as key and average joy as value
-        avg_joy_by_date = {}
-        for date, docs in documents_by_date.items():
-            joy_values = [] 
-            for doc in docs:
-                joy_values.append(doc['joydata'] )
-            average_joy = sum(joy_values) / len(joy_values)
-            avg_joy_by_date[date] = average_joy
+            # # Create dictionary with date as key and average joy as value
+            # avg_joy_by_date = {}
+            # for date, docs in documents_by_date.items():
+            #     joy_values = [] 
+            #     for doc in docs:
+            #         joy_values.append(doc['joydata'] )
+            #     average_joy = sum(joy_values) / len(joy_values)
+            #     avg_joy_by_date[date] = average_joy
 
-        return avg_joy_by_date           
+            return ratings
+        except Exception as e:
+            print('METRICS ERROR')
+            print(e)   
         
 
     def get_student_joy_ratings(self, project_id, anonymous=True): # Return Most Recent Joy Rating for each Student
