@@ -1,0 +1,20 @@
+name: Test
+on:
+    workflow_dispatch:
+  jobs:
+    demo_app_authentication:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Generate a token
+          id: generate-token
+          uses: actions/create-github-app-token@v1
+          with:
+            app-id: ${{ vars.ID_VARIABLE }}
+            private-key: ${{ secrets.RSA_PRIVATE_KEY }}
+  
+        - name: Use the token
+          env:
+            GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          run: |
+            gh api octocat
+  
