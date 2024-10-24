@@ -25,6 +25,7 @@ export default function Courses() {
     const [newCourseTerm, setNewCourseTerm] = useState(''); // Store the new course term
     const [newCourseSection, setNewCourseSection] = useState(''); // Store the new course section
     const [userRole, setUserRole] = useState('')
+    const [loading,setLoading] = useState(true) // Loadign state
     const inputRef = useRef(null); // Create a ref for the input field
 
     // Fetch courses data when the component mounts
@@ -59,6 +60,7 @@ export default function Courses() {
                         // Set the initial courses to the state if the response is approved
                         if (result.approved && result.courses) {
                             setCourseList(result.courses);
+                            setLoading(false);
                         }  
                 }
                 else{
@@ -68,6 +70,9 @@ export default function Courses() {
             } catch (error) {
                 console.error('Error fetching courses:', error);
                 setError('Error loading courses. Please try again later.');
+            }
+            finally{
+                setLoading(false);
             }
         }
         fetchData();
@@ -113,7 +118,6 @@ export default function Courses() {
     
             try {
                 
-                
                 //Need to have checks to ensure that the instructor is valid 
                 const response = await fetch('http://localhost:3001/add-course' , {
                     method: 'POST',
@@ -127,6 +131,7 @@ export default function Courses() {
                 const result = await response.json();
     
                 if (response.ok) {
+                    window.location.reload();
                     alert('Course added successfully!');
                     setCourseList([...courseList, courseData]); // Add the new course to the list
                     // Reset form and close popup
@@ -135,6 +140,8 @@ export default function Courses() {
                     setNewCourseTerm('');
                     setNewCourseSection('');
                     setIsPopupVisible(false);
+                    
+
                 } else {
                     alert(`Error adding course: ${result.reason}`);
                 }
@@ -142,6 +149,7 @@ export default function Courses() {
                 console.error('Error sending request:', error);
                 alert('Error adding course. Please try again later.');
             }
+
         } else {
             alert('Please fill in all the fields.');
         }
@@ -229,6 +237,15 @@ export default function Courses() {
     if (error) {
         return <p>{error}</p>;
     }
+
+    if (loading){
+        return (
+            <div className="spinner-wrapper">
+            <div className="spinner"></div>
+            </div>
+        );
+    }
+
     if (data && data.approved && courseList.length > 0) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
@@ -271,6 +288,7 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
+                                
                                 <Link href ={course.course_id} className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>

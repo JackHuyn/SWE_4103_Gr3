@@ -298,7 +298,6 @@ def add_course():
             instructor_ids=instructor_ids,
             section=course_section,
             term=course_term,
-            project_ids=[],
             student_ids=[]
         )  
 
