@@ -10,7 +10,7 @@ import {useState} from 'react'
 
 
 //Author: Raphael Ferreira
-export default function FileUpload() {
+export default function FileUpload({localId, courseId}: {localId: string, courseId: string}) {
     const [file,setFile] = useState<File>()
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -22,6 +22,7 @@ export default function FileUpload() {
             alert('fileUpload of nextjs')
             const data = new FormData()
             data.set('file',file)
+            data.set('course_id', courseId)
             
             //Posts the uploaded file to the backend
             const res = await fetch('http://localhost:3001/upload_file',{

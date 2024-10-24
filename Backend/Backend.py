@@ -141,7 +141,10 @@ def getUserRole(local_id):
     user_data = dbWrapper.getUserData(local_id)
     return user_data['account_type']
 
-
+#Helper to get student list in course
+def getStudentList(local_id):
+    course_data = dbWrapper.getCourseData(local_id)
+    return course_data['student_ids']
 
 #Author: Raphael Ferreira 
 @app.route('/check-instructor',methods=['GET'])
@@ -205,34 +208,25 @@ def upload():
             response=json.dumps({}),
             status=401,
             mimetype='application/json'
-
         )
-
         return response  
-       
     
-    else:
-        file = request.files['file']
+    file = request.files['file']
+    course_id = request.form.get('course_id')
         #would need to confirm that I am logged in using validate_session or firebase_auth.validate_token ? 
         #valid = True
-        response = app.response_class(
-            response=json.dumps({'approved': True }),
-            status = 200, 
-            mimetype = 'application/json'
-
-        )
-
-    
+    response = app.response_class(
+        response=json.dumps({'approved': True }),
+        status = 200, 
+        mimetype = 'application/json'
+    )
     if file.filename == '':
         response = app.response_class(
             response = json.dumps({'approved': False}),
             status=401,
             mimetype='application/json'
         )
-
         return response
-        
-
     if file and fp.allowed_file(file.filename):
         saved_file_path = fp.save_file(file) 
         list_of_emails = fp.extract_email(saved_file_path)
@@ -244,7 +238,10 @@ def upload():
             user_dict = dbWrapper.findUser(email)
             if user_dict != None:
                 user_id = user_dict['uid']
-                dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+                if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
+                    print(user_id + ':\tDone')
+                else:
+                    print(user_id + ':\tFail')
             else:
                 # add not found emails to a not found list
                 users_not_found.append(email)
@@ -298,9 +295,8 @@ def add_course():
             instructor_ids=instructor_ids,
             section=course_section,
             term=course_term,
-            project_ids=[],
             student_ids=[]
-        )
+        )  
 
         if success:
             response = app.response_class(
@@ -334,8 +330,189 @@ def add_course():
             mimetype='application/json'
         )
         return response
+    
+
+@app.route('/remove-course', methods=['POST'])
+@cross_origin()  # Enable CORS for this route
+def remove_course():
+    try:
+        
+        # Extract course details from the request JSON body
+        data = request.get_json()
+        
+        # Extract the fields from the JSON object
+        course_name = data.get('course_name', "")
+        print(course_name)
+        print(type(course_name))
+
+
+        # Check if all required fields are provided
+        if not (course_name):
+            raise ValueError("Missing required fields")
+
+        # Call the `removeCourse` function from `DbWrapper`
+        success = dbWrapper.removeCourse(
+            course_id=course_name
+        )
+
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Course removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove course'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+
+@app.route('/auth/course_home_page', methods = ["GET"])
+@cross_origin()
+def get_course_data():
+    local_id = request.args.get("localId", default = '-1', type=str)
+    course_id = request.args.get("courseId", default= '-1', type=str)
+    print('We have the course_id of : ', course_id)
+    if local_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'No/wrong id'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    
+    
+    #To Do: Get projects data
+    #To Do: Check Role ?
+
+    try: 
+        course_data = dbWrapper.getCourseData(course_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+        print(course_data)
+
+        if course_data:
+            # Convert dictionary to JSON for frontend use
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': course_data
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
+        
+        elif course_data == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+
+
+
+        else:
+            # handle any other unexpected exist
+            
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    # error
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
 
     
+#Author: Sarun Weerakul
+#print student email from course list
+@app.route('/auth/student_list_in_courses', methods= ['GET','POST'])
+@cross_origin()
+def student_List():
+    local_id = request.args.get("localId", default = -1, type = str)
+    print('course ID is : ', local_id)
+    if local_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course ID'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    try:  
+        students = getStudentList(local_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+        if students:
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': students
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response      
+        elif students == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+        else:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
+
+
+
 
 
 # Jack Huynh _ Show courses 
@@ -415,3 +592,5 @@ def show_courses():
 if __name__ == '__main__':
     print("Start")
     app.run(port=3001, debug=True)
+    
+
