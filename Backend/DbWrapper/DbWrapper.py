@@ -165,22 +165,24 @@ class DbWrapper:
             return False
         return True
     
-    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, timestamp:int)->bool:
-        x = [i for i in self.db.collection(JOY).where(filter=And([FieldFilter("student_id", "==", student_id), FieldFilter("timestamp", "==", timestamp), FieldFilter("group_id", "==", group_id)])).stream()]
-        if len(x) > 0:
-            return self.updateJoyRating(student_id, group_id, joy_rating, timestamp)
+    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+        if (self.updateJoyRating(student_id, group_id, joy_rating)):
+            return True
+        timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
         template["student_id"] = student_id
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
-        template["timestamp"] = timestamp
+        template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         return True
 
-    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, timestamp:int)->bool:
+    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+        timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
+            doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False
         return True
@@ -243,9 +245,8 @@ if __name__ == "__main__":
     print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
     print(test.addGroup("java3_proj1"))
     print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    timestamp = datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp()
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5, int(timestamp)))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3, int(timestamp)))
+    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
+    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
     print(test.addNGroups("java3_proj1", 5))
     print(test.removeGroup("java3_proj1_gr1"))
     print(test.addGroup("java3_proj1"))
