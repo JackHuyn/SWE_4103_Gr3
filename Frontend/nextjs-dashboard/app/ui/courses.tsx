@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
+import '@/app/ui/stylesheets/coursePage.css'; 
 import { Button } from './button';
 import Cookies from 'js-cookie';
 import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
@@ -267,7 +267,7 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
-                                //<Link href ={course.course_id}>
+                                <Link href ={course.course_id} className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
 
@@ -287,7 +287,7 @@ export default function Courses() {
                                     {/*</CardBody>*/}
                                     
                                 </div>
-                                //</Link>
+                                </Link>
                             ))}
                         </div>
                     )}
