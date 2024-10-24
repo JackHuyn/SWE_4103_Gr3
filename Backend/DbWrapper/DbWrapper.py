@@ -137,7 +137,7 @@ class DbWrapper:
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
         inserted = False
@@ -188,6 +188,8 @@ class DbWrapper:
         return True
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
+        print(course_id)
+        print(x)
         if len(x) == 0:
             return False
         try:
