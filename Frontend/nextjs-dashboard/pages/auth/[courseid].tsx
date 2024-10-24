@@ -1,13 +1,19 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import '@/app/ui/stylesheets/courseDetails.css'; 
+import '@/app/ui/stylesheets/courseDetails.css';
+import '@/app/ui/stylesheets/loading.css';
+import '@/app/ui/stylesheets/popup.css';
+
+
 
 export default function CourseDetails() {
   const router = useRouter();
   const { courseid } = router.query;
   const [courseDetails, setCourseDetails] = useState(null);
   const localId = Cookies.get('localId');
+  const [isPopupVisible, setIsPopupVisible] = useState(false); // Stores true or false depending on if the popup is visible
+  const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents
 
   useEffect(() => {
     if (localId && courseid) {
@@ -28,18 +34,48 @@ export default function CourseDetails() {
     }
   }, [localId, courseid]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setCsvFile(file);
+  };
+
+  // Handle file upload
+  const handleUpload = () => {
+    if (csvFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        console.log('CSV File Content:', text);
+        // Process the CSV content here (e.g., parse and add students)
+      };
+      reader.readAsText(csvFile);
+      setIsPopupVisible(false); // Close the popup
+    } else {
+      alert('Please select a CSV file.');
+    }
+  };
+
+  if (!courseDetails) {
+    return (
+      <div className="spinner-wrapper">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-wrapper">
       <div className="course-header">
         <h1>{courseid}</h1>
+        {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
         <p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>
-        <p>{JSON.stringify(courseDetails, null, 2)}</p>
+
       </div>
 
       <div className="content-grid">
 
         {/* Projects Section */}
-        
+
         <div className="projects-section">
           <div className="section-header">
             <h2>Projects</h2>
@@ -60,7 +96,7 @@ export default function CourseDetails() {
         <div className="students-section">
           <div className="section-header">
             <h2>Students</h2>
-            <button className="add-button">+</button>
+            <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
           </div>
           <div className="students-list">
             {courseDetails?.students?.map((student, index) => (
@@ -72,6 +108,24 @@ export default function CourseDetails() {
           <p className="view-all">View all</p>
         </div>
       </div>
+
+      {isPopupVisible && (
+        <div className="popup">
+          <div className="popup_content">
+            <h2>Upload CSV</h2>
+            <input type="file" accept=".csv" onChange={handleFileChange} />
+            <div className="popup_buttons">
+              <button className="popup_button upload" onClick={handleUpload}>
+                Upload
+              </button>
+              <button className="popup_button cancel_button" onClick={() => setIsPopupVisible(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

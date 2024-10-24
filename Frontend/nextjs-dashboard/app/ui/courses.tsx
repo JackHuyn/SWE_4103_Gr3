@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; 
+import '@/app/ui/stylesheets/loading.css'; 
+import '@/app/ui/stylesheets/popup.css';
+
+
 import { Button } from './button';
 import Cookies from 'js-cookie';
 import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
@@ -292,12 +296,6 @@ export default function Courses() {
                         </div>
                     )}
 
-                    <Link
-                        href="/auth/login"
-                        className="flex items-center gap-5 rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-                    >
-                        <span>Back to Home</span>
-                    </Link>
                 </div>
 
                 {/* Popup Window for Adding Course */}
@@ -382,6 +380,11 @@ export default function Courses() {
 
     
     else {
-        return <p>Loading...</p>;
+        return (
+            <div className="spinner-wrapper">
+            <div className="spinner"></div>
+            </div>
+        );
+          
     }
 }
