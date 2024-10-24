@@ -2,16 +2,47 @@ import unittest
 from unittest.mock import MagicMock
 import sys
 import os
+from google.cloud.firestore_v1 import ArrayUnion
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DbWrapper.DbWrapper import DbWrapper  
 
+# Version 3 with new updates 
 class TestDbWrapper(unittest.TestCase):
 
     def setUp(self):
         # Mock the Firestore client
-        self.mock_db = MagicMock()
-        self.db_wrapper = DbWrapper(self.mock_db)  
+        self.mock_db = MagicMock()  # Make sure this is properly initialized
+        self.db_wrapper = DbWrapper(self.mock_db)  # Pass mock_db to DbWrapper
 
+    # 1. Test activateCourse (success scenario)
+    def test_activateCourse(self):
+        # Mock Firestore document and update method
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        # Call the method
+        result = self.db_wrapper.activateCourse("course123")
+
+        # Verify that the update method was called with the correct status
+        mock_doc.update.assert_called_once_with({"status": 0})
+
+        # Check that the function returns True
+        self.assertTrue(result)
+
+    # 2. Test activateCourse (failure scenario)
+    def test_activateCourse_fail(self):
+        # Mock Firestore document and simulate an exception
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+        mock_doc.update.side_effect = Exception("Error")
+
+        # Call the method
+        result = self.db_wrapper.activateCourse("course123")
+
+        # Check that the function returns False on error
+        self.assertFalse(result)
+
+    # 3. Test archiveCourse (success scenario)
     def test_archiveCourse(self):
         # Mock the Firestore document and its update method
         mock_doc = MagicMock()
@@ -26,6 +57,7 @@ class TestDbWrapper(unittest.TestCase):
         # Check that the function returns True
         self.assertTrue(result)
 
+    # 4. Test archiveCourse (failure scenario)
     def test_archiveCourse_fail(self):
         # Mock the Firestore document and simulate an exception
         mock_doc = MagicMock()
@@ -38,6 +70,7 @@ class TestDbWrapper(unittest.TestCase):
         # Check that the function returns False on error
         self.assertFalse(result)
 
+    # 5. Test getUserData
     def test_getUserData(self):
         # Mock Firestore document
         mock_doc = MagicMock()
@@ -51,6 +84,7 @@ class TestDbWrapper(unittest.TestCase):
         mock_doc.get.assert_called_once()
         self.assertEqual(result, {"uid": "testuser", "email": "test@example.com"})
 
+    # 6. Test addUser (success scenario)
     def test_addUser(self):
         # Mock Firestore query and document creation
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
@@ -73,6 +107,7 @@ class TestDbWrapper(unittest.TestCase):
         # Check that the function returns True
         self.assertTrue(result)
 
+    # 7. Test addUser (existing user)
     def test_addUser_existing(self):
         # Simulate an existing user in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [MagicMock()]
@@ -83,6 +118,7 @@ class TestDbWrapper(unittest.TestCase):
         # Verify that the document was not created because the user already exists
         self.assertFalse(result)
 
+    # 8. Test getStudentCourses
     def test_getStudentCourses(self):
         # Mock Firestore stream query for courses
         mock_course_doc = MagicMock()
@@ -95,6 +131,7 @@ class TestDbWrapper(unittest.TestCase):
         # Verify that the query was made and the correct data was returned
         self.assertEqual(result, [{"course_id": "course123"}])
 
+    # 9. Test removeCourse (success scenario)
     def test_removeCourse(self):
         # Simulate a course found in the database by returning a mock document
         mock_course = MagicMock()
@@ -109,7 +146,7 @@ class TestDbWrapper(unittest.TestCase):
         # Check that the function returns True
         self.assertTrue(result)
 
-
+    # 10. Test removeCourse (course not found)
     def test_removeCourse_not_found(self):
         # Simulate no courses found in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
@@ -118,6 +155,109 @@ class TestDbWrapper(unittest.TestCase):
         result = self.db_wrapper.removeCourse("course123")
 
         # Check that the function returns False when the course is not found
+        self.assertFalse(result)
+
+    # 11. Test addJoyRating (success scenario)
+    def test_addJoyRating(self):
+        # Simulate no existing joy rating
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+        # Mock document creation
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        # Call the method
+        result = self.db_wrapper.addJoyRating("student123", "group123", 5, 1234567890)
+
+        # Verify that the document was created
+        mock_doc.set.assert_called_once_with({
+            "student_id": "student123",
+            "group_id": "group123",
+            "joy_rating": 5,
+            "timestamp": 1234567890
+        })
+
+        # Check that the function returns True
+        self.assertTrue(result)
+
+    # 12. Test addJoyRating (existing rating)
+    def test_addJoyRating_existing(self):
+        # Simulate an existing joy rating
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [MagicMock()]
+
+        # Mock the update process
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        # Call the method (this should trigger an update)
+        result = self.db_wrapper.addJoyRating("student123", "group123", 5, 1234567890)
+
+        # Verify that the update method was called
+        mock_doc.update.assert_called_once_with({"joy_rating": 5})
+
+        # Check that the function returns True
+        self.assertTrue(result)
+
+    # 13. Test addGroupToProject (success scenario)
+    def test_addGroupToProject(self):
+        # Mock Firestore document
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        # Call the method
+        result = self.db_wrapper.addGroupToProject("group123", "proj123")
+
+        # Verify that the update method was called correctly
+        mock_doc.update.assert_called_once_with({"group_ids": ArrayUnion(["group123"])})
+
+        # Check that the function returns True
+        self.assertTrue(result)
+
+    # 14. Test addGroupToProject (failure scenario)
+    def test_addGroupToProject_fail(self):
+        # Mock the Firestore document and simulate an exception
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+        mock_doc.update.side_effect = Exception("Error")
+
+        # Call the method
+        result = self.db_wrapper.addGroupToProject("group123", "proj123")
+
+        # Verify that the update method was called but failed
+        mock_doc.update.assert_called_once_with({"group_ids": ArrayUnion(["group123"])})
+
+        # Check that the function returns False on error
+        self.assertFalse(result)
+
+    # 15. Test addProjectToCourse (success scenario)
+    def test_addProjectToCourse(self):
+        # Mock Firestore document
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        # Call the method
+        result = self.db_wrapper.addProjectToCourse("proj123", "course123")
+
+        # Verify that the update method was called with the correct data
+        mock_doc.update.assert_called_once_with({"project_ids": ArrayUnion(["proj123"])})
+
+        # Check that the function returns True
+        self.assertTrue(result)
+
+    # 16. Test addProjectToCourse (failure scenario)
+    def test_addProjectToCourse_fail(self):
+        # Mock Firestore document and simulate an exception
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+        mock_doc.update.side_effect = Exception("Error")
+
+        # Call the method
+        result = self.db_wrapper.addProjectToCourse("proj123", "course123")
+
+        # Verify that the update method was called but failed
+        mock_doc.update.assert_called_once_with({"project_ids": ArrayUnion(["proj123"])})
+
+        # Check that the function returns False on error
         self.assertFalse(result)
 
 
