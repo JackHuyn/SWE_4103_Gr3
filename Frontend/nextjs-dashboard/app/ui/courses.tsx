@@ -3,6 +3,9 @@ import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
 import { Button } from './button';
 import Cookies from 'js-cookie';
+import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
+
+
 
 export default function Courses() {
 
@@ -11,6 +14,7 @@ export default function Courses() {
     const [showCourses, setShowCourses] = useState(true); // Track whether to show/hide courses
     const [courseList, setCourseList] = useState([]); // Store the list of courses
     const [isPopupVisible, setIsPopupVisible] = useState(false); // Control the popup visibility
+    const [isPopup2Visible, setIsPopup2Visible] = useState(false); // Control the popup2 visibility
     const [newCourseName, setNewCourseName] = useState(''); // Store the new course name
     const [newCourseDescription, setNewCourseDescription] = useState(''); // Store the new course description
     const [newCourseTerm, setNewCourseTerm] = useState(''); // Store the new course term
@@ -79,6 +83,10 @@ export default function Courses() {
         setIsPopupVisible(true); // Show the popup
     };
 
+    const removeCourse = () =>{
+        setIsPopup2Visible(true); // Show the popup2
+    };
+
     // Handle adding a new course with name, description, and term
     const handleAddCourse = async () => {
         if (newCourseName && newCourseDescription && newCourseTerm && newCourseSection) {
@@ -114,15 +122,64 @@ export default function Courses() {
     
                 if (response.ok) {
                     alert('Course added successfully!');
-                    setCourseList([...courseList, courseData]); // Add the new course to the list
+                    window.location.reload();
+                    //setCourseList([...courseList, courseData]); // Add the new course to the list
                     // Reset form and close popup
-                    setNewCourseName('');
+                    /**setNewCourseName('');
                     setNewCourseDescription('');
                     setNewCourseTerm('');
                     setNewCourseSection('');
-                    setIsPopupVisible(false);
+                    setIsPopupVisible(false);**/
                 } else {
                     alert(`Error adding course: ${result.reason}`);
+                }
+            } catch (error) {
+                console.error('Error sending request:', error);
+                alert('Error adding course. Please try again later.');
+            }
+        } else {
+            alert('Please fill in all the fields.');
+        }
+    };
+
+    //handling remove course with course id
+
+    const handleRemoveCourse = async () => {
+        if (newCourseName) {
+            
+            //Ensure localId cookie is valid
+            const localId  = Cookies.get('localId')
+
+            if (!localId){
+                window.location.href = "/auth/login"
+            }
+            const courseData = {
+                course_name: newCourseName
+            };
+    
+            try {
+                
+                
+                //Need to have checks to ensure that the instructor is valid 
+                const response = await fetch('http://localhost:3001/remove-course' , {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        
+                    },
+                    body: JSON.stringify(courseData),  // Send JSON data in request body
+                });
+    
+                const result = await response.json();
+    
+                if (response.ok) {
+                    alert('Course removed successfully!');
+                    window.location.reload();
+                    // Reset form and close popup
+                    setNewCourseName('');
+                    setIsPopup2Visible(false);
+                } else {
+                    alert(`Error removing course: ${result.reason}`);
                 }
             } catch (error) {
                 console.error('Error sending request:', error);
@@ -167,7 +224,6 @@ export default function Courses() {
     if (error) {
         return <p>{error}</p>;
     }
-
     if (data && data.approved && courseList.length > 0) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
@@ -188,24 +244,35 @@ export default function Courses() {
                             <h1>Courses</h1>
                         </div>
 
-                        {/* Right Section: Add Course Button */}
-                        {userRole=='1' &&
-                        <Button className="addCourse" onClick={addCourse}>
-                            +
-                        </Button> }
-                        
+                        {/* Right Section: Add and Remove Buttons */}
+                        {userRole === '1' && (
+                            <div className="addandremove">
+                                <Button className="addCourse" onClick={addCourse}>
+                                    +
+                                </Button>
+                                <Button className="removeCourse" onClick = {removeCourse}>
+                                    -
+                                </Button>
+                                
+                            </div>
+                        )}
                     </div>
+
 
                     {/* Conditionally render courses */}
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
+                                
+                                <Link href ={course.course_id}>
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
-                                    <h3 className="course-title">{course.course_name}</h3>
+                                    <h3 className="course-title">{course.course_id}</h3>
                                     <p className="course-detail">Description: {course.course_description}</p>
                                     <p className="course-detail">Section: {course.section}</p>
                                     <p className="course-detail">Term: {course.term}</p>
+                                    
                                 </div>
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -260,6 +327,33 @@ export default function Courses() {
                         </div>
                     </div>
                 )}
+
+
+            {/* Popup Window for Removing Course */}
+            {isPopup2Visible && (
+                    <div className="popup">
+                        <div className="popup_content">
+                            <h2>Enter Course ID</h2>
+
+                            <input
+                                ref={inputRef} // Attach the ref to the input field
+                                type="text"
+                                value={newCourseName}
+                                onChange={(e) => setNewCourseName(e.target.value)}
+                                placeholder="Course ID"
+                            />
+
+                            <div className="popup_buttons">
+                                <Button className="popup_button" onClick={handleRemoveCourse}>
+                                    yep
+                                </Button>
+                                <Button className="popup_button cancel_button" onClick={() => setIsPopup2Visible(false)}>
+                                    nah
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}          
 
 
             </main>
