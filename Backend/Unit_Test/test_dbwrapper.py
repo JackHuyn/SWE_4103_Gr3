@@ -218,8 +218,240 @@ class TestDbWrapper(unittest.TestCase):
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [MagicMock()]
         result = self.db_wrapper.addProject("course123", "proj123", "Project 1", "github.com/repo")
         self.assertFalse(result)
+    # # 18. Test addGroup
+    # def test_addGroup(self):
+    #     # Mock the return value for getProjectGroups and getProjectData
+    #     self.db_wrapper.getProjectGroups = MagicMock(return_value=[{"group_id": "proj1_gr0"}])
+    #     self.db_wrapper.getProjectData = MagicMock(return_value={"project_name": "Test Project"})
+    #     mock_collection = MagicMock()
+    #     self.mock_db.collection.return_value = mock_collection
 
-    # Additional test cases later
+    #     result = self.db_wrapper.addGroup("proj1")
+
+    #     # Verify that the group is added
+    #     mock_collection.document.return_value.set.assert_called_once_with({
+    #         "group_id": "proj1_gr1",
+    #         "group_name": "Test Project Group 1",
+    #         "project_id": "proj1",
+    #         "student_ids": []
+    #     })
+    #     self.assertTrue(result)
+
+    # 19. Test for `addNGroups`
+    def test_addNGroups(self):
+        self.db_wrapper.addGroup = MagicMock(return_value=True)
+        
+        result = self.db_wrapper.addNGroups("proj1", 3)
+
+        # Verify that addGroup was called 3 times
+        self.assertEqual(self.db_wrapper.addGroup.call_count, 3)
+        self.assertTrue(result)
+
+    # 20. Test for `addStudentToGroup`
+    def test_addStudentToGroup(self):
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        result = self.db_wrapper.addStudentToGroup("group123", "student123")
+
+        # Verify that the student was added to the group
+        mock_doc.update.assert_called_once_with({"student_ids": ArrayUnion(["student123"])})
+        self.assertTrue(result)
+
+    def test_addStudentToGroup_fail(self):
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+        mock_doc.update.side_effect = Exception("Error")
+
+        result = self.db_wrapper.addStudentToGroup("group123", "student123")
+
+        self.assertFalse(result)
+
+    # 21. Test for `addJoyRating`
+    def test_addJoyRating(self):
+        self.db_wrapper.updateJoyRating = MagicMock(return_value=False)
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        result = self.db_wrapper.addJoyRating("student123", "group123", 5)
+
+        # Verify that the joy rating is added
+        mock_doc.set.assert_called_once()
+        self.assertTrue(result)
+
+    def test_addJoyRating_existing(self):
+        # If updateJoyRating returns True, it should bypass adding a new rating
+        self.db_wrapper.updateJoyRating = MagicMock(return_value=True)
+
+        result = self.db_wrapper.addJoyRating("student123", "group123", 5)
+
+        # Verify that set was not called since updateJoyRating was successful
+        self.mock_db.collection.return_value.document.return_value.set.assert_not_called()
+        self.assertTrue(result)
+
+    # 22. Test for `updateJoyRating`
+    def test_updateJoyRating(self):
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+
+        result = self.db_wrapper.updateJoyRating("student123", "group123", 5)
+
+        # Verify that the joy rating is updated
+        mock_doc.update.assert_called_with({"joy_rating": 5})
+        mock_doc.update.assert_called_with({"timestamp": self.mock_db.SERVER_TIMESTAMP})
+        self.assertTrue(result)
+
+    def test_updateJoyRating_fail(self):
+        mock_doc = MagicMock()
+        self.mock_db.collection.return_value.document.return_value = mock_doc
+        mock_doc.update.side_effect = Exception("Error")
+
+        result = self.db_wrapper.updateJoyRating("student123", "group123", 5)
+
+        self.assertFalse(result)
+    
+    # 23. Test for removeCourse
+    def test_removeCourse(self):
+        # Simulate a course found in the database
+        mock_course = MagicMock()
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_course]
+
+        # Call the removeCourse method
+        result = self.db_wrapper.removeCourse("course123")
+
+        # Verify that the document was deleted
+        self.mock_db.collection.return_value.document.return_value.delete.assert_called_once()
+        self.assertTrue(result)
+
+    def test_removeCourse_not_found(self):
+        # Simulate no course found in the database
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+        # Call the removeCourse method
+        result = self.db_wrapper.removeCourse("course123")
+
+        # Check that the function returns False if no course is found
+        self.assertFalse(result)
+
+    def test_removeCourse_fail(self):
+        # Simulate a course found in the database
+        mock_course = MagicMock()
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_course]
+
+        # Simulate a failure during the deletion process
+        self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
+
+        # Call the removeCourse method
+        result = self.db_wrapper.removeCourse("course123")
+
+        # Verify that the method returns False on failure
+        self.assertFalse(result)
+
+    # 24. Test for `removeProject`
+    def test_removeProject(self):
+        # Simulate a project found in the database
+        mock_project = MagicMock()
+        mock_project.to_dict.return_value = {"project_id": "proj123"}
+        self.db_wrapper.getProjectGroups = MagicMock(return_value=[{"group_id": "group1"}, {"group_id": "group2"}])
+        self.db_wrapper.removeGroup = MagicMock(return_value=True)
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_project]
+
+        # Call the removeProject method
+        result = self.db_wrapper.removeProject("proj123")
+
+        # Verify that the associated groups are removed and the project is deleted
+        self.db_wrapper.removeGroup.assert_any_call("group1")
+        self.db_wrapper.removeGroup.assert_any_call("group2")
+        self.mock_db.collection.return_value.document.return_value.delete.assert_called_once()
+        self.assertTrue(result)
+
+    def test_removeProject_not_found(self):
+        # Simulate no project found in the database
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+        # Call the removeProject method
+        result = self.db_wrapper.removeProject("proj123")
+
+        # Check that the function returns False if no project is found
+        self.assertFalse(result)
+
+    def test_removeProject_fail(self):
+        # Simulate a project found in the database
+        mock_project = MagicMock()
+        mock_project.to_dict.return_value = {"project_id": "proj123"}
+        self.db_wrapper.getProjectGroups = MagicMock(return_value=[{"group_id": "group1"}, {"group_id": "group2"}])
+        self.db_wrapper.removeGroup = MagicMock(return_value=True)
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_project]
+
+        # Simulate a failure during the deletion process
+        self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
+
+        # Call the removeProject method
+        result = self.db_wrapper.removeProject("proj123")
+
+        # Verify that the method returns False on failure
+        self.assertFalse(result)
+
+    # 25. Test for `removeGroup`
+    def test_removeGroup(self):
+        # Simulate a group found in the database
+        mock_group = MagicMock()
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_group]
+
+        # Call the removeGroup method
+        result = self.db_wrapper.removeGroup("group123")
+
+        # Verify that the document was deleted
+        self.mock_db.collection.return_value.document.return_value.delete.assert_called_once()
+        self.assertTrue(result)
+
+    def test_removeGroup_not_found(self):
+        # Simulate no group found in the database
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+        # Call the removeGroup method
+        result = self.db_wrapper.removeGroup("group123")
+
+        # Check that the function returns False if no group is found
+        self.assertFalse(result)
+
+    def test_removeGroup_fail(self):
+        # Simulate a group found in the database
+        mock_group = MagicMock()
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_group]
+
+        # Simulate a failure during the deletion process
+        self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
+
+        # Call the removeGroup method
+        result = self.db_wrapper.removeGroup("group123")
+
+        # Verify that the method returns False on failure
+        self.assertFalse(result)
+
+    # 26. Test for `findUser`
+    def test_findUser(self):
+        # Simulate user found in the database
+        mock_user = MagicMock()
+        mock_user.to_dict.return_value = {"email": "test@example.com", "name": "Test User"}
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_user]
+
+        # Call the findUser method
+        result = self.db_wrapper.findUser("test@example.com")
+
+        # Verify that the document was fetched and returned correctly
+        self.assertEqual(result, {"email": "test@example.com", "name": "Test User"})
+
+    def test_findUser_not_found(self):
+        # Simulate no user found in the database
+        self.mock_db.collection.return_value.where.return_value.stream.return_value = []
+
+        # Call the findUser method
+        result = self.db_wrapper.findUser("test@example.com")
+
+        # Check that the function returns None if no user is found
+        self.assertIsNone(result)
+
     
 if __name__ == '__main__':
     unittest.main()
