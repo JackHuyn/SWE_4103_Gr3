@@ -1,9 +1,11 @@
 import Chart from 'chart.js/auto'
 
+const group_id = 'TEMPLATE'
+
 async function getChart() {
     console.log('GET CHART CALLED')
     let contributions = []
-    return fetch("http://127.0.0.1:3001/metrics/get-student-joy-ratings",
+    return fetch("http://127.0.0.1:3001/metrics/get-student-joy-ratings?groupId="+group_id,
         {
             method: 'GET'
         }
@@ -38,12 +40,12 @@ async function getChart() {
             console.log(r)
             
             const joy_data = r['joyData']
-            const student_ids = joy_data.map(row => row.studentId)
+            const student_ids = joy_data.map(row => row.student_id)
 
             let joy_graph_data = []
             joy_graph_data.push({
                 label: 'Joy Rating',
-                data: joy_data.map(row => row.joyRating)
+                data: joy_data.map(row => row.joy_rating)
             })
 
             const config = {

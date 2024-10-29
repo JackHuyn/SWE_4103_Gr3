@@ -2,7 +2,7 @@ import '@/app/ui/stylesheets/joyRatingInput.css'
 
 let star_rating: number = 0
 
-const project_id = 'TEMPLATE' //REPLACE THIS ASAP
+const group_id = 'TEMPLATE' //REPLACE THIS ASAP
 
 async function setStars(num_stars: number)
 {
@@ -20,9 +20,9 @@ async function setStars(num_stars: number)
 
 async function submitStars()
 {
-    fetch("http://127.0.0.1:3001/metrics/?projectId="+project_id,
+    fetch("http://127.0.0.1:3001/metrics/submit-joy-rating?groupId="+group_id+"&uid=test2&joyRating="+star_rating,
         {
-            method: 'GET'
+            method: 'POST'
         }
     ).then(response => {
         if (!response.ok) {

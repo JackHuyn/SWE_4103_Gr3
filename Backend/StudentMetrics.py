@@ -45,17 +45,13 @@ class StudentMetrics:
             print(e)   
         
 
-    def get_student_joy_ratings(self, project_id, anonymous=True): # Return Most Recent Joy Rating for each Student
-        raw_ratings = self.db.getTeamJoy(project_id)
-        if anonymous is False:
-            return raw_ratings
-        ratings = []
-        for r in raw_ratings:
-            ratings.append({'joy_rating': r['joy_rating'], 'date': r['date']})
-        return ratings
+    def get_recent_student_joy_ratings(self, group_id): # Return Most Recent Joy Rating for each Student
+        raw_ratings = self.db.getRecentStudentJoyRatings(group_id)
+        return raw_ratings
     
-    def add_student_joy_ratings(self, project_id, uid, joy_rating):
-        return self.db.addStudentJoyRatings(project_id, uid, joy_rating)
+    def add_student_joy_rating(self, group_id, uid, joy_rating):
+        print(joy_rating)
+        return self.db.addJoyRating(uid, group_id, joy_rating)
     
     def get_github_contribution_stats(self, project_id):
         repo_address = self.db.getGithubRepoAddress(project_id)

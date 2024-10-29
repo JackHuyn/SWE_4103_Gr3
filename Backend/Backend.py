@@ -450,8 +450,9 @@ def get_team_joy_ratings(): # Avg Joy Ratings per Day
 @app.route('/metrics/get-student-joy-ratings', methods=['GET'])
 @cross_origin()
 def get_student_joy_ratings(): # Avg Joy Ratings per Day
+    group_id = request.args.get("groupId", default = "", type = str)
     try:
-        joy_data = metrics.get_student_joy_ratings("")
+        joy_data = metrics.get_recent_student_joy_ratings(group_id)
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
@@ -467,6 +468,26 @@ def get_student_joy_ratings(): # Avg Joy Ratings per Day
     return response
 
 @app.route('/metrics/submit-joy-rating', methods=['POST'])
+@cross_origin()
+def submit_student_joy_rating():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("uid", default = "", type = str)
+    joy_rating = request.args.get("joyRating", default = "", type = str)
+    try:
+        joy_data = metrics.add_student_joy_rating(group_id, uid, joy_rating)
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/metrics/contributions', methods=['GET'])
 @cross_origin()

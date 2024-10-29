@@ -4,6 +4,7 @@ from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
 import os
 import datetime
+import pytz
 
 COURSES = "coursedata"
 GROUPS = "groupdata"
@@ -142,6 +143,7 @@ class DbWrapper:
         template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
+        template["avg_joy"] = []
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -168,6 +170,25 @@ class DbWrapper:
         return True
     
     def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+        now = datetime.datetime.now()
+        current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
+        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        midnight_utc = timezone.localize(current_date)
+        firestore_timestamp = midnight_utc.isoformat()
+
+        group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
+        if(group):
+            g = group.to_dict()
+            if 'avg_joy' in g:
+                for avg in g['avg_joy']:
+                    if avg['date'] >= firestore_timestamp:
+                        group.update({'avg_joy': firestore.ArrayRemove(avg)})
+
+
+        # if group[avg_joy] has avg for current date, delete
+        # calculate avg for current date
+        # if(len(existing_avg))
+
         if (self.updateJoyRating(student_id, group_id, joy_rating)):
             return True
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
@@ -178,6 +199,27 @@ class DbWrapper:
         template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         return True
+    
+    def calculateJoyAverage(self, group_id:str, date):
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+        firestore_timestamp_start = date_start_utc.isoformat()
+        firestore_timestamp_end = date_end_utc.isoformat()
+
+        sum = 0
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", firestore_timestamp_start)).where(
+                    filter=FieldFilter("timestamp", "<=", firestore_timestamp_end)).stream()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            sum += d['joy_rating']
+        avg = sum / len(joy_docs)
+        return {}
+
 
     def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
@@ -226,34 +268,20 @@ class DbWrapper:
         return None
     
     # Project Access Functions
-    def getStudentJoyRatings(self, group_id:str) -> dict:
-        docs = self.db.collection(JOY).document(group_id).get().stream()
+    def getRecentStudentJoyRatings(self, group_id:str) -> dict:
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        user_ids = []
+        docList = []
         for doc in docs:
-            print (doc.to_dict())
-            return doc.to_dict()
-        return None
-    
-    
-    def addStudentJoyRatings(self, project_id:str, uid:str, rating:int) -> bool:
-        doc = self.db.collection(PROJECTS).document(project_id)
-        try:
-            doc.update(
-                {
-                    "joy_data": ArrayUnion(
-                        [
-                            {
-                                "uid": uid,
-                                "joy_rating": rating,
-                                "date": datetime.datetime.now()
-                            }
-                        ]
-                    )
-                }
-            )
-        except Exception as e:
-            print(e)
-            return False
-        return True
+            d = doc.to_dict()
+            if(d['student_id'] in user_ids):
+                continue
+            print('D: ', d)
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            docList.append(d)
+            user_ids.append(d['student_id'])
+        return docList
     
     def getGithubRepoAddress(self, group_id:str):
         docs = self.db.collection(GROUPS).document(group_id).get()
