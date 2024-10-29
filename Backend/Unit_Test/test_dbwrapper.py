@@ -316,7 +316,6 @@ class TestDbWrapper(unittest.TestCase):
         mock_course = MagicMock()
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_course]
 
-        # Call the removeCourse method
         result = self.db_wrapper.removeCourse("course123")
 
         # Verify that the document was deleted
@@ -327,7 +326,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate no course found in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
 
-        # Call the removeCourse method
         result = self.db_wrapper.removeCourse("course123")
 
         # Check that the function returns False if no course is found
@@ -341,7 +339,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate a failure during the deletion process
         self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
 
-        # Call the removeCourse method
         result = self.db_wrapper.removeCourse("course123")
 
         # Verify that the method returns False on failure
@@ -356,7 +353,6 @@ class TestDbWrapper(unittest.TestCase):
         self.db_wrapper.removeGroup = MagicMock(return_value=True)
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_project]
 
-        # Call the removeProject method
         result = self.db_wrapper.removeProject("proj123")
 
         # Verify that the associated groups are removed and the project is deleted
@@ -369,7 +365,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate no project found in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
 
-        # Call the removeProject method
         result = self.db_wrapper.removeProject("proj123")
 
         # Check that the function returns False if no project is found
@@ -386,7 +381,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate a failure during the deletion process
         self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
 
-        # Call the removeProject method
         result = self.db_wrapper.removeProject("proj123")
 
         # Verify that the method returns False on failure
@@ -398,7 +392,6 @@ class TestDbWrapper(unittest.TestCase):
         mock_group = MagicMock()
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_group]
 
-        # Call the removeGroup method
         result = self.db_wrapper.removeGroup("group123")
 
         # Verify that the document was deleted
@@ -409,7 +402,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate no group found in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
 
-        # Call the removeGroup method
         result = self.db_wrapper.removeGroup("group123")
 
         # Check that the function returns False if no group is found
@@ -423,7 +415,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate a failure during the deletion process
         self.mock_db.collection.return_value.document.return_value.delete.side_effect = Exception("Error")
 
-        # Call the removeGroup method
         result = self.db_wrapper.removeGroup("group123")
 
         # Verify that the method returns False on failure
@@ -436,7 +427,6 @@ class TestDbWrapper(unittest.TestCase):
         mock_user.to_dict.return_value = {"email": "test@example.com", "name": "Test User"}
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_user]
 
-        # Call the findUser method
         result = self.db_wrapper.findUser("test@example.com")
 
         # Verify that the document was fetched and returned correctly
@@ -446,7 +436,6 @@ class TestDbWrapper(unittest.TestCase):
         # Simulate no user found in the database
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
 
-        # Call the findUser method
         result = self.db_wrapper.findUser("test@example.com")
 
         # Check that the function returns None if no user is found
