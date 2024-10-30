@@ -20,29 +20,12 @@ class StudentMetrics:
                     'date': str(rating['date'])
                 })
             print(ratings)
-            # documents_by_date = {}
-
-            # for doc in all_ratings:
-            #     created_at = doc['timestamp'].timestamp() 
-            #     date = dt.fromtimestamp(created_at).date()
-
-            #     if date not in documents_by_date:
-            #         documents_by_date[date] = []
-            #     documents_by_date[date].append(doc)
-
-            # # Create dictionary with date as key and average joy as value
-            # avg_joy_by_date = {}
-            # for date, docs in documents_by_date.items():
-            #     joy_values = [] 
-            #     for doc in docs:
-            #         joy_values.append(doc['joydata'] )
-            #     average_joy = sum(joy_values) / len(joy_values)
-            #     avg_joy_by_date[date] = average_joy
 
             return ratings
         except Exception as e:
             print('METRICS ERROR')
             print(e)   
+            return {}
         
 
     def get_recent_student_joy_ratings(self, group_id): # Return Most Recent Joy Rating for each Student
@@ -52,6 +35,34 @@ class StudentMetrics:
     def add_student_joy_rating(self, group_id, uid, joy_rating):
         print(joy_rating)
         return self.db.addJoyRating(uid, group_id, joy_rating)
+    
+    def get_team_velocity(self, group_id):
+        return [
+            {
+                'planned_points': 13,
+                'completed_points': 10,
+                'sprint_start_date': str(dt(2024, 10, 12)),
+                'sprint_end_date': str(dt(2024, 9, 26))
+            },
+            {
+                'planned_points': 15,
+                'completed_points': 16,
+                'sprint_start_date': str(dt(2024, 9, 26)),
+                'sprint_end_date': str(dt(2024, 10, 10))
+            },
+            {
+                'planned_points': 10,
+                'completed_points': 12,
+                'sprint_start_date': str(dt(2024, 10, 10)),
+                'sprint_end_date': str(dt(2024, 10, 24))
+            },
+            {
+                'planned_points': 19,
+                'completed_points': 12,
+                'sprint_start_date': str(dt(2024, 10, 24)),
+                'sprint_end_date': str(dt(2024, 10, 7))
+            }
+        ]
     
     def get_github_contribution_stats(self, project_id):
         repo_address = self.db.getGithubRepoAddress(project_id)
