@@ -41,6 +41,14 @@ class FirebaseAuth:
             return True
         except KeyError as ke:
             return False
+    
+    def user_logout(self, local_id):
+        if self.end_session(local_id):
+            print("LOGOUT SUCCESSFUL")
+            return True
+        else:
+            print("LOGOUT UNSUCCESSFUL")
+            return False
 
     def validate_token(self, local_id, id_token):
         if(local_id not in self.active_sessions):

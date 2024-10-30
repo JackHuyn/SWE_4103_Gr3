@@ -68,6 +68,7 @@ class GitHubManager:
 
 
 if __name__ == '__main__':
+    auth = Auth.Token("")
     g = Github(base_url=GITHUB_BASE_URL)
 
     swe_repo = g.get_repo("JackHuyn/SWE_4103_Gr3")
@@ -92,11 +93,11 @@ if __name__ == '__main__':
 
     # print(swe_repo.get_rate_limit())
 
-    activity = swe_repo.get_stats_contributors()
-    for a in activity:
-        print("-", a.author)
-        for week in a.weeks:
-            print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
+    # activity = swe_repo.get_stats_contributors()
+    # for a in activity:
+    #     print("-", a.author)
+    #     for week in a.weeks:
+    #         print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
 
 
     # print("---------------------------")
