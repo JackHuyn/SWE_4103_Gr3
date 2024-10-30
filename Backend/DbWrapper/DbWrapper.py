@@ -232,6 +232,8 @@ class DbWrapper:
         return True
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
+        print(course_id)
+        print(x)
         if len(x) == 0:
             return False
         try:

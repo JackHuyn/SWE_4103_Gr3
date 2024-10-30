@@ -7,17 +7,18 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.4",
+    "@nextui-org/card": "^2.0.34",
     "@tailwindcss/forms": "^0.5.7",
     "@vercel/postgres": "^0.8.0",
     "autoprefixer": "10.4.19",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
-    "next": "15.0.0-canary.56",
+    "next": "^15.0.0",
     "next-auth": "5.0.0-beta.19",
     "postcss": "8.4.38",
-    "react": "19.0.0-rc-f38c22b244-20240704",
-    "react-dom": "19.0.0-rc-f38c22b244-20240704",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tailwindcss": "3.4.4",
     "typescript": "5.5.2",
     "use-debounce": "^10.0.1",
@@ -32,5 +33,12 @@
   },
   "engines": {
     "node": ">=20.12.0"
-  }
+  },
+  "name": "nextjs-dashboard",
+  "version": "1.0.0",
+  "description": "This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.",
+  "main": "postcss.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
