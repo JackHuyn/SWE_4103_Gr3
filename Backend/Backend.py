@@ -687,6 +687,27 @@ def get_github_contribution_stats():
         )
     return response
 
+@app.route('/metrics/get-team-velocity', methods=['GET'])
+@cross_origin()
+def get_team_velocity():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        resp = metrics.get_team_velocity(group_id)
+        # print(resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'velocity': resp}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
 
     
 if __name__ == '__main__':
