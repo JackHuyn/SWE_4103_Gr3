@@ -22,14 +22,17 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
+github_api_key_filename = 'swe4103-github-metrics-admin.json'
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 cred = credentials.Certificate(os.path.join(dir_path, credFileName))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-
 dbWrapper = DbWrapper(db)
+
 metrics = StudentMetrics.StudentMetrics(dbWrapper)
+with(open(os.path.join(dir_path, github_api_key_filename), "r") as key_file):
+    github_api_key = json.load(key_file)
 
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 
@@ -708,7 +711,48 @@ def get_team_velocity():
         )
     return response
 
+@app.route('/auth/get-github-app-client-id', methods=['GET'])
+@cross_origin()
+def get_github_app_client_id():
+    try:
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'clientId': github_api_key['client_id']}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
+@app.route('/auth/github-code-request', methods=['POST'])
+@cross_origin()
+def github_code_request():
+    local_id = request.args.get("localId", default = "", type = str)
+    id_token = request.args.get("idToken", default = "", type = str)
+    code = request.args.get("code", default = "", type = str)
+
+    try:
+        pass
+        # request and store oauth
+        # update user's session to use authenticated github object
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
     
 if __name__ == '__main__':
     print("Start")

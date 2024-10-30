@@ -11,10 +11,10 @@ GITHUB_BASE_URL = 'https://api.github.com'
 
 class GitHubManager:
 
-    def __init__(self, repo_address) -> None:
+    def __init__(self, oauth_token, repo_address) -> None:
         self.repo_address = repo_address
-        # auth = Auth.Token("")
-        self.github = Github(base_url=GITHUB_BASE_URL)
+        auth = Auth.Token(oauth_token)
+        self.github = Github(auth=auth, base_url=GITHUB_BASE_URL)
         self.repo = self.github.get_repo(self.repo_address)
 
     def get_commit_data(self):
