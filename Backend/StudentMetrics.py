@@ -17,7 +17,8 @@ class StudentMetrics:
             for rating in all_ratings:
                 ratings.append({
                     'avg': rating['rating'],
-                    'date': str(rating['date'])
+                    'date': str(rating['date']),
+                    'comment': rating['comment']
                 })
             print(ratings)
 
@@ -32,9 +33,9 @@ class StudentMetrics:
         raw_ratings = self.db.getRecentStudentJoyRatings(group_id)
         return raw_ratings
     
-    def add_student_joy_rating(self, group_id, uid, joy_rating):
+    def add_student_joy_rating(self, group_id, uid, joy_rating, comment):
         print(joy_rating)
-        return self.db.addJoyRating(uid, group_id, joy_rating)
+        return self.db.addJoyRating(uid, group_id, joy_rating, comment)
     
     def get_team_velocity(self, group_id):
         return [
@@ -63,6 +64,9 @@ class StudentMetrics:
                 'sprint_end_date': str(dt(2024, 10, 7))
             }
         ]
+    
+    def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
+        print(group_id, start_date, end_date, planned_story_points, completed_story_points)
     
     def get_github_contribution_stats(self, project_id):
         repo_address = self.db.getGithubRepoAddress(project_id)

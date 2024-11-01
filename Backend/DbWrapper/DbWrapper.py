@@ -169,7 +169,7 @@ class DbWrapper:
             return False
         return True
     
-    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         now = datetime.datetime.now()
         current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
         timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
@@ -189,13 +189,14 @@ class DbWrapper:
         # calculate avg for current date
         # if(len(existing_avg))
 
-        if (self.updateJoyRating(student_id, group_id, joy_rating)):
+        if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
             return True
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
         template["student_id"] = student_id
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
+        template["comment"] = comment
         template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         return True
@@ -221,11 +222,12 @@ class DbWrapper:
         return {}
 
 
-    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
+            doc.update({"comment": comment})
             doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False

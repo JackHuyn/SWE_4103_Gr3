@@ -653,8 +653,10 @@ def submit_student_joy_rating():
     group_id = request.args.get("groupId", default = "", type = str)
     uid = request.args.get("uid", default = "", type = str)
     joy_rating = request.args.get("joyRating", default = "", type = str)
+    comment = request.args.get("comment", default = "", type = str)
+
     try:
-        joy_data = metrics.add_student_joy_rating(group_id, uid, joy_rating)
+        joy_data = metrics.add_student_joy_rating(group_id, uid, joy_rating, comment)
         response = app.response_class(
             response=json.dumps({'approved': True}),
             status=200,
@@ -710,6 +712,33 @@ def get_team_velocity():
             mimetype='application/json'
         )
     return response
+
+@app.route('/metrics/submit-team-velocity', methods=['POST'])
+@cross_origin()
+def sumbit_team_velocity():
+    local_id = request.args.get("localId", default = "", type = str)
+    group_id = request.args.get("groupId", default = "", type = str)
+    start_date = request.args.get("startDate", default = "", type = str)
+    end_date = request.args.get("endDate", default = "", type = str)
+    planned_story_points = request.args.get("plannedStoryPoints", default = "", type = str)
+    completed_story_points = request.args.get("completedStoryPoints", default = "", type = str)
+
+    try:
+        metrics.submit_team_velocity(group_id, start_date, end_date, planned_story_points, completed_story_points)
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
 
 @app.route('/auth/get-github-app-client-id', methods=['GET'])
 @cross_origin()

@@ -66,6 +66,14 @@ export default function ContributionsGraph()
                           borderWidth: 2,
                         }
                       },
+                      ticks: {
+                        min: 0,
+                        max: 5,
+                        suggestedMin: 0,
+                        suggestedMax: 5,
+                        stepSize: 1,
+                        autoSkip: false
+                      },
                       layout: {
                         padding: {
                             left: 0,
@@ -76,7 +84,10 @@ export default function ContributionsGraph()
                       },
                       scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                minTicksLimit: 5
+                            }
                         }
                       },
                       responsive: true,
