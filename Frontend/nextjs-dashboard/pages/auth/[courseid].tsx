@@ -27,16 +27,28 @@ export default function CourseDetails() {
   //setUserRole('1')
 
 
-  // Fetch projects when the component mounts
-  useEffect(() => {
-    async function fetchData() {
 
-      
+  useEffect(() => {
+    if (localId && courseid) {
+      const fetchData = async () => {
+        const res = await fetch(
+          `http://localhost:3001/auth/course_home_page?localId=${localId}&courseId=${courseid}`
+        );
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = await res.json();
+        setCourseDetails(data);
         
-        try {
+        setStudentList(data.courses.student_ids)
+        console.log(data)
+
+          try {
             //console.log('Course .tsx is displayed')
-            
-            const localId = Cookies.get('localId')
+            //if (!router.isReady) return;
+            //const localId = Cookies.get('localId')
             
             if(localId) {
 
@@ -57,9 +69,11 @@ export default function CourseDetails() {
                         throw new Error('Failed to fetch data');
                     }
                     const result = await res.json();
-                    setProjectData(result);
+                    
                     // Set the initial projects to the state if the response is approved
                     if (result.approved && result.projects) {
+                        console.log('it has been approved')
+                        setProjectData(result);
                         setProjectList(result.projects);
                         setLoading(false);
                     }  
@@ -75,25 +89,6 @@ export default function CourseDetails() {
         finally{
             setLoading(false);
         }
-    }
-    fetchData();
-}, []);
-
-  useEffect(() => {
-    if (localId && courseid) {
-      const fetchData = async () => {
-        const res = await fetch(
-          `http://localhost:3001/auth/course_home_page?localId=${localId}&courseId=${courseid}`
-        );
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch data');
-        }
-
-        const data = await res.json();
-        setCourseDetails(data);
-        setStudentList(data.courses.student_ids)
-        console.log(data)
       };
 
       fetchData();
@@ -112,6 +107,7 @@ export default function CourseDetails() {
 
           const data = await res.json();
           if (data.approved) {
+
             setStudentList(data.courses); // Store student list in state
 
           }
@@ -211,7 +207,7 @@ return () => {
     document.removeEventListener('keydown', handleEscapeKey);
 };
 }, [isProjectPopupVisible]);**/
-if (projectData && projectList.length >= 0) {
+if (projectData) {
     return (
       <div className="page-wrapper">
         <div className="course-header">
@@ -231,9 +227,9 @@ if (projectData && projectList.length >= 0) {
               <button className="add-button" onClick={addProject}>+ </button>
             </div>
             <div className="projects-grid">
-              {projectList.map((project, index) => (
+              {projectData?.projects?.map((projects, index) => (
                 <div key={index} className="project-card">
-                  {project.project_id}
+                  {projects.project_id}
                 </div>
               ))}
             </div>
