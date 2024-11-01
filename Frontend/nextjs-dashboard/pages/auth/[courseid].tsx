@@ -6,7 +6,6 @@ import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 
 
-import FileUpload from '@/app/ui/upload-form'
 
 export default function CourseDetails() {
   const router = useRouter();
