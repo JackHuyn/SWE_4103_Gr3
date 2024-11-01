@@ -34,7 +34,7 @@ metrics = StudentMetrics.StudentMetrics(dbWrapper)
 with(open(os.path.join(dir_path, github_api_key_filename), "r") as key_file):
     github_api_key = json.load(key_file)
 
-firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
+firebase_auth = fb_auth.FirebaseAuth(dbWrapper, auth, FIREBASE_WEB_API_KEY)
 
 
 
