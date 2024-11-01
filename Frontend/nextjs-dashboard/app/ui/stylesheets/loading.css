@@ -1,0 +1,34 @@
+@import url('./colors.css');
+@import url('./default.css');
+@import url('./fonts.css');
+
+.spinner-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full page height */
+    background-color: #1a1a1a; /* Same background as the page */
+    background-image:var(--imageBackground);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .spinner {
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    border-top: 8px solid #fff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Animation for the spinner */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
