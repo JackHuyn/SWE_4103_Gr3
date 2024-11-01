@@ -333,7 +333,7 @@ def add_course():
             mimetype='application/json'
         )
         return response
-    
+        
 
 @app.route('/remove-course', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
