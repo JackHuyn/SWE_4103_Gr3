@@ -70,7 +70,9 @@ class FirebaseAuth:
             self.end_session(local_id)
             return False
         uid = decoded_token['uid']
-        return True
+        
+        return {'status': True, 'uid':uid}
     
     def validate_instructor_key(self, provided_key):
         return provided_key == 'D6B74'
+    
