@@ -2,7 +2,7 @@
 @import url('./default.css');
 
 #team-velocity-dialog {
-    /* display: none; */
+    display: none;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -16,6 +16,7 @@
     text-align: center;
     margin: auto;
     padding: auto;
+    z-index: 11;
 }
 
 #team-velocity-dialog > h1 {

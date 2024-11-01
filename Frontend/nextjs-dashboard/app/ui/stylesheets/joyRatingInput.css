@@ -2,7 +2,7 @@
 @import url('./default.css');
 
 #joy-rating-dialog {
-    /* display: none; */
+    display: none;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -16,7 +16,9 @@
     text-align: center;
     margin: auto;
     padding: auto;
+    z-index: 12;
 }
+
 
 #joy-rating-dialog > h1 {
     margin: 2% 0;
