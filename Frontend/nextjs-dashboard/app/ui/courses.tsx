@@ -224,7 +224,7 @@ export default function Courses() {
     if (error) {
         return <p>{error}</p>;
     }
-    if (data && data.approved && courseList.length > 0) {
+    if (false && data && data.approved && courseList.length > 0) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
