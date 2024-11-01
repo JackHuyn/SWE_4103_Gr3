@@ -23,7 +23,7 @@ db = firestore.client()
 
 dbWrapper = DbWrapper(db)
 
-firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
+firebase_auth = fb_auth.FirebaseAuth(dbWrapper, auth, FIREBASE_WEB_API_KEY)
 
 
 @app.route('/', methods=['GET'])
