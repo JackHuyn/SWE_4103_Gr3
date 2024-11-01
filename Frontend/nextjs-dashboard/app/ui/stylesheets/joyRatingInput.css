@@ -1,0 +1,48 @@
+@import url('./colors.css');
+@import url('./default.css');
+
+#joy-rating-dialog {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 40%;
+    background-color: black;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: auto;
+    padding: auto;
+    z-index: 12;
+}
+
+
+#joy-rating-dialog > h1 {
+    margin: 2% 0;
+}
+
+#joy-stars > button {
+    background-color: transparent;
+    border-style: none;
+    margin: 1% 1%;
+    padding: 0;
+
+    font-size: 3.25em;
+    color: whitesmoke;
+}
+
+#submit-joy-rating-button {
+    padding: 1% 2%;
+    margin: 0;
+}
+
+#joy-comment-textarea {
+    background-color: var(--formBackground);
+    color: var(--fontColorLight);
+    resize: none;
+    width: 60%;
+    height: 100px;
+}

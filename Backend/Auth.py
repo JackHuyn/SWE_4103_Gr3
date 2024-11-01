@@ -29,6 +29,7 @@ class FirebaseAuth:
                     params={"key": self.api_key},
                     data=payload)
         login_resp = r.json()
+        print(login_resp)
 
         self.active_sessions.update({login_resp['localId']: login_resp})
 
@@ -39,6 +40,14 @@ class FirebaseAuth:
             self.active_sessions.pop(local_id)
             return True
         except KeyError as ke:
+            return False
+    
+    def user_logout(self, local_id):
+        if self.end_session(local_id):
+            print("LOGOUT SUCCESSFUL")
+            return True
+        else:
+            print("LOGOUT UNSUCCESSFUL")
             return False
 
     def validate_token(self, local_id, id_token):

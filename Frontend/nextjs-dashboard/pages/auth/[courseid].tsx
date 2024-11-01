@@ -6,11 +6,13 @@ import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 
 
+import FileUpload from '@/app/ui/upload-form'
 
 export default function CourseDetails() {
   const router = useRouter();
   const { courseid } = router.query;
   const [courseDetails, setCourseDetails] = useState(null);
+  const [studentList, setStudentList] = useState([]);
   const localId = Cookies.get('localId');
   const [isPopupVisible, setIsPopupVisible] = useState(false); // Stores true or false depending on if the popup is visible
   const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents

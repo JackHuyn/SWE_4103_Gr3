@@ -4,6 +4,7 @@ from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
 import os
 import datetime
+import pytz
 
 COURSES = "coursedata"
 GROUPS = "groupdata"
@@ -71,11 +72,13 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==",  group_id))
-        docList = []
-        for doc in docs:
-            docList.append(doc.to_dict())
-        return docList
+        try:
+            doc = self.db.collection(GROUPS).document(group_id).get()
+            return doc.to_dict()['avg_joy']
+        except Exception as e:
+            print('DB WRAPPER ERROR')
+            print(e)
+            return []
     def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
@@ -140,6 +143,7 @@ class DbWrapper:
         #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
+        template["avg_joy"] = []
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -165,23 +169,65 @@ class DbWrapper:
             return False
         return True
     
-    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
-        if (self.updateJoyRating(student_id, group_id, joy_rating)):
+    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
+        now = datetime.datetime.now()
+        current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
+        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        midnight_utc = timezone.localize(current_date)
+        firestore_timestamp = midnight_utc.isoformat()
+
+        group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
+        if(group):
+            g = group.to_dict()
+            if 'avg_joy' in g:
+                for avg in g['avg_joy']:
+                    if avg['date'] >= firestore_timestamp:
+                        group.update({'avg_joy': firestore.ArrayRemove(avg)})
+
+
+        # if group[avg_joy] has avg for current date, delete
+        # calculate avg for current date
+        # if(len(existing_avg))
+
+        if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
             return True
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
         template["student_id"] = student_id
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
+        template["comment"] = comment
         template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         return True
+    
+    def calculateJoyAverage(self, group_id:str, date):
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+        firestore_timestamp_start = date_start_utc.isoformat()
+        firestore_timestamp_end = date_end_utc.isoformat()
 
-    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+        sum = 0
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", firestore_timestamp_start)).where(
+                    filter=FieldFilter("timestamp", "<=", firestore_timestamp_end)).stream()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            sum += d['joy_rating']
+        avg = sum / len(joy_docs)
+        return {}
+
+
+    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
+            doc.update({"comment": comment})
             doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False
@@ -224,6 +270,30 @@ class DbWrapper:
         for doc in docs:
             return doc.to_dict()
         return None
+    
+    # Project Access Functions
+    def getRecentStudentJoyRatings(self, group_id:str) -> dict:
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        user_ids = []
+        docList = []
+        for doc in docs:
+            d = doc.to_dict()
+            if(d['student_id'] in user_ids):
+                continue
+            print('D: ', d)
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            docList.append(d)
+            user_ids.append(d['student_id'])
+        return docList
+    
+    def getGithubRepoAddress(self, group_id:str):
+        docs = self.db.collection(GROUPS).document(group_id).get()
+        return docs.to_dict()['github_repo_address']
+
+
+
+    
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
@@ -234,21 +304,14 @@ if __name__ == "__main__":
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     test = DbWrapper(db)
-    docs = test.getStudentCourses("3713652")
-    print(docs)
-    print(test.addStudentToCourse("3713652", "TestCourse"))
-    print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
-    print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
-    print(test.activateCourse("TestCourseAgain"))
-    print(test.getInstructorCourses("some_prof"))
-    print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
-    print(test.addGroup("java3_proj1"))
-    print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
-    print(test.addNGroups("java3_proj1", 5))
-    print(test.removeGroup("java3_proj1_gr1"))
-    print(test.addGroup("java3_proj1"))
-    print(test.removeProject("java3_proj1"))
+    print(test.addStudentJoyRatings('TEMPLATE', 'python_test', 4))
+    print(test.getStudentJoyRatings('TEMPLATE'))
+    # docs = test.getStudentCourses("3713652")
+    # print(docs)
+    # print(test.addStudentToCourse("3713652", "TestCourse"))
+    # print(test.getUserData("TestUser"))
+    # print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+    # print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
+    # print(test.activateCourse("TestCourseAgain"))
+    # print(test.getInstructorCourses("some_prof"))
     #print(test.removeCourse("TestCourseAgain"))

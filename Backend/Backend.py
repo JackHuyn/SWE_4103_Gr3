@@ -1,3 +1,4 @@
+#Third Party Libraries
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import FileUpload as fp
@@ -5,9 +6,15 @@ import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
 import requests
-import Auth as fb_auth
 import os 
+
+#First Party Libraries
+import Auth as fb_auth
+import FileUpload as fp
 from DbWrapper.DbWrapper import DbWrapper
+import StudentMetrics as StudentMetrics
+
+
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -15,15 +22,20 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
+github_api_key_filename = 'swe4103-github-metrics-admin.json'
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 cred = credentials.Certificate(os.path.join(dir_path, credFileName))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-
 dbWrapper = DbWrapper(db)
 
+metrics = StudentMetrics.StudentMetrics(dbWrapper)
+with(open(os.path.join(dir_path, github_api_key_filename), "r") as key_file):
+    github_api_key = json.load(key_file)
+
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
+
 
 
 @app.route('/', methods=['GET'])
@@ -65,6 +77,7 @@ def signup_user():
 
         dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid)
         
+        
         print(signup_resp)
         response = app.response_class(
             response=json.dumps({'approved': True}),
@@ -88,6 +101,7 @@ def signup_user():
         )
         return response
     except Exception as e:
+        print(e)
         print(e)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Server Error'}),
@@ -141,7 +155,10 @@ def getUserRole(local_id):
     user_data = dbWrapper.getUserData(local_id)
     return user_data['account_type']
 
-
+#Helper to get student list in course
+def getStudentList(local_id):
+    course_data = dbWrapper.getCourseData(local_id)
+    return course_data['student_ids']
 
 #Author: Raphael Ferreira 
 @app.route('/check-instructor',methods=['GET'])
@@ -168,15 +185,17 @@ def check_instructor_role():
     return response
 
     
+    
 
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
 def validate_session():
     local_id = request.args.get("localId", default = -1, type = str)
     id_token = request.args.get("idToken", default = -1, type = str)
+    valid = fb_auth.validate_token(local_id, id_token)
     response = app.response_class(
-        response=json.dumps({'approved': firebase_auth.validate_token(local_id, id_token)}),
-        status=200,
+        response=json.dumps({'approved': valid}),
+        status=200 if valid else 401,
         mimetype='application/json'
     )
     print(response.response)
@@ -205,34 +224,25 @@ def upload():
             response=json.dumps({}),
             status=401,
             mimetype='application/json'
-
         )
-
         return response  
-       
     
-    else:
-        file = request.files['file']
+    file = request.files['file']
+    course_id = request.form.get('course_id')
         #would need to confirm that I am logged in using validate_session or firebase_auth.validate_token ? 
         #valid = True
-        response = app.response_class(
-            response=json.dumps({'approved': True }),
-            status = 200, 
-            mimetype = 'application/json'
-
-        )
-
-    
+    response = app.response_class(
+        response=json.dumps({'approved': True }),
+        status = 200, 
+        mimetype = 'application/json'
+    )
     if file.filename == '':
         response = app.response_class(
             response = json.dumps({'approved': False}),
             status=401,
             mimetype='application/json'
         )
-
         return response
-        
-
     if file and fp.allowed_file(file.filename):
         saved_file_path = fp.save_file(file) 
         list_of_emails = fp.extract_email(saved_file_path)
@@ -244,7 +254,10 @@ def upload():
             user_dict = dbWrapper.findUser(email)
             if user_dict != None:
                 user_id = user_dict['uid']
-                dbWrapper.addStudentToCourse(user_id,'TestCourse2') #add students to cs1073 for now
+                if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
+                    print(user_id + ':\tDone')
+                else:
+                    print(user_id + ':\tFail')
             else:
                 # add not found emails to a not found list
                 users_not_found.append(email)
@@ -388,9 +401,7 @@ def remove_course():
             status=500,
             mimetype='application/json'
         )
-        return response
-
-    
+        return response    
 
 @app.route('/auth/course_home_page', methods = ["GET"])
 @cross_origin()
@@ -412,7 +423,6 @@ def get_course_data():
 
     try: 
         course_data = dbWrapper.getCourseData(course_id)
-
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
@@ -462,7 +472,60 @@ def get_course_data():
         return response
 
     
-
+#Author: Sarun Weerakul
+#print student email from course list
+@app.route('/auth/student_list_in_courses', methods= ['GET','POST'])
+@cross_origin()
+def student_List():
+    local_id = request.args.get("localId", default = -1, type = str)
+    print('course ID is : ', local_id)
+    if local_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course ID'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    try:  
+        students = getStudentList(local_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+        if students:
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'courses': students
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response      
+        elif students == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+        else:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
 
 
 
@@ -541,6 +604,184 @@ def show_courses():
             mimetype='application/json'
         )
         return response
+    
+
+@app.route('/metrics/get-avg-team-joy-ratings', methods=['GET'])
+@cross_origin()
+def get_team_joy_ratings(): # Avg Joy Ratings per Day
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        joy_data = metrics.get_avg_team_joy_ratings(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print('BACKEND ERROR')
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-student-joy-ratings', methods=['GET'])
+@cross_origin()
+def get_student_joy_ratings(): # Avg Joy Ratings per Day
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        joy_data = metrics.get_recent_student_joy_ratings(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/submit-joy-rating', methods=['POST'])
+@cross_origin()
+def submit_student_joy_rating():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("uid", default = "", type = str)
+    joy_rating = request.args.get("joyRating", default = "", type = str)
+    comment = request.args.get("comment", default = "", type = str)
+
+    try:
+        joy_data = metrics.add_student_joy_rating(group_id, uid, joy_rating, comment)
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/contributions', methods=['GET'])
+@cross_origin()
+def get_github_contribution_stats():
+    project_id = request.args.get("projectId", default = "", type = str)
+    try:
+        resp = metrics.get_github_contribution_stats(project_id)
+        # print(resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'contributions': resp}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-team-velocity', methods=['GET'])
+@cross_origin()
+def get_team_velocity():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        resp = metrics.get_team_velocity(group_id)
+        # print(resp)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'velocity': resp}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/submit-team-velocity', methods=['POST'])
+@cross_origin()
+def sumbit_team_velocity():
+    local_id = request.args.get("localId", default = "", type = str)
+    group_id = request.args.get("groupId", default = "", type = str)
+    start_date = request.args.get("startDate", default = "", type = str)
+    end_date = request.args.get("endDate", default = "", type = str)
+    planned_story_points = request.args.get("plannedStoryPoints", default = "", type = str)
+    completed_story_points = request.args.get("completedStoryPoints", default = "", type = str)
+
+    try:
+        metrics.submit_team_velocity(group_id, start_date, end_date, planned_story_points, completed_story_points)
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+
+@app.route('/auth/get-github-app-client-id', methods=['GET'])
+@cross_origin()
+def get_github_app_client_id():
+    try:
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'clientId': github_api_key['client_id']}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/auth/github-code-request', methods=['POST'])
+@cross_origin()
+def github_code_request():
+    local_id = request.args.get("localId", default = "", type = str)
+    id_token = request.args.get("idToken", default = "", type = str)
+    code = request.args.get("code", default = "", type = str)
+
+    try:
+        pass
+        # request and store oauth
+        # update user's session to use authenticated github object
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
     
 if __name__ == '__main__':
     print("Start")
