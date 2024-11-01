@@ -143,8 +143,6 @@ export default function Courses() {
                     setNewCourseTerm('');
                     setNewCourseSection('');
                     setIsPopupVisible(false);
-                    
-
                 } else {
                     alert(`Error adding course: ${result.reason}`);
                 }

@@ -348,6 +348,8 @@ def add_course():
         return response
         
 
+    
+
 @app.route('/remove-course', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
 def remove_course():
@@ -782,6 +784,146 @@ def github_code_request():
             mimetype='application/json'
         )
     return response
+# Author:  Raphael Ferreira
+#This route displays all course related projects
+@app.route('/auth/projects', methods= ["GET"])
+@cross_origin()
+def show_projects():
+    # get student id from the current login
+    local_id = request.args.get("localId", default = -1, type = str)
+    course_id = request.args.get("courseId", default = -1, type = str)
+    print('user ID is : ', local_id)
+    print('course id : ', course_id)
+    # handle wrong student id case
+    if local_id == -1: 
+        response = app.response_class(
+            response=json.dumps({'error': 'No/wrong id'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    elif course_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course'}),
+            status = 401,
+            mimetype='application/json'
+        )
+    try:  
+        
+        course_data_projects = dbWrapper.getCourseProjects(course_id)
+      
+
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+
+        # if data exist?
+        if course_data_projects:
+            # Convert dictionary to JSON for frontend use
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'projects': course_data_projects
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
+        
+        elif course_data_projects == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+
+
+
+        else:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    # error
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+    
+
+#Author: Raphael Ferreira
+@app.route('/add-project', methods=['POST'])
+@cross_origin()  # Enable CORS for this route
+def add_project():
+    try:
+        
+        # Extract course details from the request JSON body
+        data = request.get_json()
+        
+        # Extract the fields from the JSON object
+        course_id = data.get('course_id', "")
+        project_name = data.get('project_name', "")
+        project_id = course_id + "_" +  project_name
+        
+        github_repo_address = data.get('github_repo_addres', "")
+    
+        print('course id: ', course_id)
+        print('project id : ', project_id)
+        print('project name: ', project_name)
+        print('github_repo_address', github_repo_address) 
+        # Check if all required fields are provided
+        if not (project_id):
+            raise ValueError("Missing required fields")
+
+        # Call the `addCourse` function from `DbWrapper`
+        success = dbWrapper.addProject(
+            course_id,
+            project_id,
+            project_name,
+            github_repo_address
+        )  
+
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Project added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add project'}),
+                status=500,
+                mimetype='application/json'
+            )
+
+        return response
+
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
     
 if __name__ == '__main__':
     print("Start")
