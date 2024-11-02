@@ -236,7 +236,8 @@ if __name__ == "__main__":
     test = DbWrapper(db)
     docs = test.getStudentCourses("3713652")
     print(docs)
-    print(test.addStudentToCourse("3713652", "TestCourse"))
+    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+    '''print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
     print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
     print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
@@ -250,5 +251,5 @@ if __name__ == "__main__":
     print(test.addNGroups("java3_proj1", 5))
     print(test.removeGroup("java3_proj1_gr1"))
     print(test.addGroup("java3_proj1"))
-    print(test.removeProject("java3_proj1"))
+    print(test.removeProject("java3_proj1"))'''
     #print(test.removeCourse("TestCourseAgain"))

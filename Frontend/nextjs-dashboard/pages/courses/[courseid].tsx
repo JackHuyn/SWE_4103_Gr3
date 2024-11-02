@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 //import { Button } from './button';
 import Cookies from 'js-cookie';
+import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
@@ -228,9 +229,13 @@ if (projectData) {
             </div>
             <div className="projects-grid">
               {projectData?.projects?.map((projects, index) => (
+                <Link href={'/projects/' + projects.project_id}> 
                 <div key={index} className="project-card">
-                  {projects.project_id}
+                  
+                  {projects.project_name}
+                  
                 </div>
+                </Link>
               ))}
             </div>
             <p className="view-all">View all</p>
