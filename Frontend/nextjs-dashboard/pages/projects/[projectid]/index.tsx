@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 //import { Button } from './button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
@@ -20,12 +21,13 @@ import { group } from 'console';
  */
 export default function ProjectDetails(){
 
+    const searchParams = useSearchParams();
     const router = useRouter();
     const { projectid } = router.query;
-    console.log(router.query)
     const [groupDetails, setGroupDetails] = useState(null);
     const localId = Cookies.get('localId');
-    const [isGroupPopupVisible, setIsGroupPopupVisible] = useState(false); 
+    const [isGroupPopupVisible, setIsGroupPopupVisible] = useState(false);
+    const [courseid, setCourseId] = useState(null);
     const [newGroupName, setNewGroupName] = useState('');
     const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
     const [userRole, setUserRole] = useState('')
@@ -35,7 +37,8 @@ export default function ProjectDetails(){
 
     useEffect(() => {
 
-        const controller = new AbortController();
+        setCourseId(searchParams.get('course_id'))
+        
         if (localId && projectid) {
           const fetchData = async () => {
 
@@ -55,9 +58,7 @@ export default function ProjectDetails(){
                 }
 
                 const res = await fetch(
-                  `http://localhost:3001/show_groups?localId=${localId}&projectId=${projectid}`,{
-                    signal:controller.signal,
-                  }
+                  `http://localhost:3001/show_groups?localId=${localId}&projectId=${projectid}`
                 )
         
                 if (!res.ok) {
@@ -105,7 +106,7 @@ export default function ProjectDetails(){
     
           fetchData();
         }
-        return () => controller.abort()
+        
       }, [localId, projectid]);
 
 
@@ -179,7 +180,12 @@ export default function ProjectDetails(){
               </div>
               <div className="groups-grid">
                 {groupDetails?.groups?.map((groups, index) => (
-                  <Link href={'/projects/' + projectid + '/' + groups.group_id}> 
+                  <Link href={{pathname: '/projects/' + projectid + '/' + groups.group_id,
+                    query:{
+                      course_id: courseid
+
+                    }
+                  }}> 
                   <div key={index} className="project-card">
                     {groups.group_name}
                   </div>
