@@ -112,8 +112,6 @@ export default function ProjectDetails(){
 
 
       const handleAddGroup = async () => {
-    
-        if (newGroupName) {
             
             //Ensure localId cookie is valid
             const localId  = Cookies.get('localId')
@@ -156,9 +154,7 @@ export default function ProjectDetails(){
                 alert('Error adding group. Please try again later.');
             }
     
-        } else {
-            alert('Please provide a group name.');
-        }
+         
     };
 
 
@@ -185,7 +181,7 @@ export default function ProjectDetails(){
                 {groupDetails?.groups?.map((groups, index) => (
                   <Link href={'/projects/' + projectid + '/' + groups.group_id}> 
                   <div key={index} className="project-card">
-                    {groups.group_id}
+                    {groups.group_name}
                   </div>
                   </Link>
                 ))}
@@ -203,12 +199,12 @@ export default function ProjectDetails(){
           <div className="popup">
               <div className="popup_content">
                   <h2>Add New Group</h2>
-                  <input
+                  {/**<input
                       //ref={inputRef} // Attach the ref to the input field
                       type="text"
                       value={newGroupName}
                       onChange={(e) => setNewGroupName(e.target.value)}
-                      placeholder="Project Name"/>
+                      placeholder="Project Name"/>**/}
 
 
                   
