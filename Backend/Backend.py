@@ -602,6 +602,7 @@ def get_team_joy_ratings(): # Avg Joy Ratings per Day
     group_id = request.args.get("groupId", default = "", type = str)
     try:
         joy_data = metrics.get_avg_team_joy_ratings(group_id)
+        print('JOY DATA: ', joy_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
@@ -665,11 +666,11 @@ def submit_student_joy_rating():
 @cross_origin()
 def get_github_contribution_stats():
     local_id = request.args.get("localId", default = "", type = str)
-    project_id = request.args.get("projectId", default = "", type = str)
+    group_id = request.args.get("groupId", default = "", type = str)
     try:
         user_obj = firebase_auth.active_sessions[local_id]
         auth = user_obj.github_auth
-        resp = metrics.get_github_contribution_stats(auth, project_id)
+        resp = metrics.get_github_contribution_stats(auth, group_id)
         # print(resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'contributions': resp}),
