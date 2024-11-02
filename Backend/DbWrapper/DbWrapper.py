@@ -291,8 +291,9 @@ class DbWrapper:
         docs = self.db.collection(GROUPS).document(group_id).get()
         return docs.to_dict()['github_repo_address']
 
-
-
+    def updateGithubOAuthToken(self, uid:str, github_oauth_token:str) -> bool:
+        print("UID: ", uid)
+        return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
     
 
 if __name__ == "__main__":

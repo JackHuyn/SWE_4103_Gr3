@@ -13,7 +13,8 @@ import Auth as fb_auth
 import FileUpload as fp
 from DbWrapper.DbWrapper import DbWrapper
 import StudentMetrics as StudentMetrics
-
+import User as User
+import GitHub as Github
 
 
 app = Flask(__name__)
@@ -663,13 +664,23 @@ def submit_student_joy_rating():
 @app.route('/metrics/contributions', methods=['GET'])
 @cross_origin()
 def get_github_contribution_stats():
+    local_id = request.args.get("localId", default = "", type = str)
     project_id = request.args.get("projectId", default = "", type = str)
     try:
-        resp = metrics.get_github_contribution_stats(project_id)
+        user_obj = firebase_auth.active_sessions[local_id]
+        auth = user_obj.github_auth
+        resp = metrics.get_github_contribution_stats(auth, project_id)
         # print(resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'contributions': resp}),
             status=200,
+            mimetype='application/json'
+        )
+    except User.InvalidGitHubAuthException as igae:
+        print("Invalid GitHub Authentication")
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=498, # (Unreserved) Invalid GitHub Authentication
             mimetype='application/json'
         )
     except Exception as e:
@@ -753,11 +764,14 @@ def github_code_request():
     local_id = request.args.get("localId", default = "", type = str)
     id_token = request.args.get("idToken", default = "", type = str)
     code = request.args.get("code", default = "", type = str)
-
     try:
-        pass
-        # request and store oauth
-        # update user's session to use authenticated github object
+        print('a')
+        oauth_token = Github.getOAuthTokenFromCode(github_api_key['client_id'], github_api_key['client_secret'], code)
+        print('b')
+        print("OAuth Token Resp: ", oauth_token)
+        uid = firebase_auth.active_sessions[local_id].uid
+        dbWrapper.updateGithubOAuthToken(uid, oauth_token)
+        firebase_auth.active_sessions[local_id].github_oauth_token = oauth_token
         response = app.response_class(
             response=json.dumps({'approved': True}),
             status=200,

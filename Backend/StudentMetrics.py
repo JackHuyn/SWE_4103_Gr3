@@ -68,7 +68,7 @@ class StudentMetrics:
     def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
         print(group_id, start_date, end_date, planned_story_points, completed_story_points)
     
-    def get_github_contribution_stats(self, project_id):
+    def get_github_contribution_stats(self, auth, project_id):
         repo_address = self.db.getGithubRepoAddress(project_id)
-        git = github.GitHubManager(repo_address)
+        git = github.GitHubManager(auth, repo_address)
         return git.get_contributions()

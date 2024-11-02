@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import '@/app/ui/stylesheets/default.css'
+import { redirect } from "next/dist/server/api-utils";
 
 export default function GitHubCodeRequest() {
 
@@ -8,8 +9,8 @@ export default function GitHubCodeRequest() {
         let code = queryParameters.get("code")
         console.log(code)
 
-        let local_id = ''
-        let id_token = ''
+        let local_id = 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1'
+        let id_token = 'test'
 
         fetch("http://127.0.0.1:3001/auth/github-code-request?localId="+local_id+"&idToken="+id_token+"&code="+code,
             {
@@ -44,6 +45,7 @@ export default function GitHubCodeRequest() {
                 if(!r['approved'])
                     throw 'idek bro'
                 console.log(r)
+                window.location.href = '/metrics'
                 
             } catch(err) {
                 console.log(err)
@@ -53,7 +55,7 @@ export default function GitHubCodeRequest() {
         })
 
         //redirect()
-    })
+    }, [])
 
     return (
         <div>
