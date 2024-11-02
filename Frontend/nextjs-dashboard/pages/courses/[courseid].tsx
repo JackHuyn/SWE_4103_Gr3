@@ -225,7 +225,9 @@ if (projectData) {
           <div className="projects-section">
             <div className="section-header">
               <h2>Projects</h2>
-              <button className="add-button" onClick={addProject}>+ </button>
+              { userRole == '1' &&
+                (<button className="add-button" onClick={addProject}>+ </button>)
+              }
             </div>
             <div className="projects-grid">
               {projectData?.projects?.map((projects, index) => (
@@ -246,7 +248,8 @@ if (projectData) {
           <div className="students-section">
             <div className="section-header">
               <h2>Students</h2>
-              <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
+              { userRole == '1' && 
+                (<button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>)}
             </div>
             <div className="students-list">
               {courseDetails?.courses?.student_ids?.map((student_ids, index) => (

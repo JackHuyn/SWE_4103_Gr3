@@ -15,7 +15,7 @@ import { group } from 'console';
  * 
  * Instructor = > Currently it only show the groups associated with this project
  * Student => Implementation only sees their group TBD
- * @param param0 
+ * @param 
  * @returns 
  */
 export default function ProjectDetails(){
@@ -39,22 +39,62 @@ export default function ProjectDetails(){
         if (localId && projectid) {
           const fetchData = async () => {
 
-             
-             const res = await fetch(
-              `http://localhost:3001/show_groups?localId=${localId}&projectId=${projectid}`,{
-                signal:controller.signal,
+
+            try{
+              if(localId) {
+
+                const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
+
+                //check if instructor role ? If not show student display
+                if(!role_response.ok){
+                    setUserRole('0')
+                }
+                else {
+                    //fetching same for instructor
+                    setUserRole('1')
+                }
+
+                const res = await fetch(
+                  `http://localhost:3001/show_groups?localId=${localId}&projectId=${projectid}`,{
+                    signal:controller.signal,
+                  }
+                )
+        
+                if (!res.ok) {
+                  throw new Error('Failed to fetch data');
+                }
+        
+                const data = await res.json();
+                if(data.approved)
+                {
+                    setGroupDetails(data);
+                }
+
               }
-            )
-    
-            if (!res.ok) {
-              throw new Error('Failed to fetch data');
+
+              else  {
+                window.location.href = "/auth/login"
+              }
+
             }
-    
-            const data = await res.json();
-            if(data.approved)
-            {
-                setGroupDetails(data);
+
+           
+
+            catch (error) {
+              console.error('Error fetching Groups:', error);
+              setError('Error loading Groups. Please try again later.');
             }
+            finally{
+              setLoading(false);
+            }
+
+            
+
+
+            
+
+             
+             
             
             
             ///setStudentList(data.courses.student_ids)
@@ -138,7 +178,8 @@ export default function ProjectDetails(){
             <div className="groups-section">
               <div className="section-header">
                 <h2>Groups</h2>
-                <button className="add-button" onClick={()=>setIsAddGroupVisible(true)}>+ </button>
+                {userRole == '1' && 
+                  (<button className="add-button" onClick={()=>setIsAddGroupVisible(true)}>+ </button>)}
               </div>
               <div className="groups-grid">
                 {groupDetails?.groups?.map((groups, index) => (
