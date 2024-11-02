@@ -169,7 +169,7 @@ class DbWrapper:
             return False
         return True
     
-    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         now = datetime.datetime.now()
         current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
         timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
@@ -189,13 +189,14 @@ class DbWrapper:
         # calculate avg for current date
         # if(len(existing_avg))
 
-        if (self.updateJoyRating(student_id, group_id, joy_rating)):
+        if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
             return True
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
         template["student_id"] = student_id
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
+        template["comment"] = comment
         template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         return True
@@ -221,11 +222,12 @@ class DbWrapper:
         return {}
 
 
-    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
+            doc.update({"comment": comment})
             doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False
@@ -289,8 +291,9 @@ class DbWrapper:
         docs = self.db.collection(GROUPS).document(group_id).get()
         return docs.to_dict()['github_repo_address']
 
-
-
+    def updateGithubOAuthToken(self, uid:str, github_oauth_token:str) -> bool:
+        print("UID: ", uid)
+        return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
     
 
 if __name__ == "__main__":

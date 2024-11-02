@@ -1,12 +1,14 @@
 import requests
 import json
+from  User import User as User
 
 class InvalidInstructorKeyException(Exception):
     pass
 
 class FirebaseAuth:
 
-    def __init__(self, auth, api_key) -> None:
+    def __init__(self, db, auth, api_key) -> None:
+        self.db = db
         self.auth = auth
         self.api_key = api_key
         self.active_sessions = {}
@@ -29,11 +31,13 @@ class FirebaseAuth:
                     params={"key": self.api_key},
                     data=payload)
         login_resp = r.json()
-        print(login_resp)
+        # print(login_resp)
 
-        self.active_sessions.update({login_resp['localId']: login_resp})
+        user_obj = User(login_resp, self.db.getUserData(login_resp['localId']))
 
-        return login_resp
+        self.active_sessions.update({user_obj.local_id: user_obj})
+        
+        return user_obj
     
     def end_session(self, local_id):
         try:
@@ -55,7 +59,7 @@ class FirebaseAuth:
             print("LOCAL ID NOT FOUND")
             return False
         user_session = self.active_sessions[local_id]
-        if(user_session['idToken'] != id_token):
+        if(user_session.id_token != id_token):
             print("ID TOKEN DOES NOT MATCH")
             self.end_session(local_id)
             return False

@@ -20,7 +20,10 @@ async function setStars(num_stars: number)
 
 async function submitStars()
 {
-    fetch("http://127.0.0.1:3001/metrics/submit-joy-rating?groupId="+group_id+"&uid=test2&joyRating="+star_rating,
+
+    const comment = document.getElementById('joy-comment-textarea').value
+
+    fetch("http://127.0.0.1:3001/metrics/submit-joy-rating?groupId="+group_id+"&uid=test2&joyRating="+star_rating+"&comment="+comment,
         {
             method: 'POST'
         }
@@ -73,6 +76,10 @@ export default function JoyRatingInput()
                 <button className='star_button' onClick={(event) => setStars(3)}>☆</button>
                 <button className='star_button' onClick={(event) => setStars(4)}>☆</button>
                 <button className='star_button' onClick={(event) => setStars(5)}>☆</button>
+            </div>
+            <div>
+                <h3>Comment:</h3>
+                <textarea name="joy-comment" id="joy-comment-textarea" placeholder='(optional)'></textarea>
             </div>
             <button id="submit-joy-rating-button" onClick={submitStars}>Submit</button>
         </div>

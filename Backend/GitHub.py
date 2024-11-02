@@ -9,12 +9,34 @@ import requests
 
 GITHUB_BASE_URL = 'https://api.github.com'
 
+
+def getOAuthTokenFromCode(client_id, client_secret, code):
+    rest_api_url = "https://github.com/login/oauth/access_token"
+    print('test')
+    r = requests.post(rest_api_url,
+                params={
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "code": code
+                    })
+    print('test2')
+    print(r)
+    print(r.text)
+
+    args = r.text.split('&')
+    for arg in args:
+        if(arg.startswith('access_token')):
+            return arg.split('=')[1]
+    # print("R: ", r.json())
+    # return r.json()
+    return {}
+
+
 class GitHubManager:
 
-    def __init__(self, repo_address) -> None:
+    def __init__(self, auth, repo_address) -> None:
         self.repo_address = repo_address
-        # auth = Auth.Token("")
-        self.github = Github(base_url=GITHUB_BASE_URL)
+        self.github = Github(auth=auth, base_url=GITHUB_BASE_URL)
         self.repo = self.github.get_repo(self.repo_address)
 
     def get_commit_data(self):

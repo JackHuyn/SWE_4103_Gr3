@@ -1,0 +1,17 @@
+#github-app-authorization-dialog {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 40%;
+    background-color: black;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: auto;
+    padding: auto;
+    z-index: 11;
+}

@@ -4,6 +4,7 @@
 
 .page_wrapper {
     display: flex;
+    
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -12,16 +13,49 @@
     background-color: #1a1a1a; /* Clean, dark background */
 }
 
+#logout {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d; /* Bright red color for attention */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jura', sans-serif;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#logout:hover {
+    background-color: #e63946;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#logout:active {
+    background-color: #c32f33;
+    transform: scale(0.98);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}  
+
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 3%;
+    margin-top: 4%;
     height: 10vh;
     padding: 0 5%;
     background-color: #2b2b2b;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+a.link {
+    text-decoration: none !important;
+    color: inherit;
 }
 
 .header_left {
@@ -87,6 +121,8 @@ h1 {
     background-color: #2b2b2b;
 }
 
+
+
 .courses {
     display: grid;
     width: 70%;
@@ -145,90 +181,6 @@ h1 {
     color: #e0e0e0;
 }
 
-
-
-
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-}
-
-.popup_content {
-    background-color: #2d2d2d;
-    width: 400px;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    font-family: 'Jura', sans-serif;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.popup_content h2 {
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 20px;
-}
-
-.popup_content input {
-    width: 100%;
-    max-width: 350px;
-    padding: 12px;
-    border: 1px solid #5b5b5b;
-    border-radius: 10px;
-    background-color: #3a3a3a;
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.popup_content input:focus {
-    border-color: #007bff;
-}
-
-.popup_buttons {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.popup_button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background-color: #007bff;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    margin: 0 5px;
-}
-
-.popup_button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-.cancel_button {
-    background-color: #dc3545;
-}
-
-.cancel_button:hover {
-    background-color: #c82333;
-}
 
 .toggleCourses {
     background: none;

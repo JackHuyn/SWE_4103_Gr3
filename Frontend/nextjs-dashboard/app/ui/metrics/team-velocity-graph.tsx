@@ -5,13 +5,13 @@ const groupId = 'TEMPLATE'
 
     
 
-export default function ContributionsGraph()
+export default function TeamVelocityGraph()
 {
 
     useEffect(() => {
         console.log('GET CHART CALLED')
         let contributions = []
-        return fetch("http://127.0.0.1:3001/metrics/get-avg-team-joy-ratings?groupId="+groupId,
+        return fetch("http://127.0.0.1:3001/metrics/get-team-velocity?groupId="+groupId,
             {
                 method: 'GET'
             }
@@ -43,32 +43,31 @@ export default function ContributionsGraph()
                 let r = JSON.parse(resp.text)
                 if(!r['approved'])
                     throw 'idek bro'
-                console.log('Avg Joy Data: ', r)
+                console.log(r)
                 //let weeks = []
-                const contributions = r['joyData']
-                const days = contributions.map(row => row.date)
+                const velocity = r['velocity']
+                const days = velocity.map(row => row.sprint_start_date)
     
-                let avg_joy_graph_data = 
+                let team_velocity_graph_data = 
                     [
                         {
-                            label: 'AVG',
-                            data: contributions.map(row => row.avg)
+                            label: 'Completed',
+                            data: velocity.map(row => row.completed_points)
+                        },
+                        {
+                            label: 'Planned',
+                            data: velocity.map(row => row.planned_points)
                         }
                     ]
     
                 const config = {
-                    type: 'line',
+                    type: 'bar',
                     data: {
                         labels: days,
-                        datasets: avg_joy_graph_data
+                        datasets: team_velocity_graph_data
                     },
                     options: {
                         indexAxis: 'x',
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
                         responsive: true,
                         plugins: {
                           legend: {
@@ -83,7 +82,7 @@ export default function ContributionsGraph()
                 };
     
                 return new Chart(
-                        document.getElementById('avg-joy-graph'),
+                        document.getElementById('team-velocity-graph'),
                         config
                     )
             } catch(err) {
@@ -96,8 +95,8 @@ export default function ContributionsGraph()
 
     return(
         <div id="avg-joy-container">
-            <h3>Average Team Joy</h3>
-            <div style={{width: '800px'}}><canvas id="avg-joy-graph"></canvas></div>
+            <h3>Team Velocity</h3>
+            <div style={{width: '800px'}}><canvas id="team-velocity-graph"></canvas></div>
         </div>
     )
 }
