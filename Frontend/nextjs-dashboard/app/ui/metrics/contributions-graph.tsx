@@ -1,17 +1,18 @@
 import Chart from 'chart.js/auto'
 import { groupEnd } from 'console';
 import { useEffect } from 'react';
+import Cookies from 'js-cookie';
 
-
-
+let group_id = 'TEMPLATE'
 
 export default function ContributionsGraph()
 {
 
     useEffect(() => {
-        console.log('GET CHART CALLED')
-        let contributions = []
-        return fetch("http://127.0.0.1:3001/metrics/contributions?localId=G4rI7g4ChTbkkQwtXjZBxaI7fRj1&projectId=TEMPLATE",
+
+        const local_id = Cookies.get('localId')
+
+        return fetch("http://127.0.0.1:3001/metrics/contributions?localId="+local_id+"&groupId="+group_id,
             {
                 method: 'GET'
             }
@@ -26,6 +27,8 @@ export default function ContributionsGraph()
 
                 if (response.status === 498) {// GitHub Authentication Error
                     // Show GitHub App Access Request Button
+                    document.getElementById('metrics-dialog-backdrop').style.display = 'block'
+                    document.getElementById('github-app-authorization-dialog').style.display = 'block'
                     return {
                         text: "GitHub Authentication Error",
                         status: "danger"

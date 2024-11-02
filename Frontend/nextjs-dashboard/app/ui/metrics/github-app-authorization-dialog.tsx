@@ -1,21 +1,17 @@
-import { useEffect } from "react";
-import '@/app/ui/stylesheets/default.css'
-import { redirect } from "next/dist/server/api-utils";
-import Cookies from 'js-cookie';
+import '@/app/ui/stylesheets/githubAppAuthorizationDialog.css'
 
-export default function GitHubCodeRequest() {
+let star_rating: number = 0
 
-    useEffect(() => {
-        const queryParameters = new URLSearchParams(window.location.search)
-        let code = queryParameters.get("code")
-        console.log(code)
+const group_id = 'TEMPLATE' //REPLACE THIS ASAP
 
-        const local_id = Cookies.get('localId')
-        const id_token = Cookies.get('idToken')
+export default function GitHubAppAuthorizationDialog()
+{
 
-        fetch("http://127.0.0.1:3001/auth/github-code-request?localId="+local_id+"&idToken="+id_token+"&code="+code,
+    async function redirectToGitHubAppAuthorization()
+    {
+        fetch("http://127.0.0.1:3001/auth/get-github-app-client-id",
             {
-                method: 'POST'
+                method: 'GET'
             }
         ).then(response => {
             if (!response.ok) {
@@ -46,7 +42,8 @@ export default function GitHubCodeRequest() {
                 if(!r['approved'])
                     throw 'idek bro'
                 console.log(r)
-                window.location.href = '/metrics'
+                const client_id = r['clientId']
+                window.location.assign('https://github.com/login/oauth/authorize?client_id='+client_id)
                 
             } catch(err) {
                 console.log(err)
@@ -54,13 +51,13 @@ export default function GitHubCodeRequest() {
         }).catch((error) => {
             console.log(error)
         })
+       
+    }
 
-        //redirect()
-    }, [])
-
-    return (
-        <div>
-            <h1>Redirecting...</h1>
+    return(
+        <div id="github-app-authorization-dialog">
+            <h3>GitHub App Authorization Required</h3>
+            <button onClick={redirectToGitHubAppAuthorization}>Authorize App</button>
         </div>
     )
 }
