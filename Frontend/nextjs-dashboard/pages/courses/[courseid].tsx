@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 //import { Button } from './button';
 import Cookies from 'js-cookie';
+import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
@@ -119,6 +120,7 @@ export default function CourseDetails() {
 
           const data = await res.json();
           if (data.approved) {
+
             setStudentList(data.courses); // Store student list in state
 
           }
@@ -235,13 +237,23 @@ export default function CourseDetails() {
           <div className="projects-section">
             <div className="section-header">
               <h2>Projects</h2>
-              <button className="add-button" onClick={addProject}>+ </button>
+              { userRole == '1' &&
+                (<button className="add-button" onClick={addProject}>+ </button>)
+              }
             </div>
             <div className="projects-grid">
-              {projectList.map((project, index) => (
+              {projectData?.projects?.map((projects, index) => (
+                <Link href={{pathname: '/projects/' + projects.project_id,
+                  query:{course_id: courseid
+
+                  },
+                }}> 
                 <div key={index} className="project-card">
-                  {project.project_id}
+                  
+                  {projects.project_name}
+                  
                 </div>
+                </Link>
               ))}
             </div>
             <p className="view-all">View all</p>
@@ -252,7 +264,8 @@ export default function CourseDetails() {
           <div className="students-section">
             <div className="section-header">
               <h2>Students</h2>
-              <button className="add-button" onClick={() => setIsPopupVisible(true)}>+</button>
+              { userRole == '1' && 
+                (<button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>)}
             </div>
             <div className="students-list">
               {courseDetails?.courses?.student_ids?.map((student_ids, index) => (

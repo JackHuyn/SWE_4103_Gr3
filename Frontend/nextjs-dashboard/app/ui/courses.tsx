@@ -247,7 +247,7 @@ export default function Courses() {
         );
     }
 
-    if (data && data.approved && courseList.length > 0) {
+    if (data && data.approved && courseList.length >= 0) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
@@ -290,7 +290,7 @@ export default function Courses() {
                         <div className="courses">
                             {courseList.map((course, index) => (
                                 
-                                <Link href ={course.course_id} className = "link">
+                                <Link href ={'/courses/' + course.course_id} className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
 
