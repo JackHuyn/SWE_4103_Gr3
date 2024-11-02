@@ -192,7 +192,7 @@ def check_instructor_role():
 def validate_session():
     local_id = request.args.get("localId", default = -1, type = str)
     id_token = request.args.get("idToken", default = -1, type = str)
-    valid = fb_auth.validate_token(local_id, id_token)
+    valid = firebase_auth.validate_token(local_id, id_token)
     response = app.response_class(
         response=json.dumps({'approved': valid}),
         status=200 if valid else 401,

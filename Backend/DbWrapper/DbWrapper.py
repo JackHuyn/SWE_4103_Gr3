@@ -108,7 +108,7 @@ class DbWrapper:
         return True
     def addCourse(self, course_description:str, course_id:str, instructor_ids:list[str], section:str, term:str, student_ids=[], status=0)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
-        if len(x) > 0:
+        if len(x) > 0:  
             return False
         template = {}
         template["course_description"] = course_description
@@ -140,7 +140,7 @@ class DbWrapper:
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
         template["avg_joy"] = []
