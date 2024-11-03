@@ -1,0 +1,75 @@
+name: Setting up CI pipeline
+
+on: 
+  push:
+    branches: 
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    # needs: github-secrets
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["pypy3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Check Python version
+      - name: Display python version
+        run: |
+          python -c "import sys; print(sys.version)"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          mkdir logFile
+          python -m pip install --upgrade pip
+          pip install pylint Flask flask_cors firebase_admin
+
+      # Firebase setup
+      - name: Install Firebase 
+        run: |
+          npm install -g firebase-tools
+
+      # Lint with Ruff
+      - name: Lint with Ruff
+        run: |
+          pip install ruff
+          ruff check --output-format=github --exit-zero
+        continue-on-error: true
+
+      # Run tests using pytest
+      - name: Check code using pytest
+        run: |
+          pip install pytest pytest-cov pytest-flask pytest-repeat
+          pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
+
+      # install dependencies 2
+      - name: install npm in Unit_test
+        working-directory: Backend/Unit_Test
+        run: npm install
+        
+      # run all test
+      - name: run test on Suite
+        working-directory: Backend/Unit_Test
+        run: firebase emulatores:exec 'npm test'
+
+      # Compress and upload files
+      - name: Compress and upload file
+        uses: actions/upload-artifact@v4
+        with:
+          name: log_File
+          path: ${{ github.workspace }}/
+          if-no-files-found: error
+          overwrite: true
