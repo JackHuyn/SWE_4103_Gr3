@@ -130,27 +130,27 @@ class DbWrapper:
         self.db.collection(PROJECTS).document(project_id).set(template)
         return True
     
-    def addGroup(self, project_id:str, student_ids:list[str]=[])->bool:
-        x = self.getProjectGroups(project_id)
-        group_n = len(x)
-        template = {}
-        group_id = f"{project_id}_gr{group_n}"
-        projData = self.getProjectData(project_id)
-        template["group_id"] = group_id
-        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
-        template["project_id"] = project_id
-        template["student_ids"] = student_ids
-        inserted = False
-        while(not inserted):
-            x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
-            if len(x) > 0:
-                group_n -= 1
-                group_id = f"{project_id}_gr{group_n}"
-                template["group_id"] = group_id
-            else:
-                self.db.collection(GROUPS).document(group_id).set(template)
-                inserted = True
-        return True
+    # def addGroup(self, project_id:str, student_ids:list[str]=[])->bool:
+    #     x = self.getProjectGroups(project_id)
+    #     group_n = len(x)
+    #     template = {}
+    #     group_id = f"{project_id}_gr{group_n}"
+    #     projData = self.getProjectData(project_id)
+    #     template["group_id"] = group_id
+    #     template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+    #     template["project_id"] = project_id
+    #     template["student_ids"] = student_ids
+    #     inserted = False
+    #     while(not inserted):
+    #         x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
+    #         if len(x) > 0:
+    #             group_n -= 1
+    #             group_id = f"{project_id}_gr{group_n}"
+    #             template["group_id"] = group_id
+    #         else:
+    #             self.db.collection(GROUPS).document(group_id).set(template)
+    #             inserted = True
+    #     return True
     
     def addNGroups(self, project_id:str, n:int)->bool:
         for i in range(n):

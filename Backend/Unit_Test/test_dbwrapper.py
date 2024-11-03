@@ -3,7 +3,6 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unittest.mock import MagicMock, patch
-import datetime
 from google.cloud.firestore_v1 import ArrayUnion
 from DbWrapper.DbWrapper import DbWrapper
 
