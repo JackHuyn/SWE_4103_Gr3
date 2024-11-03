@@ -459,21 +459,51 @@ def get_course_data():
 
     
 #Author: Sarun Weerakul
-#print student email from course list
-@app.route('/auth/student_list_in_courses', methods= ['GET','POST'])
+#convert student id to email
+@app.route('/convert_id_to_email', methods=['GET', 'POST'])
 @cross_origin()
-def student_List():
+def get_users_data():
+    data = request.args.get("uids","")
+    data_array = data.split(",") if data else []
+    users_data = []
+    for uid in data_array:
+        doc = dbWrapper.getUserData(uid)
+        if doc is None:
+            return {"error": "User not found"}, 404
+        else:
+            email = doc['email']
+            if email:
+                users_data.append(email)
+    return jsonify({"emails": users_data}) if users_data else jsonify({"message": "No valid emails found"}), 200
+#----------------------------------
+#Author: Sarun Weerakul
+#This route displays student info
+@app.route('/auth/course/students_info', methods= ['GET', 'POST'])
+@cross_origin()
+def show_student():
     local_id = request.args.get("localId", default = -1, type = str)
-    print('course ID is : ', local_id)
-    if local_id == -1:
+    course_id = request.args.get("courseId", default = -1, type = str)
+    print('user ID is : ', local_id)
+    print('course id : ', course_id)
+    if local_id == -1: 
         response = app.response_class(
-            response=json.dumps({'error': 'Invalid course ID'}),
+            response=json.dumps({'error': 'No/wrong id'}),
             status = 401,
             mimetype='applicaion/json'
         )
         return response
-    try:  
-        students = getStudentList(local_id)
+    elif course_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course'}),
+            status = 401,
+            mimetype='application/json'
+        )
+    try:
+        course_data_students = (dbWrapper.getCourseData(course_id))['student_ids']
+        students = []
+        for student in course_data_students:
+            toadd = dbWrapper.getUserData(student)
+            students.append(toadd)
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
             status = 200,
@@ -484,13 +514,13 @@ def student_List():
             response = app.response_class(
                 response=json.dumps({
                     'approved': True,
-                    'courses': students
+                    'students': students
                 }),
                 status=200,
                 mimetype='application/json'
             )
-            return response      
-        elif students == []:
+            return response
+        elif course_data_students == []:
             response = app.response_class(
               response=json.dumps({'approved':False, 'reason':'No data found'}),
               status = 200,
@@ -512,9 +542,6 @@ def student_List():
         )
         return response
 #----------------------------------
-
-
-
 
 
 # Jack Huynh _ Show courses 
@@ -619,7 +646,6 @@ def show_projects():
     try:  
         
         course_data_projects = dbWrapper.getCourseProjects(course_id)
-      
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),

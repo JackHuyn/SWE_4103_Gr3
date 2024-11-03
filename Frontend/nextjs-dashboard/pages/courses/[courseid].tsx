@@ -14,6 +14,7 @@ export default function CourseDetails() {
   const router = useRouter();
   const { courseid } = router.query;
   const [courseDetails, setCourseDetails] = useState(null);
+  const [studentData, setStudentData] = useState([]);
   const [studentList, setStudentList] = useState([]);
   const [projectData, setProjectData] = useState([]);
   const [projectList, setProjectList] = useState([]);
@@ -63,7 +64,7 @@ export default function CourseDetails() {
                     //fetching same for instructor
                     setUserRole('1')
                 }
-
+                //project part
                 const res = await fetch('http://localhost:3001/auth/projects?localId=' + localId + '&courseId=' + courseid)
                     if (!res.ok) {
 
@@ -77,7 +78,19 @@ export default function CourseDetails() {
                         setProjectData(result);
                         setProjectList(result.projects);
                         setLoading(false);
-                    }  
+                    }
+                //student part
+                    const stu_f = await fetch('http://localhost:3001/auth/course/students_info?localId=' + localId + '&courseId=' + courseid)
+                    if (!stu_f.ok) {
+                        throw new Error('Failed to fetch data');
+                    }
+                    const stu_r = await stu_f.json();
+                    if (stu_r.approved && stu_r.students) {
+                        console.log('it has been approved')
+                        setStudentData(stu_r);
+                        setStudentList(stu_r.students);
+                        setLoading(false);
+                    }
             }
             else{
                 window.location.href = "/auth/login"
@@ -95,31 +108,6 @@ export default function CourseDetails() {
       fetchData();
     }
   }, [localId, courseid]);
-
-  useEffect(() => {
-    if (localId) {
-      const fetchStudentList = async () => {
-        try {
-          const res = await fetch(
-            `http://localhost:3001/auth/student_list_in_courses?localId=${localId}`
-          );
-
-          if (!res.ok) throw new Error('Failed to fetch student list');
-
-          const data = await res.json();
-          if (data.approved) {
-
-            setStudentList(data.courses); // Store student list in state
-
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      fetchStudentList();
-    }
-  }, [localId]);
 
   if (!courseDetails) {
     return (
@@ -240,19 +228,19 @@ if (projectData) {
             </div>
             <p className="view-all">View all</p>
           </div>
-
           {/* Students Section */}
-
           <div className="students-section">
             <div className="section-header">
               <h2>Students</h2>
               <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
             </div>
             <div className="students-list">
-              {courseDetails?.courses?.student_ids?.map((student_ids, index) => (
+              {studentData?.students?.map((students, index) => (
+                <Link href={'/students_info/' + students.uid}>
                 <div key={index} className="student-card">
-                  {student_ids}
+                  {students.email}
                 </div>
+                </Link>
               ))}
             </div>
             <p className="view-all">View all</p>
@@ -280,18 +268,6 @@ if (projectData) {
         {localId && courseid && (
           <FileUpload localId={localId} courseId={courseid as string} />
         )}
-        <p>-----Student List-----</p>
-        {/* Display student list */}
-        {studentList.length > 0 ? (
-          <ul>
-            {studentList.map((student, index) => (
-              <li key={index}>{student}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No students found.</p>
-        )}
-    
 
     
       {isProjectPopupVisible && (
