@@ -63,7 +63,7 @@ jobs:
       # run all test
       - name: run test on Suite
         working-directory: Backend/Unit_Test
-        run: firebase emulatores:exec 'npm test'
+        run: firebase emulators:exec 'python -m unittest'
 
       # Compress and upload files
       - name: Compress and upload file
