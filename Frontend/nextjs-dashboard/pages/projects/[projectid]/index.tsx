@@ -8,6 +8,7 @@ import FileUpload from '@/app/ui/upload-form'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
+import '@/app/ui/stylesheets/groups.css';
 import { group } from 'console';
 
 
@@ -88,15 +89,6 @@ export default function ProjectDetails(){
             finally{
               setLoading(false);
             }
-
-            
-
-
-            
-
-             
-             
-            
             
             ///setStudentList(data.courses.student_ids)
             //console.log(data)
@@ -162,7 +154,7 @@ export default function ProjectDetails(){
     return (
         <div className="page-wrapper">
           <div className="course-header">
-            <h1>{projectid}</h1>
+            {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
             {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
             {/*<p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>*/}
   
@@ -172,17 +164,18 @@ export default function ProjectDetails(){
   
             {/* Groups Section */}
   
-            <div className="groups-section">
+            <div className="projects-section full-width-section">
               <div className="section-header">
                 <h2>Groups</h2>
                 {userRole == '1' && 
                   (<button className="add-button" onClick={()=>setIsAddGroupVisible(true)}>+ </button>)}
               </div>
-              <div className="groups-grid">
+              <div className="projects-grid" >
                 {groupDetails?.groups?.map((groups, index) => (
                   <Link href={{pathname: '/projects/' + projectid + '/' + groups.group_id,
                     query:{
-                      course_id: courseid
+                      course_id: courseid,
+                      group_id: groups.group_id
 
                     }
                   }}> 
@@ -219,7 +212,7 @@ export default function ProjectDetails(){
                       <button className="popup_button" onClick={handleAddGroup}>
                           Add Group
                       </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsAddGroupVisible(false)}>
+                      <button className="popup_button cancel_button" onClick={() => setIsAddGroupVisible(false)}>
                           Cancel
                       </button>
                   </div>

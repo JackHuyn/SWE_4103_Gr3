@@ -331,7 +331,7 @@ export default function CourseDetails() {
                 <button className="popup_button" onClick={handleAddProject}>
                   Add Project
                 </button>
-                <button className="popup_button_cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
+                <button className="popup_button cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
                   Cancel
                 </button>
               </div>

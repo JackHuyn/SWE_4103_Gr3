@@ -108,6 +108,10 @@ export default function ContributionsGraph()
         }).catch((error) => {
             console.log(error)
         })
+
+        
+
+        
     }, [])
 
     return(
