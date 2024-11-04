@@ -217,26 +217,52 @@ def upload():
     if file and fp.allowed_file(file.filename):
         saved_file_path = fp.save_file(file) 
         list_of_emails = fp.extract_email(saved_file_path)
+        list_of_students = fp.extract_student_info(saved_file_path)
         print(list_of_emails)
         users_not_found = []
 
+        """
+        #------- add only students who have account -------
         #Send emails to backend and retrieve their student id's
         for email in list_of_emails:
             user_dict = dbWrapper.findUser(email)
             if user_dict != None:
                 user_id = user_dict['uid']
                 if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
-                    print(user_id + ':\tDone')
+                    print(user_id + ':Add\tDone')
                 else:
-                    print(user_id + ':\tFail')
+                    print(user_id + ':Add\tFail')
             else:
                 # add not found emails to a not found list
                 users_not_found.append(email)
 
         print('No accounts were found for the following email addresses: ', users_not_found)
-
-
-        
+        #----------------------------------------------------
+        """
+        #------- create account for invalid student and all in the class -------
+        for info in list_of_students:
+            fname = info.split(",")[0]
+            lname = info.split(",")[1]
+            email = info.split(",")[2]
+            student_dict = dbWrapper.findUser(email)
+            if student_dict != None:
+                student_id = student_dict['uid']
+                if dbWrapper.addStudentToCourse(student_id, course_id):
+                    print(student_id + ': Add\tDone')
+                else:
+                    print(student_id + ': Add\tFail')
+            else:
+                student_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, email) #password is email by default
+                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid):
+                    student_id = student_resp.uid
+                    print(student_id + ': Create\tDone')
+                    if dbWrapper.addStudentToCourse(student_id, course_id):
+                        print(student_id + ': Add\tDone')
+                    else:
+                        print(student_id + ': Add\tFail')
+                else:
+                    print(student_resp.uid + ': Create\tFail')
+        #----------------------------------------------------------------------
         
         response = app.response_class(
             response = json.dumps({'approved': True}),
