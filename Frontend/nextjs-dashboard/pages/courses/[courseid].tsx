@@ -19,7 +19,8 @@ export default function CourseDetails() {
   const [projectData, setProjectData] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const localId = Cookies.get('localId');
-  const [isProjectPopupVisible, setIsProjectPopupVisible] = useState(false); 
+  const [isProjectPopupVisible, setIsProjectPopupVisible] = useState(false);
+  const [isStudentPopupVisible, setIsStudentPopupVisible] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [isPopupVisible, setIsPopupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents
@@ -175,6 +176,55 @@ export default function CourseDetails() {
     }
 };
 
+/**
+//Function: set visibiliy of addStudent popup
+const addStudent = () => {
+  setIsStudentPopupVisible(true);
+};
+//Function: handle add student
+const handleAddStudent = async () => {  
+  if (newProjectName) {
+      const localId  = Cookies.get('localId')
+      if (!localId){
+          window.location.href = "/auth/login"
+      }
+      const projectData = {
+          course_id: courseid,
+          project_id: courseid + "_" + newProjectName,
+          project_name: newProjectName
+      };
+      try {  
+          //Need to have checks to ensure that the instructor is valid 
+          const response = await fetch('http://localhost:3001/add-project' , {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  
+              },
+              body: JSON.stringify(projectData),  // Send JSON data in request body
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+              window.location.reload();
+              alert('project added successfully!');
+              window.location.reload();
+              
+          } else {
+              alert(`Error adding project: ${result.reason}`);
+          }
+      } catch (error) {
+          console.error('Error sending request:', error);
+          alert('Error adding project. Please try again later.');
+      }
+
+  } else {
+      alert('Please provide a project name.');
+  }
+};
+**/
+
 /**useEffect(() => {
   if (isProjectPopupVisible && inputRef.current) {
       inputRef.current.focus(); // Focus the input field when the popup is shown
@@ -213,7 +263,9 @@ if (projectData) {
           <div className="projects-section">
             <div className="section-header">
               <h2>Projects</h2>
-              <button className="add-button" onClick={addProject}>+ </button>
+              {userRole === '1' && (
+                <button className="add-button" onClick={addProject}>+ </button>
+              )}
             </div>
             <div className="projects-grid">
               {projectData?.projects?.map((projects, index) => (
@@ -232,13 +284,15 @@ if (projectData) {
           <div className="students-section">
             <div className="section-header">
               <h2>Students</h2>
-              <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
+              {userRole === '1' && (
+                <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
+              )}
             </div>
             <div className="students-list">
               {studentData?.students?.map((students, index) => (
                 <Link href={'/students_info/' + students.uid}>
                 <div key={index} className="student-card">
-                  {students.email}
+                  {students.first_name+" "+students.last_name}
                 </div>
                 </Link>
               ))}
@@ -265,7 +319,8 @@ if (projectData) {
         )}
 
         {/* Reuse FileUpload Component */}
-        {localId && courseid && (
+        
+        {localId && courseid && userRole=='1' &&(
           <FileUpload localId={localId} courseId={courseid as string} />
         )}
 
