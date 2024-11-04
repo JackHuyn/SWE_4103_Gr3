@@ -49,7 +49,7 @@ function loginEmailUser(email, password) {
         document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
         document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
         //console.log("Cookies: ", document.cookie)
-        window.location.href = "/auth/courses"  
+        window.location.href = "/courses"  
       } catch(err) {
         document.getElementById('login_error_span').style.display = 'block'
         document.getElementById('login_error_span').innerText = err

@@ -334,7 +334,7 @@ def add_course():
             mimetype='application/json'
         )
         return response
-    
+        
 
     
 
@@ -862,6 +862,82 @@ def show_projects():
         return response
     
 
+# Author:  Raphael Ferreira
+#This route displays all groups
+@app.route('/show_groups', methods= ["GET"])
+@cross_origin()
+def show_groups():
+    # get student id from the current login
+    local_id = request.args.get("localId", default = -1, type = str)
+    project_id = request.args.get("projectId", default = -1, type = str)
+    print('user ID is : ', local_id)
+    print('project id : ', project_id)
+    # handle wrong student id case
+    if local_id == -1: 
+        response = app.response_class(
+            response=json.dumps({'error': 'No/wrong id'}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+        return response
+    elif project_id == -1:
+        response = app.response_class(
+            response=json.dumps({'error': 'Invalid course'}),
+            status = 401,
+            mimetype='application/json'
+        )
+    try:  
+        
+        list_of_groups = dbWrapper.getProjectGroups(project_id)
+      
+
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'id': 'valid'}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+
+
+        if list_of_groups:
+            
+            print("converting")
+            response = app.response_class(
+                response=json.dumps({
+                    'approved': True,
+                    'groups': list_of_groups
+                }),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
+        
+        elif list_of_groups == []:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 200,
+              mimetype='applicaion/json'
+            )
+            return response
+
+
+
+        else:
+            response = app.response_class(
+              response=json.dumps({'approved':False, 'reason':'No data found'}),
+              status = 401,
+              mimetype='applicaion/json'
+            )
+            return response
+    # error
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Error fetching data', 'error': str(e)}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+    
+#This route adds a project to the database
 #Author: Raphael Ferreira
 @app.route('/add-project', methods=['POST'])
 @cross_origin()  # Enable CORS for this route
@@ -903,6 +979,68 @@ def add_project():
         else:
             response = app.response_class(
                 response=json.dumps({'approved': False, 'reason': 'Failed to add project'}),
+                status=500,
+                mimetype='application/json'
+            )
+
+        return response
+
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+    
+#Author: Raphael Ferreira
+@app.route('/add-group', methods=['POST'])
+@cross_origin()  # Enable CORS for this route
+def add_group():
+    try:
+        
+        # Extract course details from the request JSON body
+        data = request.get_json()
+        
+        # Extract the fields from the JSON object
+        #course_id = data.get('group_name', "")
+        project_id = data.get('project_id', "")
+        #github_repo_address = data.get('github_repo_addres', "")
+    
+        #print('course id: ', course_id)
+        print('project id : ', project_id)
+        #print('project name: ', project_name)
+        #print('github_repo_address', github_repo_address) 
+        # Check if all required fields are provided
+        if not (project_id):
+            raise ValueError("Missing required fields")
+
+        # Call the `addCourse` function from `DbWrapper`
+        success = dbWrapper.addGroup(
+            project_id,
+            #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
+            ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
+        )  
+
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Group added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add group'}),
                 status=500,
                 mimetype='application/json'
             )

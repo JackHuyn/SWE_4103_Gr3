@@ -2,47 +2,79 @@
 @import url('./default.css');
 
 #joy-rating-dialog {
-    display: none;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60%;
-    height: 40%;
-    background-color: black;
-    color: white;
-    align-items: center;
-    justify-content: center;
+    width: 380px;
+    background-color: #2d2d2d;
+    padding: 20px;
+    border-radius: 12px;
     text-align: center;
-    margin: auto;
-    padding: auto;
-    z-index: 12;
+    color: white;
+    font-family: 'Jura', sans-serif;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-
-#joy-rating-dialog > h1 {
-    margin: 2% 0;
-}
-
-#joy-stars > button {
-    background-color: transparent;
-    border-style: none;
-    margin: 1% 1%;
-    padding: 0;
-
-    font-size: 3.25em;
-    color: whitesmoke;
-}
-
-#submit-joy-rating-button {
-    padding: 1% 2%;
+#joy-rating-dialog h1 {
+    font-size: 1.8rem;
+    font-weight: normal;
     margin: 0;
+    color: #e0e0e0;
+}
+
+#joy-stars {
+    display: flex;
+    gap: 8px;
+}
+
+#joy-stars .star_button {
+    background-color: transparent;
+    border: none;
+    font-size: 2.25rem;
+    color: whitesmoke;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+#joy-stars .star_button:hover {
+    transform: scale(1.1);
 }
 
 #joy-comment-textarea {
-    background-color: var(--formBackground);
-    color: var(--fontColorLight);
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #4b4b4b;
+    border-radius: 8px;
+    background-color: #3a3a3a;
+    color: white;
+    font-size: 0.9rem;
     resize: none;
-    width: 60%;
-    height: 100px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#joy-comment-textarea:focus {
+    border-color: #007bff;
+}
+
+#submit-joy-rating-button {
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#submit-joy-rating-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.04);
 }

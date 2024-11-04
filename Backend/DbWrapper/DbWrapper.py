@@ -108,7 +108,7 @@ class DbWrapper:
         return True
     def addCourse(self, course_description:str, course_id:str, instructor_ids:list[str], section:str, term:str, student_ids=[], status=0)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
-        if len(x) > 0:
+        if len(x) > 0:  
             return False
         template = {}
         template["course_description"] = course_description
@@ -140,7 +140,7 @@ class DbWrapper:
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
         template["avg_joy"] = []
@@ -305,14 +305,22 @@ if __name__ == "__main__":
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     test = DbWrapper(db)
-    print(test.addStudentJoyRatings('TEMPLATE', 'python_test', 4))
-    print(test.getStudentJoyRatings('TEMPLATE'))
-    # docs = test.getStudentCourses("3713652")
-    # print(docs)
-    # print(test.addStudentToCourse("3713652", "TestCourse"))
-    # print(test.getUserData("TestUser"))
-    # print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
-    # print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
-    # print(test.activateCourse("TestCourseAgain"))
-    # print(test.getInstructorCourses("some_prof"))
+    docs = test.getStudentCourses("3713652")
+    print(docs)
+    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+    '''print(test.addStudentToCourse("3713652", "TestCourse"))
+    print(test.getUserData("TestUser"))
+    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+    print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
+    print(test.activateCourse("TestCourseAgain"))
+    print(test.getInstructorCourses("some_prof"))
+    print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
+    print(test.addGroup("java3_proj1"))
+    print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
+    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
+    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
+    print(test.addNGroups("java3_proj1", 5))
+    print(test.removeGroup("java3_proj1_gr1"))
+    print(test.addGroup("java3_proj1"))
+    print(test.removeProject("java3_proj1"))'''
     #print(test.removeCourse("TestCourseAgain"))
