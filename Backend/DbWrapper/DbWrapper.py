@@ -146,7 +146,7 @@ class DbWrapper:
         today = datetime.datetime.today()
         today = today.strftime("%d/%m/%Y") #Cast a string to it to use the date as a value key
         template["avg_joy"] = {
-            today: ''
+            today: 'None'
         }
         inserted = False
         while(not inserted):
@@ -204,22 +204,22 @@ class DbWrapper:
         timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
         date_start_utc = timezone.localize(date_start)
         date_end_utc = timezone.localize(date_end)
-        firestore_timestamp_start = date_start_utc.isoformat()
-        firestore_timestamp_end = date_end_utc.isoformat()
 
         sum = 0
         count = 0
         joy_docs = self.db.collection(JOY).where(
             filter=FieldFilter("group_id", "==", group_id)).where(
-                filter=FieldFilter("timestamp", ">=", firestore_timestamp_start)).where(
-                    filter=FieldFilter("timestamp", "<=", firestore_timestamp_end)).stream()
+                filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).stream()
         for doc in joy_docs:
             d = doc.to_dict()
             print(d)
             sum += d['joy_rating']
             count +=1
+        
         if count > 0:
             avg = sum / count
+            avg = round(avg, 2)
         else:
             avg = 'None'
         
@@ -323,8 +323,8 @@ if __name__ == "__main__":
     test = DbWrapper(db)
     #docs = test.getStudentCourses("3713652")
     #print(docs)
-    #print(test.addGroup('JBTestGroup',['vTRZQxoDzWTtPYCOPr8LxIcJk72','1234541','69420']))
-    print(test.addJoyRating('vTRZQxoDzWTtPYCOPr8LxIcJk72', 'JBTestGroup_gr0',5,'wawaweewa baby'))
+    print(test.addGroup('JBTestGroup',['vTRZQxoDzWTtPYCOPr8LxIcJk72','1234541','69420']))
+    # print(test.addJoyRating('vTRZQxoDzWTtPYCOPr8LxIcJk72', 'JBTestGroup_gr0',5,'wawaweewa baby'))
     '''print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
     print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
