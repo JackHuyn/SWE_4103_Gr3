@@ -555,7 +555,70 @@ def show_student():
         )
         return response
 #----------------------------------
-
+#Author: Sarun Weerakul
+#This route adds a student to course
+@app.route('/add-a-student', methods=['POST'])
+@cross_origin()
+def add_a_student():
+    try:
+        data = request.get_json()
+        course_id = data.get('course_id','')
+        student_fname = data.get('student_fname','')
+        student_lname = data.get('student_lname','')
+        student_email = data.get('student_email','')
+        success = False
+        if not (course_id or student_fname or student_lname or student_email):
+            raise ValueError("Missing required fields")
+        student_dict = dbWrapper.findUser(student_email)
+        if student_dict != None:
+            student_id = student_dict['uid']
+            if dbWrapper.addStudentToCourse(student_id, course_id):
+                success = True
+                print(student_id + ': Add\tDone')
+            else:
+                print(student_id + ': Add\tFail')
+        else:
+            student_resp = firebase_auth.sign_up_with_email_and_password(student_fname,student_lname,student_email,student_email) #password is email by default
+            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid):
+                student_id = student_resp.uid
+                print(student_id + ': Create\tDone')
+                if dbWrapper.addStudentToCourse(student_id, course_id):
+                    success = True
+                    print(student_id + ': Add\tDone')
+                else:
+                    print(student_id + ': Add\tFail')
+            else:
+                print(student_resp.uid + ': Create\tFail')
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Student added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add student'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])

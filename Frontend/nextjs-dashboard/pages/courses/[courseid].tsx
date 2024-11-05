@@ -18,6 +18,9 @@ export default function CourseDetails() {
   const [studentList, setStudentList] = useState([]);
   const [projectData, setProjectData] = useState([]);
   const [projectList, setProjectList] = useState([]);
+  const [newStudentFName, setNewStudentFName] = useState('');
+  const [newStudentLName, setNewStudentLName] = useState('');
+  const [newStudentEmail, setNewStudentEmail] = useState('');
   const localId = Cookies.get('localId');
   const [isProjectPopupVisible, setIsProjectPopupVisible] = useState(false);
   const [isStudentPopupVisible, setIsStudentPopupVisible] = useState(false);
@@ -176,54 +179,49 @@ export default function CourseDetails() {
     }
 };
 
-/**
+
 //Function: set visibiliy of addStudent popup
 const addStudent = () => {
   setIsStudentPopupVisible(true);
 };
 //Function: handle add student
 const handleAddStudent = async () => {  
-  if (newProjectName) {
+  if (newStudentFName && newStudentLName && newStudentEmail) {
       const localId  = Cookies.get('localId')
       if (!localId){
           window.location.href = "/auth/login"
       }
-      const projectData = {
+      const studentData = {
           course_id: courseid,
-          project_id: courseid + "_" + newProjectName,
-          project_name: newProjectName
+          student_fname: newStudentFName,
+          student_lname: newStudentLName,
+          student_email: newStudentEmail
       };
       try {  
           //Need to have checks to ensure that the instructor is valid 
-          const response = await fetch('http://localhost:3001/add-project' , {
+          const response = await fetch('http://localhost:3001/add-a-student' , {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
-                  
               },
-              body: JSON.stringify(projectData),  // Send JSON data in request body
+              body: JSON.stringify(studentData),  // Send JSON data in request body
           });
-
           const result = await response.json();
-
           if (response.ok) {
               window.location.reload();
-              alert('project added successfully!');
+              alert('student added successfully!');
               window.location.reload();
-              
           } else {
-              alert(`Error adding project: ${result.reason}`);
+              alert(`Error adding student: ${result.reason}`);
           }
       } catch (error) {
           console.error('Error sending request:', error);
-          alert('Error adding project. Please try again later.');
+          alert('Error adding student. Please try again later.');
       }
-
   } else {
-      alert('Please provide a project name.');
+      alert('Please provide all information.');
   }
 };
-**/
 
 /**useEffect(() => {
   if (isProjectPopupVisible && inputRef.current) {
@@ -285,7 +283,7 @@ if (projectData) {
             <div className="section-header">
               <h2>Students</h2>
               {userRole === '1' && (
-                <button className="add-button" onClick={()=>setIsPopupVisible(true)}>+</button>
+                <button className="add-button" onClick={addStudent}>+</button>
               )}
             </div>
             <div className="students-list">
@@ -336,9 +334,6 @@ if (projectData) {
                       onChange={(e) => setNewProjectName(e.target.value)}
                       placeholder="Project Name"/>
 
-
-                  
-
                   <div className="popup_buttons">
                       <button className="popup_button" onClick={handleAddProject}>
                           Add Project
@@ -351,7 +346,40 @@ if (projectData) {
           </div>
         )}
 
-        
+      {isStudentPopupVisible && (
+          <div className="popup">
+              <div className="popup_content">
+                  <h2>Add New Student</h2>
+                  <input
+                      ref={inputRef}
+                      type="text"
+                      value={newStudentFName}
+                      onChange={(e) => setNewStudentFName(e.target.value)}
+                      placeholder="First Name"/>
+                  <input
+                      ref={inputRef}
+                      type="text"
+                      value={newStudentLName}
+                      onChange={(e) => setNewStudentLName(e.target.value)}
+                      placeholder="Last Name"/>
+                  <input
+                      ref={inputRef}
+                      type="text"
+                      value={newStudentEmail}
+                      onChange={(e) => setNewStudentEmail(e.target.value)}
+                      placeholder="Email"/>
+
+                  <div className="popup_buttons">
+                      <button className="popup_button" onClick={handleAddStudent}>
+                          Add Student
+                      </button>
+                      <button className="popup_button_cancel_button" onClick={() => setIsStudentPopupVisible(false)}>
+                          Cancel
+                      </button>
+                  </div>
+              </div>
+          </div>
+        )}
 
       </div>
 
