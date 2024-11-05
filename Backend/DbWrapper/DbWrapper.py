@@ -143,7 +143,11 @@ class DbWrapper:
         #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
-        template["avg_joy"] = []
+        today = datetime.datetime.today()
+        today = today.strftime("%d/%m/%Y") #Cast a string to it to use the date as a value key
+        template["avg_joy"] = {
+            today: ''
+        }
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -175,21 +179,11 @@ class DbWrapper:
         timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
         midnight_utc = timezone.localize(current_date)
         firestore_timestamp = midnight_utc.isoformat()
-
-        group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
-        if(group):
-            g = group.to_dict()
-            if 'avg_joy' in g:
-                for avg in g['avg_joy']:
-                    if avg['date'] >= firestore_timestamp:
-                        group.update({'avg_joy': firestore.ArrayRemove(avg)})
-
-
-        # if group[avg_joy] has avg for current date, delete
-        # calculate avg for current date
-        # if(len(existing_avg))
+        date = datetime.datetime.today()
+        date= date.strftime("%d/%m/%Y")          
 
         if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
+            print('updated')
             return True
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
@@ -199,9 +193,12 @@ class DbWrapper:
         template["comment"] = comment
         template["timestamp"] = firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
-        return True
+        if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
+            return True
+        return False
     
     def calculateJoyAverage(self, group_id:str, date):
+        print('calculatingavg')
         date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
         date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
         timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
@@ -211,15 +208,31 @@ class DbWrapper:
         firestore_timestamp_end = date_end_utc.isoformat()
 
         sum = 0
+        count = 0
         joy_docs = self.db.collection(JOY).where(
             filter=FieldFilter("group_id", "==", group_id)).where(
                 filter=FieldFilter("timestamp", ">=", firestore_timestamp_start)).where(
                     filter=FieldFilter("timestamp", "<=", firestore_timestamp_end)).stream()
         for doc in joy_docs:
             d = doc.to_dict()
+            print(d)
             sum += d['joy_rating']
-        avg = sum / len(joy_docs)
-        return {}
+            count +=1
+        if count > 0:
+            avg = sum / count
+        else:
+            avg = 'None'
+        
+        date = datetime.datetime.today()
+        date= date.strftime("%d/%m/%Y")
+        group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
+        if(group):
+            g = group[0].to_dict()
+            avg_joy = g.get('avg_joy',{})
+            if date in avg_joy:
+                avg_joy[date] = str(avg)
+            group[0].reference.update({'avg_joy': avg_joy})
+        return True
 
 
     def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
@@ -231,7 +244,10 @@ class DbWrapper:
             doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False
-        return True
+        if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
+            return True
+        return False
+    
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         print(course_id)
@@ -305,9 +321,10 @@ if __name__ == "__main__":
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     test = DbWrapper(db)
-    docs = test.getStudentCourses("3713652")
-    print(docs)
-    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+    #docs = test.getStudentCourses("3713652")
+    #print(docs)
+    #print(test.addGroup('JBTestGroup',['vTRZQxoDzWTtPYCOPr8LxIcJk72','1234541','69420']))
+    print(test.addJoyRating('vTRZQxoDzWTtPYCOPr8LxIcJk72', 'JBTestGroup_gr0',5,'wawaweewa baby'))
     '''print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
     print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
