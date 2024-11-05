@@ -1,4 +1,6 @@
-"use client"
+"use client";
+
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; 
@@ -134,14 +136,13 @@ export default function Courses() {
                 if (response.ok) {
                     window.location.reload();
                     alert('Course added successfully!');
-                    window.location.reload();
-                    //setCourseList([...courseList, courseData]); // Add the new course to the list
+                    setCourseList([...courseList, courseData]); // Add the new course to the list
                     // Reset form and close popup
-                    /**setNewCourseName('');
+                    setNewCourseName('');
                     setNewCourseDescription('');
                     setNewCourseTerm('');
                     setNewCourseSection('');
-                    setIsPopupVisible(false);**/
+                    setIsPopupVisible(false);
                 } else {
                     alert(`Error adding course: ${result.reason}`);
                 }
@@ -289,7 +290,7 @@ export default function Courses() {
                         <div className="courses">
                             {courseList.map((course, index) => (
                                 
-                                <Link href ={course.course_id} className = "link">
+                                <Link href ={'/courses/' + course.course_id} className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
 

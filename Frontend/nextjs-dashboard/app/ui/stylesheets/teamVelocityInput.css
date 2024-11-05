@@ -2,32 +2,69 @@
 @import url('./default.css');
 
 #team-velocity-dialog {
-    display: none;
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60%;
-    height: 40%;
-    background-color: var(--formBackground);
-    color: white;
-    align-items: center;
-    justify-content: center;
+    width: 380px;
+    background-color: #2d2d2d;
+    padding: 20px;
+    border-radius: 12px;
     text-align: center;
-    margin: auto;
-    padding: auto;
-    z-index: 11;
+    color: white;
+    font-family: 'Jura', sans-serif;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-#team-velocity-dialog > h1 {
-    margin: 2% 0;
+#team-velocity-dialog h1 {
+    font-size: 1.8rem;
+    font-weight: normal;
+    margin: 0;
+    color: #e0e0e0;
+}
+
+#team-velocity-dialog label {
+    display: block;
+    margin-bottom: 5px;
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+#team-velocity-dialog input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #4b4b4b;
+    border-radius: 8px;
+    background-color: #3a3a3a;
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 10px;
+}
+
+#team-velocity-dialog input:focus {
+    border-color: #007bff;
 }
 
 #submit-team-velocity-button {
-    padding: 1% 2%;
-    margin: 0;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-#team-velocity-dialog > label {
-    color: var(--fontColorLight);
+#submit-team-velocity-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.04);
 }

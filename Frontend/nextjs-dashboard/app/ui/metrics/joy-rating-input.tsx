@@ -1,5 +1,6 @@
 import '@/app/ui/stylesheets/joyRatingInput.css'
 
+
 let star_rating: number = 0
 
 const group_id = 'TEMPLATE' //REPLACE THIS ASAP

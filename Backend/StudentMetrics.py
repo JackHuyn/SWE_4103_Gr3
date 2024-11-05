@@ -10,23 +10,17 @@ class StudentMetrics:
         self.db = db
 
     def get_avg_team_joy_ratings(self, group_id): #get avg of a given group per day and dict
-        try:
-            all_ratings = self.db.getTeamJoy(group_id)
-            print('Ratings: ', all_ratings)
-            ratings = []
-            for rating in all_ratings:
-                ratings.append({
-                    'avg': rating['rating'],
-                    'date': str(rating['date'])
-                })
-            print(ratings)
+        all_ratings = self.db.getTeamJoy(group_id)
+        print('Ratings: ', all_ratings)
+        ratings = []
+        for rating in all_ratings:
+            ratings.append({
+                'avg': rating['rating'],
+                'date': str(rating['date'])
+            })
+        print(ratings)
 
-            return ratings
-        except Exception as e:
-            print('METRICS ERROR')
-            print(e)   
-            return {}
-        
+        return ratings
 
     def get_recent_student_joy_ratings(self, group_id): # Return Most Recent Joy Rating for each Student
         raw_ratings = self.db.getRecentStudentJoyRatings(group_id)
