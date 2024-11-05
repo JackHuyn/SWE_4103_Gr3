@@ -46,7 +46,7 @@ export default function GitHubCodeRequest() {
                 if(!r['approved'])
                     throw 'idek bro'
                 console.log(r)
-                window.location.href = '/metrics'
+                window.location.href = '/'
                 
             } catch(err) {
                 console.log(err)

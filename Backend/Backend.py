@@ -685,7 +685,10 @@ def get_github_contribution_stats():
             mimetype='application/json'
         )
     except Exception as e:
-        print(e)
+        # print('Exception: ', e)
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, ex.args)
+        print(message)
         response = app.response_class(
             response=json.dumps({'approved': False}),
             status=401,
