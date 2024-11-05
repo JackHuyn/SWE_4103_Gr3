@@ -36,7 +36,6 @@ def extract_email(file_path):
     emails = []
     with open(file_path, 'r') as csvfile:
         csvreader = csv.reader(csvfile)
-
         for row in csvreader:
             for token in row:
                 if is_email(token):

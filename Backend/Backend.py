@@ -235,9 +235,8 @@ def upload():
             else:
                 # add not found emails to a not found list
                 users_not_found.append(email)
-
         print('No accounts were found for the following email addresses: ', users_not_found)
-        #----------------------------------------------------
+        #----------------------------------------------------------------------
         """
         #------- create account for invalid student and all in the class -------
         for info in list_of_students:
