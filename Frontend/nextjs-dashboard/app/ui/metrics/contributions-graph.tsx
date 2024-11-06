@@ -1,18 +1,21 @@
 import Chart from 'chart.js/auto'
 import { groupEnd } from 'console';
-import { useEffect } from 'react';
+import { useEffect , useState} from 'react';
 import Cookies from 'js-cookie';
+import GitHubAppAuthorizationDialog from './github-app-authorization-dialog';
 
 let group_id = 'TEMPLATE'
 
 export default function ContributionsGraph()
 {
 
+    const[authDialog,showAuthDialog] = useState(false);
+
     useEffect(() => {
 
         const local_id = Cookies.get('localId')
 
-        return fetch("http://127.0.0.1:3001/metrics/contributions?localId="+local_id+"&groupId=TEMPLATE",
+        return fetch("http://127.0.0.1:3001/metrics/contributions?localId="+local_id+"&groupId="+group_id,
             {
                 method: 'GET'
             }
@@ -23,9 +26,11 @@ export default function ContributionsGraph()
                         text: "Server not found!",
                         status: "danger"
                     };
+                    
                 }
 
-                if (response.status === 498) {// GitHub Authentication Error
+                if (response.status === 401) {// GitHub Authentication Error
+                    showAuthDialog(true);
                     // Show GitHub App Access Request Button
                     document.getElementById('metrics-dialog-backdrop').style.display = 'block'
                     document.getElementById('github-app-authorization-dialog').style.display = 'block'
@@ -33,6 +38,7 @@ export default function ContributionsGraph()
                         text: "GitHub Authentication Error",
                         status: "danger"
                     };
+                    showAuthDialog(true);
                 }
 
                 return response.text().then(text => {
@@ -80,7 +86,6 @@ export default function ContributionsGraph()
                 
     
                 console.log('Weeks', weeks)
-                
     
                 return [
                     new Chart(
@@ -131,6 +136,7 @@ export default function ContributionsGraph()
             <h3>Commits</h3>
             <div style={{width: '800px'}}><canvas id="commits"></canvas></div>
             <h3>Additions</h3>
+            {authDialog && <GitHubAppAuthorizationDialog />}
             <div style={{width: '800px'}}><canvas id="additions"></canvas></div>
             <h3>Deletions</h3>
             <div style={{width: '800px'}}><canvas id="deletions"></canvas></div>

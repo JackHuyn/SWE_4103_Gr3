@@ -38,6 +38,8 @@ export default function Metrics() {
     }
 
     useEffect(() => {
+
+        
         async function checkSessionAndFetchData() {
           const localId = Cookies.get('localId');
           const idToken = Cookies.get('idToken');
@@ -62,6 +64,7 @@ export default function Metrics() {
         checkSessionAndFetchData();
       }, [router.isReady, router.asPath]);
 
+
     
 
     return (
@@ -80,7 +83,7 @@ export default function Metrics() {
                 <div className="chart-container"><JoyAvgChart groupId={groupId} /></div>
                 <div className="chart-container"><JoyStudentRatingGraph groupId={groupId} /></div>
                 <div className="chart-container"><TeamVelocityGraph groupId={groupId} /></div>
-                <GitHubAppAuthorizationDialog />
+            
             </div>
 
             {(isPopupVisible || isPopup2Visible) && (
