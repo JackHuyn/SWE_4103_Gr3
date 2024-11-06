@@ -314,6 +314,7 @@ if __name__ == "__main__":
     test = DbWrapper(db)
     docs = test.getStudentCourses("3713652")
     print(docs)
+    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
     print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
     print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))

@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import '@/app/ui/stylesheets/coursePage.css'; // Ensure this path is correct
+import '@/app/ui/stylesheets/coursePage.css'; 
+import '@/app/ui/stylesheets/loading.css'; 
+import '@/app/ui/stylesheets/popup.css';
+
+
 import { Button } from './button';
 import Cookies from 'js-cookie';
 import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
+import { Router } from 'next/router';
 
 
 
@@ -20,6 +25,7 @@ export default function Courses() {
     const [newCourseTerm, setNewCourseTerm] = useState(''); // Store the new course term
     const [newCourseSection, setNewCourseSection] = useState(''); // Store the new course section
     const [userRole, setUserRole] = useState('')
+    const [loading,setLoading] = useState(true) // Loadign state
     const inputRef = useRef(null); // Create a ref for the input field
 
     // Fetch courses data when the component mounts
@@ -39,12 +45,10 @@ export default function Courses() {
                     if(!role_response.ok){
                         setUserRole('0')
                     }
-
                     else {
                         //fetching same for instructor
                         setUserRole('1')
                     }
-
 
                     const res = await fetch('http://localhost:3001/auth/courses?localId=' + localId)
                         if (!res.ok) {
@@ -56,27 +60,34 @@ export default function Courses() {
                         // Set the initial courses to the state if the response is approved
                         if (result.approved && result.courses) {
                             setCourseList(result.courses);
-                        }
-
-                    
-
-                   
+                            setLoading(false);
+                        }  
                 }
-
                 else{
-                    
                     window.location.href = "/auth/login"
-
-
                 }
                 
             } catch (error) {
                 console.error('Error fetching courses:', error);
                 setError('Error loading courses. Please try again later.');
             }
+            finally{
+                setLoading(false);
+            }
         }
         fetchData();
     }, []);
+
+    const handleLogout = async() =>{
+        const localId = Cookies.get('localId')
+        if (localId) {
+            Cookies.remove('localId');  
+            Cookies.remove('idToken');  
+            window.location.href = "/auth/login";  
+        } else {
+            alert("You are already logged out.");
+        }
+    }
 
     // Show popup for adding a course
     const addCourse = () => {
@@ -107,7 +118,6 @@ export default function Courses() {
     
             try {
                 
-                
                 //Need to have checks to ensure that the instructor is valid 
                 const response = await fetch('http://localhost:3001/add-course' , {
                     method: 'POST',
@@ -121,6 +131,7 @@ export default function Courses() {
                 const result = await response.json();
     
                 if (response.ok) {
+                    window.location.reload();
                     alert('Course added successfully!');
                     window.location.reload();
                     //setCourseList([...courseList, courseData]); // Add the new course to the list
@@ -137,6 +148,7 @@ export default function Courses() {
                 console.error('Error sending request:', error);
                 alert('Error adding course. Please try again later.');
             }
+
         } else {
             alert('Please fill in all the fields.');
         }
@@ -224,10 +236,20 @@ export default function Courses() {
     if (error) {
         return <p>{error}</p>;
     }
-    if (data && data.approved && courseList.length > 0) {
+
+    if (loading){
+        return (
+            <div className="spinner-wrapper">
+            <div className="spinner"></div>
+            </div>
+        );
+    }
+
+    if (data && data.approved && courseList.length >= 0) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
+                <button id="logout" onClick={handleLogout}>Log Out</button>
                     <div className="header">
                         {/* Left Section: Toggle Button and Title */}
                         <div className="header_left">
@@ -256,6 +278,8 @@ export default function Courses() {
                                 
                             </div>
                         )}
+
+                        
                     </div>
 
 
@@ -264,12 +288,24 @@ export default function Courses() {
                         <div className="courses">
                             {courseList.map((course, index) => (
                                 
-                                <Link href ={course.course_id}>
+                                <Link href ={'/courses/' + course.course_id} className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
+
+
+                                    {/* 
+                                    <Card shadow="sm" key={index} isPressable onPress={() => console.log(course.course_id)}>
+                                    
+                                    <CardHeader className="justify-between">
+                                        
+                                    <h3 className="course-title">{course.course_name}</h3>
+                                    </CardHeader>
+                                    
+                                    <CardBody className="overflow-visible p-0"></Card>*/}
                                     <p className="course-detail">Description: {course.course_description}</p>
                                     <p className="course-detail">Section: {course.section}</p>
                                     <p className="course-detail">Term: {course.term}</p>
+                                    {/*</CardBody>*/}
                                     
                                 </div>
                                 </Link>
@@ -277,12 +313,6 @@ export default function Courses() {
                         </div>
                     )}
 
-                    <Link
-                        href="/auth/login"
-                        className="flex items-center gap-5 rounded-lg bg-blue-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-400 md:text-base"
-                    >
-                        <span>Back to Home</span>
-                    </Link>
                 </div>
 
                 {/* Popup Window for Adding Course */}
@@ -367,6 +397,11 @@ export default function Courses() {
 
     
     else {
-        return <p>Loading...</p>;
+        return (
+            <div className="spinner-wrapper">
+            <div className="spinner"></div>
+            </div>
+        );
+          
     }
 }
