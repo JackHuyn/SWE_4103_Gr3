@@ -69,6 +69,7 @@ export default function ContributionsGraph()
                 
     
                 console.log('Weeks', weeks)
+                
     
                 return [
                     new Chart(
