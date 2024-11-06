@@ -50,20 +50,20 @@ jobs:
         continue-on-error: true
 
       # # Run tests using pytest
-      # - name: Check code using pytest
-      #   run: |
-      #     pip install pytest pytest-cov pytest-flask pytest-repeat
-      #     pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
+      - name: Check code using pytest
+        run: |
+          pip install pytest pytest-cov pytest-flask pytest-repeat
+          pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
 
-      # install dependencies 2
-      - name: install npm in Unit_test
-        working-directory: Backend/Unit_Test
-        run: npm install
+      # # install dependencies 2
+      # - name: install npm in Unit_test
+      #   working-directory: Backend/Unit_Test
+      #   run: npm install
         
-      # run all test
-      - name: run test on Suite
-        working-directory: Backend/Unit_Test
-        run: firebase emulators:exec 'python -m unittest'
+      # # run all test
+      # - name: run test on Suite
+      #   working-directory: Backend/Unit_Test
+      #   run: firebase emulators:exec 'python -m unittest'
 
       # Compress and upload files
       - name: Compress and upload file
