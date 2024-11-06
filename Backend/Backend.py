@@ -13,7 +13,8 @@ import Auth as fb_auth
 import FileUpload as fp
 from DbWrapper.DbWrapper import DbWrapper
 import StudentMetrics as StudentMetrics
-
+import User as User
+import GitHub as Github
 
 
 app = Flask(__name__)
@@ -34,7 +35,7 @@ metrics = StudentMetrics.StudentMetrics(dbWrapper)
 with(open(os.path.join(dir_path, github_api_key_filename), "r") as key_file):
     github_api_key = json.load(key_file)
 
-firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
+firebase_auth = fb_auth.FirebaseAuth(dbWrapper, auth, FIREBASE_WEB_API_KEY)
 
 
 
@@ -43,20 +44,7 @@ firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
 def get_home():
     return 'Welcome!'
 
-@app.route('/welcome', methods=['GET'])
-@cross_origin()
-def get_welcome():
-    return get_home()
 
-@app.route('/secure', methods=['GET'])
-@cross_origin()
-def get_secure():
-    token = request.args.get("sessionId", default = -1, type = str)
-    print(token)
-    if(token == -1):
-        print("Err")
-        pass
-    return 'Welcome Secure!'
 
 @app.route('/auth/signup-with-email-and-password', methods=['POST'])
 @cross_origin()
@@ -134,13 +122,13 @@ def login_user():
     email = request.args.get("email", default = -1, type = str)
     password = request.args.get("password", default = -1, type = str)
     try:
-        login_resp = firebase_auth.sign_in_with_email_and_password(email, password)
+        user_obj = firebase_auth.sign_in_with_email_and_password(email, password)
         response = app.response_class(
-            response=json.dumps({'approved': True, 'localId': login_resp['localId'], 'idToken': login_resp['idToken']}),
+            response=json.dumps({'approved': True, 'localId': user_obj.local_id, 'idToken': user_obj.id_token}),
             status=200,
             mimetype='application/json'
         )
-        response.set_cookie('idToken', login_resp['idToken'], httponly=True, secure=True, samesite='Strict', path='/')
+        response.set_cookie('idToken', user_obj.id_token, httponly=True, secure=True, samesite='Strict', path='/')
     except Exception as e:
         print(e)
         response = app.response_class(
@@ -614,6 +602,7 @@ def get_team_joy_ratings(): # Avg Joy Ratings per Day
     group_id = request.args.get("groupId", default = "", type = str)
     try:
         joy_data = metrics.get_avg_team_joy_ratings(group_id)
+        print('JOY DATA: ', joy_data)
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
@@ -676,17 +665,30 @@ def submit_student_joy_rating():
 @app.route('/metrics/contributions', methods=['GET'])
 @cross_origin()
 def get_github_contribution_stats():
-    project_id = request.args.get("projectId", default = "", type = str)
+    local_id = request.args.get("localId", default = "", type = str)
+    group_id = request.args.get("groupId", default = "", type = str)
     try:
-        resp = metrics.get_github_contribution_stats(project_id)
+        user_obj = firebase_auth.active_sessions[local_id]
+        auth = user_obj.github_auth
+        resp = metrics.get_github_contribution_stats(auth, group_id)
         # print(resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'contributions': resp}),
             status=200,
             mimetype='application/json'
         )
+    except User.InvalidGitHubAuthException as igae:
+        print("Invalid GitHub Authentication")
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=498, # (Unreserved) Invalid GitHub Authentication
+            mimetype='application/json'
+        )
     except Exception as e:
-        print(e)
+        # print('Exception: ', e)
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, ex.args)
+        print(message)
         response = app.response_class(
             response=json.dumps({'approved': False}),
             status=401,
@@ -766,11 +768,14 @@ def github_code_request():
     local_id = request.args.get("localId", default = "", type = str)
     id_token = request.args.get("idToken", default = "", type = str)
     code = request.args.get("code", default = "", type = str)
-
     try:
-        pass
-        # request and store oauth
-        # update user's session to use authenticated github object
+        print('a')
+        oauth_token = Github.getOAuthTokenFromCode(github_api_key['client_id'], github_api_key['client_secret'], code)
+        print('b')
+        print("OAuth Token Resp: ", oauth_token)
+        uid = firebase_auth.active_sessions[local_id].uid
+        dbWrapper.updateGithubOAuthToken(uid, oauth_token)
+        firebase_auth.active_sessions[local_id].github_oauth_token = oauth_token
         response = app.response_class(
             response=json.dumps({'approved': True}),
             status=200,

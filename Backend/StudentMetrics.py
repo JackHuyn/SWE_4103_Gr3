@@ -10,24 +10,17 @@ class StudentMetrics:
         self.db = db
 
     def get_avg_team_joy_ratings(self, group_id): #get avg of a given group per day and dict
-        try:
-            all_ratings = self.db.getTeamJoy(group_id)
-            # print('Ratings: ', all_ratings)
-            ratings = []
-            for rating in all_ratings:
-                ratings.append({
-                    'avg': rating['rating'],
-                    'date': str(rating['date']),
-                    'comment': rating['comment']
-                })
-            print(ratings)
+        all_ratings = self.db.getTeamJoy(group_id)
+        print('Ratings: ', all_ratings)
+        ratings = []
+        for rating in all_ratings:
+            ratings.append({
+                'avg': rating['rating'],
+                'date': str(rating['date'])
+            })
+        print(ratings)
 
-            return ratings
-        except Exception as e:
-            print('METRICS ERROR')
-            print(e)   
-            return {}
-        
+        return ratings
 
     def get_recent_student_joy_ratings(self, group_id): # Return Most Recent Joy Rating for each Student
         raw_ratings = self.db.getRecentStudentJoyRatings(group_id)
@@ -68,7 +61,7 @@ class StudentMetrics:
     def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
         print(group_id, start_date, end_date, planned_story_points, completed_story_points)
     
-    def get_github_contribution_stats(self, project_id):
-        repo_address = self.db.getGithubRepoAddress(project_id)
-        git = github.GitHubManager(repo_address)
+    def get_github_contribution_stats(self, auth, group_id):
+        repo_address = self.db.getGithubRepoAddress(group_id)
+        git = github.GitHubManager(auth, repo_address)
         return git.get_contributions()

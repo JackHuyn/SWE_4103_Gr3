@@ -43,7 +43,7 @@ export default function ContributionsGraph()
                 let r = JSON.parse(resp.text)
                 if(!r['approved'])
                     throw 'idek bro'
-                console.log(r)
+                console.log('Avg Joy Data: ', r)
                 //let weeks = []
                 const contributions = r['joyData']
                 const days = contributions.map(row => row.date)
