@@ -12,7 +12,7 @@ export default function ContributionsGraph()
 
         const local_id = Cookies.get('localId')
 
-        return fetch("http://127.0.0.1:3001/metrics/contributions?localId="+local_id+"&groupId="+group_id,
+        return fetch("http://127.0.0.1:3001/metrics/contributions?localId="+local_id+"&groupId=TEMPLATE",
             {
                 method: 'GET'
             }
@@ -129,11 +129,11 @@ export default function ContributionsGraph()
     return(
         <div id="charts">
             <h3>Commits</h3>
-            <div style={{width: '400px'}}><canvas id="commits"></canvas></div>
+            <div style={{width: '800px'}}><canvas id="commits"></canvas></div>
             <h3>Additions</h3>
-            <div style={{width: '400px'}}><canvas id="additions"></canvas></div>
+            <div style={{width: '800px'}}><canvas id="additions"></canvas></div>
             <h3>Deletions</h3>
-            <div style={{width: '400px'}}><canvas id="deletions"></canvas></div>
+            <div style={{width: '800px'}}><canvas id="deletions"></canvas></div>
             
         </div>
     )

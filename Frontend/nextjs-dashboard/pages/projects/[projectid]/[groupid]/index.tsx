@@ -4,15 +4,18 @@ import JoyAvgChart from '@/app/ui/metrics/joy-avg-chart';
 import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
+import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 export default function Metrics() {
     const router = useRouter();
     const [groupId, setGroupId] = useState(null);
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
+    const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
@@ -35,14 +38,31 @@ export default function Metrics() {
     }
 
     useEffect(() => {
-        if (router.isReady) {
+        async function checkSessionAndFetchData() {
+          const localId = Cookies.get('localId');
+          const idToken = Cookies.get('idToken');
+    
+          // Validate session
+          const sessionResponse = await fetch(`http://127.0.0.1:3001/auth/validate-session?localId=${localId}&idToken=${idToken}`);
+          if (sessionResponse.status === 401) {
+            // Redirect if unauthorized
+            window.location.href = "/auth/login";
+            return;
+          }
+    
+          // Fetch data if session is valid
+          if (router.isReady) {
             const pathSegments = router.asPath.split('/');
             const lastSegment = pathSegments[pathSegments.length - 1].split('?')[0];
             setGroupId(lastSegment);
-            console.log(groupId);
-            console.log("Group ID:", lastSegment);
+            // Add your data-fetching logic here
+          }
         }
-    }, [router.isReady, router.asPath]);
+    
+        checkSessionAndFetchData();
+      }, [router.isReady, router.asPath]);
+
+    
 
     return (
         <div className="metrics-container">
@@ -60,6 +80,7 @@ export default function Metrics() {
                 <div className="chart-container"><JoyAvgChart groupId={groupId} /></div>
                 <div className="chart-container"><JoyStudentRatingGraph groupId={groupId} /></div>
                 <div className="chart-container"><TeamVelocityGraph groupId={groupId} /></div>
+                <GitHubAppAuthorizationDialog />
             </div>
 
             {(isPopupVisible || isPopup2Visible) && (
