@@ -1,5 +1,6 @@
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
+import firebase_admin.firestore
 from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
 import os
@@ -11,6 +12,7 @@ GROUPS = "groupdata"
 PROJECTS = "projectdata"
 USERS = "userdata"
 JOY = "joydata"
+VELOCITY = "velocitydata"
 
 class DbWrapper:
     def __init__(self, dbObject):
@@ -72,13 +74,15 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
-        try:
-            doc = self.db.collection(GROUPS).document(group_id).get()
-            return doc.to_dict()['avg_joy']
-        except Exception as e:
-            print('DB WRAPPER ERROR')
-            print(e)
-            return []
+        doc = self.db.collection(GROUPS).document(group_id).get()
+        return doc.to_dict()['avg_joy']
+
+    def getTeamVelocity(self, group_id:str)->list[dict]:
+        docs = self.db.collection(VELOCITY).where(filter=FieldFilter("group_id", "==", group_id)).stream()
+        docList = []
+        for doc in docs:
+            docList.append(doc.to_dict())
+        return docList
     def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
@@ -91,6 +95,13 @@ class DbWrapper:
         template["uid"] = uid
         template["github_personal_access_token"] = github_personal_access_token
         self.db.collection(USERS).document(uid).set(template)
+        return True
+    def addGithubTokenToUser(self, uid:str, github_personal_access_token:str)->bool:
+        doc = self.db.collection(USERS).document(uid)
+        try:
+            doc.update({"github_personal_access_token": github_personal_access_token})
+        except:
+            return False
         return True
     def addStudentToCourse(self, student_id:str, course_id:str) -> bool:
         doc = self.db.collection(COURSES).document(course_id)
@@ -133,9 +144,9 @@ class DbWrapper:
         self.db.collection(PROJECTS).document(project_id).set(template)
         return True
     
-    def addGroup(self, project_id:str, student_ids:list[str]=[])->bool:
+    def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]="")->bool:
         x = self.getProjectGroups(project_id)
-        group_n = len(x)
+        group_n = len(x) + 1
         template = {}
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
@@ -148,6 +159,8 @@ class DbWrapper:
         template["avg_joy"] = {
             today: 'None'
         }
+        template["github_repo_address"] = github_repo_address
+        template["scrum_master"] = scrum_master
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -160,6 +173,14 @@ class DbWrapper:
                 inserted = True
         return True
     
+    def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({"github_repo_address": github_repo_address})
+        except:
+            return False
+        return True
+
     def addNGroups(self, project_id:str, n:int)->bool:
         for i in range(n):
             self.addGroup(project_id)
@@ -184,7 +205,7 @@ class DbWrapper:
 
         if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
             print('updated')
-            return True
+
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         template = {}
         template["student_id"] = student_id
@@ -233,6 +254,38 @@ class DbWrapper:
                 avg_joy[date] = str(avg)
             group[0].reference.update({'avg_joy': avg_joy})
         return True
+    
+    def addScrumMasterToGroup(self, group_id:str, scrum_master:list[str]="")->bool:
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({"scrum_master": scrum_master})
+        except:
+            return False
+        return True
+    
+    
+    def addVelocityData(self, group_id:str, sprint_start:datetime.datetime, sprint_end:datetime.datetime, planned_points:int, completed_points:int=0)->bool:
+        sprints = self.getTeamVelocity(group_id)
+        sprint_num = len(sprints) + 1
+        docId = f"{group_id}_Sprint{sprint_num}"
+        template = {}
+        template['group_id'] = group_id
+        template['sprint_num'] = sprint_num
+        template['sprint_start'] = sprint_start
+        template['sprint_end'] = sprint_end
+        template['planned_points'] = planned_points
+        template['completed_points'] = completed_points
+        inserted = False
+        while(not inserted):
+            x = [i for i in self.db.collection(VELOCITY).where(filter=FieldFilter("sprint_id", "==", group_id)).stream()]
+            if len(x) > 0:
+                sprint_num += 1
+                docId = f"{group_id}_Sprint{sprint_num}"
+                template["sprint_id"] = sprint_num
+            else:
+                self.db.collection(VELOCITY).document(docId).set(template)
+                inserted = True
+        return True
 
 
     def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
@@ -248,6 +301,21 @@ class DbWrapper:
             return True
         return False
     
+    def updateVelocityData(self, velocity_id:str, sprint_start:datetime.datetime=-1, sprint_end:datetime.datetime=-1, planned_points:int=-1, completed_points:int=-1)->bool:
+        doc = self.db.collection(VELOCITY).document(velocity_id)
+        try:
+            if sprint_start != -1:
+                doc.update({'sprint_start': sprint_start})
+            if sprint_end != -1:
+                doc.update({'sprint_end': sprint_end})
+            if planned_points != -1:
+                doc.update({'planned_points': planned_points})
+            if completed_points != -1:
+                doc.update({'completed_points': completed_points})
+        except:
+            return False
+        return True
+
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         print(course_id)
@@ -278,6 +346,12 @@ class DbWrapper:
             return False
         try:
             self.db.collection(GROUPS).document(group_id).delete()
+        except:
+            return False
+        return True
+    def removeVelocity(self, velocity_id:str):
+        try:
+            self.db.collection(VELOCITY).document(velocity_id).delete()
         except:
             return False
         return True
