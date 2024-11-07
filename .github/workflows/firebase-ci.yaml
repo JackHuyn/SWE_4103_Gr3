@@ -10,12 +10,14 @@ on:
 
 jobs:
   build:
-    # needs: github-secrets
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.12"]
+
+    env:
+      CI: true  # Set CI environment variable to skip Firebase initialization
 
     steps:
       - uses: actions/checkout@v4
@@ -26,40 +28,40 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       # Check Python version
-      - name: Display python version
+      - name: Display Python version
         run: |
           python -c "import sys; print(sys.version)"
 
       # Install dependencies
       - name: Install dependencies
         run: |
-          mkdir logFile
+          mkdir -p logFile
           python -m pip install --upgrade pip
-          pip install pylint Flask flask_cors firebase_admin
+          pip install -r requirements.txt
+          pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat
 
-      - name: Remove python cache file
+      # Remove Python cache files
+      - name: Remove Python cache files
         run: |
-          find . -name "__pycache__" -type d -exec rm -r {} +;
+          find . -name "__pycache__" -type d -exec rm -r {} +
           find . -name "*.pyc" -exec rm -f {} +
 
       # Lint with Ruff
       - name: Lint with Ruff
         run: |
-          pip install ruff
           ruff check --output-format=github --exit-zero
         continue-on-error: true
 
-      # # Run tests using pytest
+      # Run tests using pytest
       - name: Check code using pytest
         run: |
-          pip install pytest pytest-cov pytest-flask pytest-repeat
-          pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
+          pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
 
       # Compress and upload files
-      - name: Compress and upload file
+      - name: Compress and upload log files
         uses: actions/upload-artifact@v4
         with:
           name: log_File
-          path: ${{ github.workspace }}/
+          path: logFile/
           if-no-files-found: error
-          overwrite: true
+          retention-days: 7

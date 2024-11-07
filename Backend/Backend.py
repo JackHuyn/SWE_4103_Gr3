@@ -16,14 +16,12 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-def initialize_firebase():
-    if os.getenv("CI") != "true":  
-        cred = credentials.Certificate(os.path.join(dir_path, credFileName))
-        firebase_admin.initialize_app(cred)
-    else:
-        print("Running in CI mode, Firebase initialization is skipped.")
+if os.getenv("CI") != "true":  
+    cred = credentials.Certificate(os.path.join(dir_path, credFileName))
+    firebase_admin.initialize_app(cred)
+else:
+    print("Running in CI mode, Firebase initialization is skipped.")
 
-initialize_firebase()
 db = firestore.client()
 dbWrapper = DbWrapper(db)
 firebase_auth = fb_auth.FirebaseAuth(auth, FIREBASE_WEB_API_KEY)
