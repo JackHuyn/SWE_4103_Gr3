@@ -89,6 +89,7 @@ jobs:
         uses: actions/checkout@master
       - name: Install Dependencies
         run: |
+          mkdir -p logFile
           python -m pip install --upgrade pip
           pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
       # - name: Build
