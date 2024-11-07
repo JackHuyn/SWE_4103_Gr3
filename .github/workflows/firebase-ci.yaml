@@ -42,7 +42,7 @@ jobs:
 
       - name: Testing
         run: |
-          python -m pytest test_database.py
+          python -m pytest Backend\Unit_Test\test_database.py
       # # Lint with Ruff
       # - name: Lint with Ruff
       #   run: |
