@@ -30,6 +30,10 @@ if os.getenv("CI") != "true":
     dir_path = os.path.dirname(os.path.realpath(__file__))
     cred = credentials.Certificate(os.path.join(dir_path, credFileName))
     firebase_admin.initialize_app(cred)
+    # firebase_admin.initialize_app(os.getenv("FIREBASE_CREDENTIALS"))
+else:
+    firebase_admin.initialize_app(os.getenv("FIREBASE_CREDENTIALS"))
+    # print("Running in CI mode, Firebase initialization is skipped.")
 db = firestore.client()
 dbWrapper = DbWrapper(db)
 
