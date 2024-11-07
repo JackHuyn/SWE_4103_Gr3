@@ -33,10 +33,10 @@ jobs:
           python -c "import sys; print(sys.version)"
 
       # - name: Set up Firebase credentials
-      #   env:
-      #     FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
       #   run: |
-      #     echo $FIREBASE_CREDENTIALS | base64 --decode > path/to/firebase-credentials.json
+      #     echo $FIREBASE_CREDENTIALS | base64 --decode > ../Backend/firebase-credentials.json
 
       # Install dependencies
       - name: Install dependencies
