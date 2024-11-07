@@ -22,7 +22,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -33,7 +32,7 @@ jobs:
         run: |
           mkdir -p logFile
           python -m pip install --upgrade pip
-          pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
+          pip install pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
 
       # Remove Python cache files
       - name: Remove Python cache files
@@ -41,24 +40,20 @@ jobs:
           find . -name "__pycache__" -type d -exec rm -r {} +
           find . -name "*.pyc" -exec rm -f {} +
 
-      # Lint with Ruff
-      - name: Lint with Ruff
+      - name: Testing
         run: |
-          ruff check --output-format=github --exit-zero
-        continue-on-error: true
-
-      - name: Test with Firebase Emulator
-        uses: w9jds/firebase-action@master
-        with:
-          args: emulators:exec --only firestore "python -m pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10"
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          -m pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
+      # # Lint with Ruff
+      # - name: Lint with Ruff
+      #   run: |
+      #     ruff check --output-format=github --exit-zero
+      #   continue-on-error: true
 
       # Compress and upload files
-      - name: Compress and upload log files
-        uses: actions/upload-artifact@v4
-        with:
-          name: log_File
-          path: logFile/
-          if-no-files-found: error
-          retention-days: 7
+      # - name: Compress and upload log files
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: log_File
+      #     path: logFile/
+      #     if-no-files-found: error
+      #     retention-days: 7
