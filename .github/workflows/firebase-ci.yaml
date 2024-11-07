@@ -37,7 +37,6 @@ jobs:
         run: |
           mkdir -p logFile
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
           pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat
 
       # Remove Python cache files
