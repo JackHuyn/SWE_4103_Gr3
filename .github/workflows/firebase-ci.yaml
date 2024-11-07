@@ -42,7 +42,7 @@ jobs:
 
       - name: Testing
         run: |
-          -m pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
+          python -m pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
       # # Lint with Ruff
       # - name: Lint with Ruff
       #   run: |
