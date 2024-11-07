@@ -7,10 +7,9 @@ import json
 
 class TestFlaskApp(unittest.TestCase):
 
-    # Setup method to initialize the test client before each test
     def setUp(self):
-        self.app = app.test_client()  # create the Flask test client
-        self.app.testing = True  # enables exceptions to be propagated
+        self.app = app.test_client() 
+        self.app.testing = True  
 
     # Test case for the signup_user endpoint
     def test_signup_user(self):
@@ -24,16 +23,12 @@ class TestFlaskApp(unittest.TestCase):
             "instructorKey": "D6B74"
         }
         
-        # Send a POST request to the /auth/signup-with-email-and-password route
+
         response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
         
-        # Check the status code of the response
         self.assertEqual(response.status_code, 200)
-        
-        # Convert the response data from JSON
         response_data = json.loads(response.data)
         
-        # Check that the response has the expected structure
         self.assertIn('approved', response_data)
         self.assertTrue(response_data['approved'])
 
@@ -70,8 +65,5 @@ class TestFlaskApp(unittest.TestCase):
         self.assertIn('approved', response_data)
         self.assertTrue(response_data['approved'])
     
-    # More test cases for other routes can go here...
-
-# Run the tests
 if __name__ == '__main__':
     unittest.main()
