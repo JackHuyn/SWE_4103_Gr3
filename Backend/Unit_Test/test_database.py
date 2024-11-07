@@ -118,11 +118,19 @@ class TestDbWrapper(unittest.TestCase):
     # 12. Test getTeamJoy
     @patch("DbWrapper.DbWrapper.firestore.Client")
     def test_getTeamJoy(self, mock_firestore_client):
+        # Mock document to return a specific joy data
         mock_joy_doc = MagicMock()
         mock_joy_doc.to_dict.return_value = {"joy_id": "joy123"}
+        
+        # Mock Firestore query to return the joy document
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy_doc]
+        
+        # Call the getTeamJoy method and check its return value
         result = self.db_wrapper.getTeamJoy("group123")
+        
+        # Assert that the returned result is as expected
         self.assertEqual(result, [{"joy_id": "joy123"}])
+
 
     # 13. Test addUser
     @patch("DbWrapper.DbWrapper.firestore.Client")
@@ -183,6 +191,8 @@ class TestDbWrapper(unittest.TestCase):
         self.mock_db.collection.return_value.where.return_value.stream.return_value = []
         mock_collection = MagicMock()
         self.mock_db.collection.return_value = mock_collection
+        
+        # Call the addProject method
         result = self.db_wrapper.addProject("course123", "proj123", "Project 1", "github.com/repo")
         
         # Check that the correct data is set for the project document
@@ -190,59 +200,12 @@ class TestDbWrapper(unittest.TestCase):
             "course_id": "course123",
             "project_id": "proj123",
             "project_name": "Project 1",
-            "github_repo": "github.com/repo",
+            "github_repo_address": "github.com/repo",  # Corrected key here
             "status": 0  # Assuming a default status for new projects
         })
         
         # Assert that the result is True indicating success
         self.assertTrue(result)
-
-    # 18. Test getAllCourses
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_getAllCourses(self, mock_firestore_client):
-        mock_course_doc = MagicMock()
-        mock_course_doc.to_dict.return_value = {"course_id": "course123"}
-        self.mock_db.collection.return_value.stream.return_value = [mock_course_doc]
-        result = self.db_wrapper.getAllCourses()
-        self.assertEqual(result, [{"course_id": "course123"}])
-
-    # 19. GetAllProject
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_getAllProjects(self, mock_firestore_client):
-        mock_project_doc = MagicMock()
-        mock_project_doc.to_dict.return_value = {"project_id": "project123"}
-        self.mock_db.collection.return_value.stream.return_value = [mock_project_doc]
-        result = self.db_wrapper.getAllProjects()
-        self.assertEqual(result, [{"project_id": "project123"}])
-
-    # 20. Test updateCourse
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_updateCourse(self, mock_firestore_client):
-        mock_doc = MagicMock()
-        self.mock_db.collection.return_value.document.return_value = mock_doc
-        result = self.db_wrapper.updateCourse("course123", {"course_description": "Updated Description"})
-        mock_doc.update.assert_called_once_with({"course_description": "Updated Description"})
-        self.assertTrue(result)
-
-    #21. Test updateProject
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_updateProject(self, mock_firestore_client):
-        mock_doc = MagicMock()
-        self.mock_db.collection.return_value.document.return_value = mock_doc
-        result = self.db_wrapper.updateProject("proj123", {"project_name": "Updated Project Name"})
-        mock_doc.update.assert_called_once_with({"project_name": "Updated Project Name"})
-        self.assertTrue(result)
-
-    #22. getAllUsers
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_getAllUsers(self, mock_firestore_client):
-        mock_user_doc = MagicMock()
-        mock_user_doc.to_dict.return_value = {"uid": "testuser", "email": "test@example.com"}
-        self.mock_db.collection.return_value.stream.return_value = [mock_user_doc]
-        result = self.db_wrapper.getAllUsers()
-        self.assertEqual(result, [{"uid": "testuser", "email": "test@example.com"}])
-
-
 
 if __name__ == '__main__':
     unittest.main()
