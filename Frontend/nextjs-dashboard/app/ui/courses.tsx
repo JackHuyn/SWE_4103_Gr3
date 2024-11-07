@@ -1,3 +1,6 @@
+"use client";
+
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import '@/app/ui/stylesheets/coursePage.css'; 
@@ -133,14 +136,13 @@ export default function Courses() {
                 if (response.ok) {
                     window.location.reload();
                     alert('Course added successfully!');
-                    window.location.reload();
-                    //setCourseList([...courseList, courseData]); // Add the new course to the list
+                    setCourseList([...courseList, courseData]); // Add the new course to the list
                     // Reset form and close popup
-                    /**setNewCourseName('');
+                    setNewCourseName('');
                     setNewCourseDescription('');
                     setNewCourseTerm('');
                     setNewCourseSection('');
-                    setIsPopupVisible(false);**/
+                    setIsPopupVisible(false);
                 } else {
                     alert(`Error adding course: ${result.reason}`);
                 }
@@ -245,7 +247,7 @@ export default function Courses() {
         );
     }
 
-    if (data && data.approved && courseList.length >= 0) {
+    if (data) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">

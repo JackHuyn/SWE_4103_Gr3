@@ -9,5 +9,5 @@ import { Button } from './button';
 import {useState} from 'react'
 
 export default function Projects(){
-    return <h1>test</h1>
+    return <h1>test- This should show a list of projects when view all is selected ? </h1>
 }

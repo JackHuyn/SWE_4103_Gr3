@@ -5,6 +5,7 @@ from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
 import os
 import datetime
+import pytz
 
 COURSES = "coursedata"
 GROUPS = "groupdata"
@@ -73,11 +74,9 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==",  group_id)).stream()
-        docList = []
-        for doc in docs:
-            docList.append(doc.to_dict())
-        return docList
+        doc = self.db.collection(GROUPS).document(group_id).get()
+        return doc.to_dict()['avg_joy']
+
     def getTeamVelocity(self, group_id:str)->list[dict]:
         docs = self.db.collection(VELOCITY).where(filter=FieldFilter("group_id", "==", group_id)).stream()
         docList = []
@@ -120,7 +119,7 @@ class DbWrapper:
         return True
     def addCourse(self, course_description:str, course_id:str, instructor_ids:list[str], section:str, term:str, student_ids=[], status=0)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
-        if len(x) > 0:
+        if len(x) > 0:  
             return False
         template = {}
         template["course_description"] = course_description
@@ -152,9 +151,14 @@ class DbWrapper:
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
         template["project_id"] = project_id
         template["student_ids"] = student_ids
+        today = datetime.datetime.today()
+        today = today.strftime("%d/%m/%Y") #Cast a string to it to use the date as a value key
+        template["avg_joy"] = {
+            today: 'None'
+        }
         template["github_repo_address"] = github_repo_address
         template["scrum_master"] = scrum_master
         inserted = False
@@ -190,6 +194,67 @@ class DbWrapper:
             return False
         return True
     
+    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
+        now = datetime.datetime.now()
+        current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
+        timezone = pytz.timezone('Etc/GMT-4')  # Replace 'UTC' with your desired timezone
+        midnight_utc = timezone.localize(current_date)
+        firestore_timestamp = midnight_utc.isoformat()
+        date = datetime.datetime.today()
+        date= date.strftime("%d/%m/%Y")          
+
+        if (self.updateJoyRating(student_id, group_id, joy_rating, comment)):
+            print('updated')
+
+        timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
+        template = {}
+        template["student_id"] = student_id
+        template["group_id"] = group_id
+        template["joy_rating"] = joy_rating
+        template["comment"] = comment
+        template["timestamp"] = firestore.SERVER_TIMESTAMP
+        self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
+        if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
+            return True
+        return False
+    
+    def calculateJoyAverage(self, group_id:str, date):
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+
+        sum = 0
+        count = 0
+        print(date_start_utc, date_end_utc)
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).get()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            sum += int(d['joy_rating'])
+            count +=1
+        # print('SUM: ', sum)
+        # print('COUNT: ', count)
+        if count > 0:
+            avg = sum / count
+            avg = round(avg, 2)
+        else:
+            avg = 'None'
+        # print('AVG: ', avg)
+        date = datetime.datetime.today()
+        date= date.strftime("%d/%m/%Y")
+        group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
+        if(group):
+            g = group[0].to_dict()
+            avg_joy = g.get('avg_joy',{})
+            avg_joy[date] = avg
+            group[0].reference.update({'avg_joy': avg_joy})
+
+        return True
+    
     def addScrumMasterToGroup(self, group_id:str, scrum_master:list[str]="")->bool:
         doc = self.db.collection(GROUPS).document(group_id)
         try:
@@ -198,17 +263,6 @@ class DbWrapper:
             return False
         return True
     
-    def addJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
-        if (self.updateJoyRating(student_id, group_id, joy_rating)):
-            return True
-        timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
-        template = {}
-        template["student_id"] = student_id
-        template["group_id"] = group_id
-        template["joy_rating"] = joy_rating
-        template["timestamp"] = firestore.SERVER_TIMESTAMP
-        self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
-        return True
     
     def addVelocityData(self, group_id:str, sprint_start:datetime.datetime, sprint_end:datetime.datetime, planned_points:int, completed_points:int=0)->bool:
         sprints = self.getTeamVelocity(group_id)
@@ -233,15 +287,19 @@ class DbWrapper:
                 inserted = True
         return True
 
-    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int)->bool:
+
+    def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
+            doc.update({"comment": comment})
             doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
         except:
             return False
-        return True
+        if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
+            return True
+        return False
     
     def updateVelocityData(self, velocity_id:str, sprint_start:datetime.datetime=-1, sprint_end:datetime.datetime=-1, planned_points:int=-1, completed_points:int=-1)->bool:
         doc = self.db.collection(VELOCITY).document(velocity_id)
@@ -302,6 +360,31 @@ class DbWrapper:
         for doc in docs:
             return doc.to_dict()
         return None
+    
+    # Project Access Functions
+    def getRecentStudentJoyRatings(self, group_id:str) -> dict:
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        user_ids = []
+        docList = []
+        for doc in docs:
+            d = doc.to_dict()
+            if(d['student_id'] in user_ids):
+                continue
+            # print('D: ', d)
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            docList.append(d)
+            user_ids.append(d['student_id'])
+        return docList
+    
+    def getGithubRepoAddress(self, group_id:str):
+        docs = self.db.collection(GROUPS).document(group_id).get()
+        return docs.to_dict()['github_repo_address']
+
+    def updateGithubOAuthToken(self, uid:str, github_oauth_token:str) -> bool:
+        print("UID: ", uid)
+        return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
+    
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
