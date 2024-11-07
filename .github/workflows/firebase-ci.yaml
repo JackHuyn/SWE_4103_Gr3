@@ -18,8 +18,7 @@ jobs:
 
     env:
       CI: true  # Set CI environment variable to skip Firebase initialization
-      env:
-        FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+      FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
 
     steps:
       - uses: actions/checkout@v4
