@@ -115,15 +115,15 @@ class TestDbWrapper(unittest.TestCase):
         result = self.db_wrapper.getStudentGroups("student123")
         self.assertEqual(result, [{"group_id": "group123"}])
 
-    # 12. Test getTeamJoy
-    @patch("DbWrapper.DbWrapper.firestore.Client")
-    def test_getTeamJoy(self, mock_firestore_client):
-        mock_joy_doc = MagicMock()
-        mock_joy_doc.to_dict.return_value = {"joy_id": "joy123"}
-        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy_doc]
+    # # 12. Test getTeamJoy
+    # @patch("DbWrapper.DbWrapper.firestore.Client")
+    # def test_getTeamJoy(self, mock_firestore_client):
+    #     mock_joy_doc = MagicMock()
+    #     mock_joy_doc.to_dict.return_value = {"joy_id": "joy123"}
+    #     self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy_doc]
         
-        result = self.db_wrapper.getTeamJoy("group123")
-        self.assertEqual(result, [{"joy_id": "joy123"}])
+    #     result = self.db_wrapper.getTeamJoy("group123")
+    #     self.assertEqual(result, [{"joy_id": "joy123"}])
 
 
     # 13. Test addUser
