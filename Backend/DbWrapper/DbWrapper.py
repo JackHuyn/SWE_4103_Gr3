@@ -389,12 +389,16 @@ class DbWrapper:
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
     credFileName = "swe4103-7b261-firebase-adminsdk.json"
+    if os.getenv("CI") != "true":
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        cred = credentials.Certificate(dir_path + "/../" + credFileName)
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+        test = DbWrapper(db)
+    else:
+        print("Running in CI mode, Firebase initialization is skipped.")
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cred = credentials.Certificate(dir_path + "/../" + credFileName)
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-    test = DbWrapper(db)
+    
     docs = test.getStudentCourses("3713652")
     print(docs)
     print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
