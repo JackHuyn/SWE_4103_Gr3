@@ -28,15 +28,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Check Python version
-      - name: Display Python version
-        run: |
-          python -c "import sys; print(sys.version)"
-
-      # - name: Set up Firebase credentials
-        
-      #   run: |
-      #     echo $FIREBASE_CREDENTIALS | base64 --decode > ../Backend/firebase-credentials.json
 
       # Install dependencies
       - name: Install dependencies
@@ -57,10 +48,12 @@ jobs:
           ruff check --output-format=github --exit-zero
         continue-on-error: true
 
-      # Run tests using pytest
-      - name: Check code using pytest
-        run: |
-          pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
+      - name: Test to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: emulators:exec --only firestore \"pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10\"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       # Compress and upload files
       - name: Compress and upload log files
