@@ -12,7 +12,7 @@ from github import BadCredentialsException
 #First Party Libraries
 import Auth as fb_auth
 import FileUpload as fp
-# from DbWrapper.DbWrapper import DbWrapper
+from DbWrapper.DbWrapper import DbWrapper
 import StudentMetrics as StudentMetrics
 import User as User
 import GitHub as Github
