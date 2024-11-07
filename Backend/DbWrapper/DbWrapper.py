@@ -1,6 +1,6 @@
 import firebase_admin
-from firebase_admin import auth, credentials, firestore
-from google.cloud.firestore_v1.base_query import FieldFilter, And
+from firebase_admin import credentials, firestore
+from google.cloud.firestore_v1.base_query import FieldFilter
 from google.cloud.firestore_v1 import ArrayUnion
 import os
 import datetime

@@ -37,10 +37,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pylint Flask flask_cors firebase_admin
 
-      # # Firebase setup
-      # - name: Install Firebase 
-      #   run: |
-      #     npm install -g firebase-tools
+      - name: Remove python cache file
+        run: |
+          find . -name "__pycache__" -type d -exec rm -r {} +;
+          find . -name "*.pyc" -exec rm -f {} +
 
       # Lint with Ruff
       - name: Lint with Ruff
@@ -54,16 +54,6 @@ jobs:
         run: |
           pip install pytest pytest-cov pytest-flask pytest-repeat
           pytest --maxfail=10 --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html --count=10
-
-      # # install dependencies 2
-      # - name: install npm in Unit_test
-      #   working-directory: Backend/Unit_Test
-      #   run: npm install
-        
-      # # run all test
-      # - name: run test on Suite
-      #   working-directory: Backend/Unit_Test
-      #   run: firebase emulators:exec 'python -m unittest'
 
       # Compress and upload files
       - name: Compress and upload file

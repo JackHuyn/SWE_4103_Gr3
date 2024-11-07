@@ -1,87 +1,85 @@
-# import unittest
-# from unittest.mock import MagicMock, patch
-# import sys
-# import os
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-# from Backend import app
-# import json
+import unittest
+from unittest.mock import MagicMock, patch
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Backend import app
+import json
 
-# class TestBackend(unittest.TestCase):
+class TestBackend(unittest.TestCase):
 
-#     @patch('firebase_admin.initialize_app')
-#     @patch('firebase_admin.credentials.Certificate')
-#     @patch('firebase_admin.auth')
-#     @patch('Backend.firestore.client')
-#     def setUp(self, mock_firestore_client, mock_auth, mock_certificate, mock_initialize_app):
-#         # Mock Firebase components
-#         self.mock_db = MagicMock()
-#         mock_firestore_client.return_value = self.mock_db
-#         mock_initialize_app.return_value = None
+    @patch('firebase_admin.initialize_app', return_value=None)  # Mock Firebase initialization
+    @patch('firebase_admin.credentials.Certificate')  # Mock credentials.Certificate
+    @patch('Backend.firestore.client')  # Mock Firestore client
+    def setUp(self, mock_firestore_client, mock_certificate, mock_initialize_app):
+        # Set up the app's test client
+        self.app = app.test_client()
+        self.app.testing = True
 
-#         # Set up the Flask app for testing
-#         self.app = app.test_client()
-#         self.app.testing = True 
+        # Mock the Firestore client returned by firestore.client()
+        self.mock_db = MagicMock()
+        mock_firestore_client.return_value = self.mock_db
 
-#     # Test case for the signup_user endpoint
-#     def test_signup_user(self):
-#         # Mock request arguments
-#         signup_data = {
-#             "fname": "Test",
-#             "lname": "Account",
-#             "email": "test11111@unb.ca",
-#             "password": "test123",
-#             "accountType": 1,
-#             "instructorKey": "D6B74"
-#         }
+    # Test case for the signup_user endpoint
+    def test_signup_user(self):
+        # Mock request arguments
+        signup_data = {
+            "fname": "Test",
+            "lname": "Account",
+            "email": "test11111@unb.ca",
+            "password": "test123",
+            "accountType": 1,
+            "instructorKey": "D6B74"
+        }
         
-#         # Send a POST request to the /auth/signup-with-email-and-password route
-#         response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
+        # Send a POST request to the /auth/signup-with-email-and-password route
+        response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
         
-#         # Check the status code of the response
-#         self.assertEqual(response.status_code, 200)
+        # Check the status code of the response
+        self.assertEqual(response.status_code, 200)
         
-#         # Convert the response data from JSON
-#         response_data = json.loads(response.data)
+        # Convert the response data from JSON
+        response_data = json.loads(response.data)
         
-#         # Check that the response has the expected structure
-#         self.assertIn('approved', response_data)
-#         self.assertTrue(response_data['approved'])
+        # Check that the response has the expected structure
+        self.assertIn('approved', response_data)
+        self.assertTrue(response_data['approved'])
 
-#     # Test case for invalid instructor key scenario
-#     def test_signup_user_invalid_instructor_key(self):
-#         signup_data = {
-#             "fname": "Test",
-#             "lname": "Account",
-#             "email": "test@unb.ca",
-#             "password": "test123",
-#             "accountType": 1,
-#             "instructorKey": "valid_key"
-#         }
+    # Test case for invalid instructor key scenario
+    def test_signup_user_invalid_instructor_key(self):
+        signup_data = {
+            "fname": "Test",
+            "lname": "Account",
+            "email": "test@unb.ca",
+            "password": "test123",
+            "accountType": 1,
+            "instructorKey": "valid_key"
+        }
         
-#         response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
-#         self.assertEqual(response.status_code, 401)
+        response = self.app.post('/auth/signup-with-email-and-password', query_string=signup_data)
+        self.assertEqual(response.status_code, 401)
 
-#         response_data = json.loads(response.data)
-#         self.assertIn('approved', response_data)
-#         self.assertFalse(response_data['approved'])
-#         self.assertEqual(response_data['reason'], 'Instructor Key Error')
+        response_data = json.loads(response.data)
+        self.assertIn('approved', response_data)
+        self.assertFalse(response_data['approved'])
+        self.assertEqual(response_data['reason'], 'Instructor Key Error')
 
-#     # Test case for login_user endpoint
-#     def test_login_user(self):
-#         login_data = {
-#             "email": "test@unb.ca",
-#             "password": "test123"
-#         }
+    # Test case for login_user endpoint
+    def test_login_user(self):
+        login_data = {
+            "email": "test@unb.ca",
+            "password": "test123"
+        }
         
-#         response = self.app.get('/auth/login-with-email-and-password', query_string=login_data)
-#         self.assertEqual(response.status_code, 200)
+        response = self.app.get('/auth/login-with-email-and-password', query_string=login_data)
+        self.assertEqual(response.status_code, 200)
         
-#         response_data = json.loads(response.data)
-#         self.assertIn('approved', response_data)
-#         self.assertTrue(response_data['approved'])
+        response_data = json.loads(response.data)
+        self.assertIn('approved', response_data)
+        self.assertTrue(response_data['approved'])
     
     
 
-# # Run the tests
-# if __name__ == '__main__':
-#     unittest.main()
+# Run the tests
+if __name__ == '__main__':
+    unittest.main()
