@@ -1,4 +1,4 @@
-name: Setting up CI pipeline
+name: CI Pipeline
 
 on: 
   push:
