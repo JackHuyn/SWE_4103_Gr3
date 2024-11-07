@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import auth, credentials, firestore
+from firebase_admin import credentials, firestore
 import firebase_admin.firestore
 from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
@@ -386,38 +386,38 @@ class DbWrapper:
         return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
     
 
-if __name__ == "__main__":
-    FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
-    credFileName = "swe4103-7b261-firebase-adminsdk.json"
-    
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cred = credentials.Certificate(dir_path + "/../" + credFileName)
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-    test = DbWrapper(db)
+# if __name__ == "__main__":
+# FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
+# credFileName = "swe4103-7b261-firebase-adminsdk.json"
+
+# dir_path = os.path.dirname(os.path.realpath(__file__))
+# cred = credentials.Certificate(dir_path + "/../" + credFileName)
+# firebase_admin.initialize_app(cred)
+# db = firestore.client()
+# test = DbWrapper(db)
 
 
-    
-    docs = test.getStudentCourses("3713652")
-    print(docs)
-    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
-    print(test.addStudentToCourse("3713652", "TestCourse"))
-    print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
-    print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
-    print(test.activateCourse("TestCourseAgain"))
-    print(test.getInstructorCourses("some_prof"))
-    print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
-    print(test.addGroup("java3_proj1"))
-    print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
-    print(test.addNGroups("java3_proj1", 5))
-    print(test.removeGroup("java3_proj1_gr1"))
-    print(test.addGroup("java3_proj1"))
-    print(test.removeProject("java3_proj1"))
-    print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
-    print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
-    print(test.getTeamVelocity("java3_proj1_gr1"))
-    print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
-    #print(test.removeCourse("TestCourseAgain"))
+
+# docs = test.getStudentCourses("3713652")
+# print(docs)
+# print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+# print(test.addStudentToCourse("3713652", "TestCourse"))
+# print(test.getUserData("TestUser"))
+# print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+# print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
+# print(test.activateCourse("TestCourseAgain"))
+# print(test.getInstructorCourses("some_prof"))
+# print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
+# print(test.addGroup("java3_proj1"))
+# print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
+# print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
+# print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
+# print(test.addNGroups("java3_proj1", 5))
+# print(test.removeGroup("java3_proj1_gr1"))
+# print(test.addGroup("java3_proj1"))
+# print(test.removeProject("java3_proj1"))
+# print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
+# print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
+# print(test.getTeamVelocity("java3_proj1_gr1"))
+# print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
+# print(test.removeCourse("TestCourseAgain")
