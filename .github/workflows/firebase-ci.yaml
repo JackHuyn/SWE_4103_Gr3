@@ -28,7 +28,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-
       # Install dependencies
       - name: Install dependencies
         run: |
@@ -48,10 +47,10 @@ jobs:
           ruff check --output-format=github --exit-zero
         continue-on-error: true
 
-      - name: Test to Firebase
+      - name: Test with Firebase Emulator
         uses: w9jds/firebase-action@master
         with:
-          args: emulators:exec --only firestore \"pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10\"
+          args: emulators:exec --only firestore "python -m pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10"
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
@@ -63,4 +62,3 @@ jobs:
           path: logFile/
           if-no-files-found: error
           retention-days: 7
-
