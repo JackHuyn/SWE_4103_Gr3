@@ -72,10 +72,13 @@
 #           retention-days: 7
 
 name: Build and Deploy
-on:
+on: 
   push:
+    branches: 
+      - '*'
+  pull_request:
     branches:
-      - master
+      - '*'
 
 jobs:
   build:
