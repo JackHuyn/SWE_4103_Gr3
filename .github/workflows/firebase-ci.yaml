@@ -1,77 +1,5 @@
-# name: CI Pipeline
+name: CI Pipeline
 
-# on: 
-#   push:
-#     branches: 
-#       - '*'
-#   pull_request:
-#     branches:
-#       - '*'
-
-# jobs:
-#   build:
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       matrix:
-#         os: [ubuntu-latest]
-#         python-version: ["3.12.0"]
-
-#     env:
-#       CI: true  # Set CI environment variable to skip Firebase initialization
-#       FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
-
-#     steps:
-#       - uses: actions/checkout@v4
-
-#       - name: Set up Python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v5
-#         with:
-#           python-version: ${{ matrix.python-version }}
-
-#       # Check Python version
-#       - name: Display Python version
-#         run: |
-#           python -c "import sys; print(sys.version)"
-
-#       # - name: Set up Firebase credentials
-        
-#       #   run: |
-#       #     echo $FIREBASE_CREDENTIALS | base64 --decode > ../Backend/firebase-credentials.json
-
-#       # Install dependencies
-#       - name: Install dependencies
-#         run: |
-#           mkdir -p logFile
-#           python -m pip install --upgrade pip
-#           pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
-
-#       # Remove Python cache files
-#       - name: Remove Python cache files
-#         run: |
-#           find . -name "__pycache__" -type d -exec rm -r {} +
-#           find . -name "*.pyc" -exec rm -f {} +
-
-#       # Lint with Ruff
-#       - name: Lint with Ruff
-#         run: |
-#           ruff check --output-format=github --exit-zero
-#         continue-on-error: true
-
-#       # Run tests using pytest
-#       - name: Check code using pytest
-#         run: |
-#           pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
-
-#       # Compress and upload files
-#       - name: Compress and upload log files
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: log_File
-#           path: logFile/
-#           if-no-files-found: error
-#           retention-days: 7
-
-name: Build and Deploy
 on: 
   push:
     branches: 
@@ -82,31 +10,59 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12.0"]
+
+    env:
+      CI: true  # Set CI environment variable to skip Firebase initialization
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Install Dependencies
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Check Python version
+      - name: Display Python version
+        run: |
+          python -c "import sys; print(sys.version)"
+
+      # - name: Set up Firebase credentials
+        
+      #   run: |
+      #     echo $FIREBASE_CREDENTIALS | base64 --decode > ../Backend/firebase-credentials.json
+
+      # Install dependencies
+      - name: Install dependencies
         run: |
           mkdir -p logFile
           python -m pip install --upgrade pip
           pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
-      # - name: Build
-      #   run: npm run build-prod
-      # - name: Archive Production Artifact
-      #   uses: actions/upload-artifact@master
-      #   with:
-      #     name: dist
-      #     path: dist
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
- #       # Compress and upload files
+
+      # Remove Python cache files
+      - name: Remove Python cache files
+        run: |
+          find . -name "__pycache__" -type d -exec rm -r {} +
+          find . -name "*.pyc" -exec rm -f {} +
+
+      # Lint with Ruff
+      - name: Lint with Ruff
+        run: |
+          ruff check --output-format=github --exit-zero
+        continue-on-error: true
+
+      # Run tests using pytest
+      - name: Check code using pytest
+        run: |
+          pytest --maxfail=10 --doctest-modules --junitxml=logFile/test-results.xml --cov=. --cov-report=xml --cov-report=html --count=10
+
+      # Compress and upload files
       - name: Compress and upload log files
         uses: actions/upload-artifact@v4
         with:
@@ -114,9 +70,4 @@ jobs:
           path: logFile/
           if-no-files-found: error
           retention-days: 7
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: firebase deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
