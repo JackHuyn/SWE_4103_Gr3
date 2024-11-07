@@ -17,8 +17,16 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-cred = credentials.Certificate(os.path.join(dir_path, credFileName))
-firebase_admin.initialize_app(cred)
+
+if os.getenv("CI") != "true":  # Assuming "CI" environment variable is set in GitHub Actions
+    cred = credentials.Certificate(os.path.join(dir_path, credFileName))
+    firebase_admin.initialize_app(cred)
+else:
+    print("Running in CI mode, Firebase initialization is skipped.")
+# cred = credentials.Certificate(os.path.join(dir_path, credFileName))
+# firebase_admin.initialize_app(cred)
+
+
 db = firestore.client()
 
 dbWrapper = DbWrapper(db)

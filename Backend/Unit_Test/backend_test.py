@@ -1,4 +1,5 @@
 # import unittest
+# from unittest.mock import MagicMock, patch
 # import sys
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -7,9 +8,19 @@
 
 # class TestBackend(unittest.TestCase):
 
-#     def setUp(self):
-#         self.app = app.test_client()  
-#         self.app.testing = True  
+#     @patch('firebase_admin.initialize_app')
+#     @patch('firebase_admin.credentials.Certificate')
+#     @patch('firebase_admin.auth')
+#     @patch('Backend.firestore.client')
+#     def setUp(self, mock_firestore_client, mock_auth, mock_certificate, mock_initialize_app):
+#         # Mock Firebase components
+#         self.mock_db = MagicMock()
+#         mock_firestore_client.return_value = self.mock_db
+#         mock_initialize_app.return_value = None
+
+#         # Set up the Flask app for testing
+#         self.app = app.test_client()
+#         self.app.testing = True 
 
 #     # Test case for the signup_user endpoint
 #     def test_signup_user(self):
