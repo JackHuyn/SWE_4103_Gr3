@@ -2,11 +2,12 @@ import {NextResponse, type NextRequest } from "next/server";
 
 
 //@Author: Raphael Ferreira 
-//The middleware gets called for specific routes that require authentication
+//The middleware gets called for routes that require authentication 
+//Ensures that the connection is not stale by verifying the user session is valid using idToken
 export async function middleware(request: NextRequest){
 
     
-    if (request.nextUrl.pathname.startsWith('/auth/courses')) {
+    if (request.nextUrl.pathname.startsWith('/courses') || request.nextUrl.pathname.startsWith('/projects')) {
 
         //get the cookies
         const tokenId = request.cookies.get("idToken")?.value
