@@ -26,14 +26,9 @@ FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
 credFileName = "swe4103-7b261-firebase-adminsdk.json"
 github_api_key_filename = 'swe4103-github-metrics-admin.json'
 
-if os.getenv("CI") != "true":
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    cred = credentials.Certificate(os.path.join(dir_path, credFileName))
-    firebase_admin.initialize_app(cred)
-    # firebase_admin.initialize_app(os.getenv("FIREBASE_CREDENTIALS"))
-else:
-    firebase_admin.initialize_app(os.getenv("FIREBASE_CREDENTIALS"))
-    # print("Running in CI mode, Firebase initialization is skipped.")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+cred = credentials.Certificate(os.path.join(dir_path, credFileName))
+firebase_admin.initialize_app(cred)
 db = firestore.client()
 dbWrapper = DbWrapper(db)
 
