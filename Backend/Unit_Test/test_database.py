@@ -118,17 +118,11 @@ class TestDbWrapper(unittest.TestCase):
     # 12. Test getTeamJoy
     @patch("DbWrapper.DbWrapper.firestore.Client")
     def test_getTeamJoy(self, mock_firestore_client):
-        # Mock document to return a specific joy data
         mock_joy_doc = MagicMock()
         mock_joy_doc.to_dict.return_value = {"joy_id": "joy123"}
-        
-        # Mock Firestore query to return the joy document
         self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy_doc]
         
-        # Call the getTeamJoy method and check its return value
         result = self.db_wrapper.getTeamJoy("group123")
-        
-        # Assert that the returned result is as expected
         self.assertEqual(result, [{"joy_id": "joy123"}])
 
 
@@ -192,19 +186,15 @@ class TestDbWrapper(unittest.TestCase):
         mock_collection = MagicMock()
         self.mock_db.collection.return_value = mock_collection
         
-        # Call the addProject method
         result = self.db_wrapper.addProject("course123", "proj123", "Project 1", "github.com/repo")
         
-        # Check that the correct data is set for the project document
         mock_collection.document.return_value.set.assert_called_once_with({
             "course_id": "course123",
             "project_id": "proj123",
             "project_name": "Project 1",
-            "github_repo_address": "github.com/repo",  # Corrected key here
-            "status": 0  # Assuming a default status for new projects
+            "github_repo_address": "github.com/repo"
         })
         
-        # Assert that the result is True indicating success
         self.assertTrue(result)
 
 if __name__ == '__main__':

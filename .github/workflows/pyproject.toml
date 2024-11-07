@@ -1,6 +1,0 @@
-[tool.ruff]
-ignore = [
-    "F841",  # Ignore "local variable is assigned to but never used"
-    "E711",  # Ignore "Comparison to None should be 'cond is not None'"
-    "E722",  # Ignore "Do not use bare 'except'"
-]
