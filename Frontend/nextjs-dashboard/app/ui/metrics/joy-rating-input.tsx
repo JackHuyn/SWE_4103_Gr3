@@ -66,7 +66,7 @@ async function submitStars(group_id, local_id)
     })
 }
 
-export default function JoyRatingInput()
+export default function JoyRatingInput({closeDialogs})
 {
 
     const [groupId, setGroupId] = useState(null);
@@ -95,7 +95,7 @@ export default function JoyRatingInput()
                 <h3>Comment:</h3>
                 <textarea name="joy-comment" id="joy-comment-textarea" placeholder='(optional)'></textarea>
             </div>
-            <button id="submit-joy-rating-button" onClick={(event) => submitStars(groupId, local_id)}>Submit</button>
+            <button id="submit-joy-rating-button" onClick={(event) => {submitStars(groupId, local_id); closeDialogs()}}>Submit</button>
         </div>
     )
 }

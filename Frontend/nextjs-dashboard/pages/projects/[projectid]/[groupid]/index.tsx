@@ -57,7 +57,7 @@ export default function Metrics() {
                 <div className="chart-container"><ContributionsGraph group_id={groupId} /></div>
                 <div className="chart-container"><JoyAvgChart group_id={groupId} /></div>
                 <div className="chart-container"><JoyStudentRatingGraph group_id={groupId} /></div>
-                {/* <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div> */}
+                <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
             {(isPopupVisible || isPopup2Visible) && (
@@ -69,7 +69,7 @@ export default function Metrics() {
                     {isPopupVisible && (
                         <div id="joy-rating-dialog" className="dialog">
                             <h2>Joy Rating Input</h2>
-                            <JoyRatingInput />
+                            <JoyRatingInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
