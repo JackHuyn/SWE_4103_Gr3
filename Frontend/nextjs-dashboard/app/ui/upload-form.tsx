@@ -30,8 +30,12 @@ export default function FileUpload({localId, courseId}: {localId: string, course
                 body:data
             })
 
-            if(!res.ok) throw new Error(await res.text())
-
+            if (res.ok) {
+                window.location.reload();
+                
+            } else {
+                throw new Error(await res.text())
+            }
         } catch (e:any){
             console.error(e)
         }
