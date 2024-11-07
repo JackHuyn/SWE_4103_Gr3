@@ -1,9 +1,10 @@
 import '@/app/ui/stylesheets/joyRatingInput.css'
-
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
 
 let star_rating: number = 0
 
-const group_id = 'TEMPLATE' //REPLACE THIS ASAP
 
 async function setStars(num_stars: number)
 {
@@ -19,12 +20,11 @@ async function setStars(num_stars: number)
     star_rating = num_stars
 }
 
-async function submitStars()
+async function submitStars(group_id, local_id)
 {
-
     const comment = document.getElementById('joy-comment-textarea').value
 
-    fetch("http://127.0.0.1:3001/metrics/submit-joy-rating?groupId="+group_id+"&uid=test2&joyRating="+star_rating+"&comment="+comment,
+    fetch("http://127.0.0.1:3001/metrics/submit-joy-rating?groupId="+group_id+"&uid="+local_id+"&joyRating="+star_rating+"&comment="+comment,
         {
             method: 'POST'
         }
@@ -68,6 +68,19 @@ async function submitStars()
 
 export default function JoyRatingInput()
 {
+
+    const [groupId, setGroupId] = useState(null);
+    const local_id = Cookies.get('localId')
+    const router = useRouter();
+    
+    useEffect(() => {
+        if (router.isReady) {
+            const group_id = router.query.group_id;
+            setGroupId(group_id);
+            console.log("Group ID:", group_id);
+        }
+    }, [router.isReady, router.query]);
+
     return(
         <div id="joy-rating-dialog">
             <h1>Rate Your Joy Level Today</h1>
@@ -82,7 +95,7 @@ export default function JoyRatingInput()
                 <h3>Comment:</h3>
                 <textarea name="joy-comment" id="joy-comment-textarea" placeholder='(optional)'></textarea>
             </div>
-            <button id="submit-joy-rating-button" onClick={submitStars}>Submit</button>
+            <button id="submit-joy-rating-button" onClick={(event) => submitStars(groupId, local_id)}>Submit</button>
         </div>
     )
 }

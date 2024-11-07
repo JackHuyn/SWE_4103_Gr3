@@ -2,22 +2,13 @@ import Chart from 'chart.js/auto';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-export default function TeamVelocityGraph() {
-    const [groupId, setGroupId] = useState(null);
-    const router = useRouter();
-
+export default function TeamVelocityGraph({group_id}) 
+{
     useEffect(() => {
-        if (router.isReady) {
-            const group_id = router.query.group_id;
-            setGroupId(group_id);
-            console.log("Group ID:", group_id);
-        }
-    }, [router.isReady, router.query]);
-
-    useEffect(() => {
-        if (groupId) {
-            console.log('GET CHART CALLED with groupId:', groupId);
-            fetch(`http://127.0.0.1:3001/metrics/get-team-velocity?groupId=${groupId}`, {
+        let chart = null
+        if (group_id) {
+            console.log('GET CHART CALLED with groupId:', group_id);
+            fetch(`http://127.0.0.1:3001/metrics/get-team-velocity?groupId=${group_id}`, {
                 method: 'GET',
             })
             .then(response => {
@@ -39,7 +30,7 @@ export default function TeamVelocityGraph() {
                     if (!r['approved']) throw 'Data not approved';
 
                     const velocity = r['velocity'];
-                    const days = velocity.map(row => row.sprint_start_date);
+                    const days = velocity.map(row => row.sprint_start);
     
                     const team_velocity_graph_data = [
                         {
@@ -73,7 +64,7 @@ export default function TeamVelocityGraph() {
                         }
                     };
     
-                    new Chart(document.getElementById('team-velocity-graph'), config);
+                    chart = new Chart(document.getElementById('team-velocity-graph'), config);
                 } catch (err) {
                     console.error("Parsing error:", err);
                 }
@@ -82,7 +73,12 @@ export default function TeamVelocityGraph() {
                 console.error("Fetch error:", error);
             });
         }
-    }, [groupId]);
+
+        return () => {
+            if(chart)
+                chart.destroy()
+        }
+    }, [group_id]);
 
     return (
         <div id="avg-joy-container">

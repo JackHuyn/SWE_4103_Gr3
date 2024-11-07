@@ -1,60 +1,77 @@
 import '@/app/ui/stylesheets/teamVelocityInput.css'
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 let star_rating: number = 0
 
-const group_id = 'TEMPLATE' //REPLACE THIS ASAP
 
-async function submitVelocity()
+
+export default function TeamVelocityInput({ closeDialogs })
 {
-    const start_date = document.getElementById('start-date').value
-    const end_date = document.getElementById('end-date').value
-    const planned_story_points = document.getElementById('planned-story-points').value
-    const completed_story_points = document.getElementById('completed-story-points').value
+    const local_id = Cookies.get('localId')
+    const [groupId, setGroupId] = useState(null);
+    const router = useRouter();
 
-    fetch("http://127.0.0.1:3001/metrics/submit-team-velocity?localId=test&groupId="+group_id+"&startDate="+start_date+"&endDate="+end_date+"&plannedStoryPoints="+planned_story_points+"&completedStoryPoints="+completed_story_points,
-        {
-            method: 'POST'
+    useEffect(() => {
+        if (router.isReady) {
+            const group_id = router.query.group_id;
+            setGroupId(group_id);
+            console.log("Group ID:", group_id);
         }
-    ).then(response => {
-        if (!response.ok) {
-            if (response.status === 404) {
-                return {
-                    text: "Server not found!",
-                    status: "danger"
-                };
+    }, [router.isReady, router.query]);
+
+    async function submitVelocity()
+    {
+        const start_date = document.getElementById('start-date').value
+        const end_date = document.getElementById('end-date').value
+        const planned_story_points = document.getElementById('planned-story-points').value
+        const completed_story_points = document.getElementById('completed-story-points').value
+
+        fetch("http://127.0.0.1:3001/metrics/submit-team-velocity?localId="+local_id+"&groupId="+groupId+"&startDate="+start_date+"&endDate="+end_date+"&plannedStoryPoints="+planned_story_points+"&completedStoryPoints="+completed_story_points,
+            {
+                method: 'POST'
             }
-  
+        ).then(response => {
+            if (!response.ok) {
+                if (response.status === 404) {
+                    return {
+                        text: "Server not found!",
+                        status: "danger"
+                    };
+                }
+    
+                return response.text().then(text => {
+                    return {
+                        text: text,
+                        status: "danger"
+                    };
+                })
+            }
             return response.text().then(text => {
                 return {
                     text: text,
-                    status: "danger"
+                    status: "success"
                 };
             })
-        }
-        return response.text().then(text => {
-            return {
-                text: text,
-                status: "success"
-            };
-        })
-    }).then(resp => {
-        console.log("result:", resp);
-        try {
-            let r = JSON.parse(resp.text)
-            if(!r['approved'])
-                throw 'idek bro'
-            console.log(r)
-            
-        } catch(err) {
-            console.log(err)
-        }
-    }).catch((error) => {
-        console.log(error)
-    })
-}
+        }).then(resp => {
+            console.log("result:", resp);
+            try {
+                let r = JSON.parse(resp.text)
+                if(!r['approved'])
+                    throw 'idek bro'
+                console.log(r)
 
-export default function TeamVelocityInput()
-{
+                closeDialogs()
+
+            } catch(err) {
+                console.log(err)
+            }
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
     return(
         <div id="team-velocity-dialog">
             <h1>Update Your Team's Velocity For This Sprint</h1>

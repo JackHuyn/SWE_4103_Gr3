@@ -6,7 +6,8 @@ import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import json
 import requests
-import os 
+import os
+from github import BadCredentialsException
 
 #First Party Libraries
 import Auth as fb_auth
@@ -671,23 +672,23 @@ def get_github_contribution_stats():
         user_obj = firebase_auth.active_sessions[local_id]
         auth = user_obj.github_auth
         resp = metrics.get_github_contribution_stats(auth, group_id)
-        # print(resp)
+        print(resp)
         response = app.response_class(
             response=json.dumps({'approved': True, 'contributions': resp}),
             status=200,
             mimetype='application/json'
         )
-    except User.InvalidGitHubAuthException as igae:
+    except (User.InvalidGitHubAuthException, BadCredentialsException) as igae:
         print("Invalid GitHub Authentication")
         response = app.response_class(
             response=json.dumps({'approved': False}),
             status=498, # (Unreserved) Invalid GitHub Authentication
             mimetype='application/json'
         )
-    except Exception as e:
+    except Exception as ex:
         # print('Exception: ', e)
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, ex.args)
+        message = template.format(type(ex).__name__, ex.args)
         print(message)
         response = app.response_class(
             response=json.dumps({'approved': False}),

@@ -197,7 +197,7 @@ class DbWrapper:
     def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
         now = datetime.datetime.now()
         current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
-        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        timezone = pytz.timezone('Etc/GMT-4')  # Replace 'UTC' with your desired timezone
         midnight_utc = timezone.localize(current_date)
         firestore_timestamp = midnight_utc.isoformat()
         date = datetime.datetime.today()
@@ -219,40 +219,40 @@ class DbWrapper:
         return False
     
     def calculateJoyAverage(self, group_id:str, date):
-        print('calculatingavg')
         date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
         date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
-        timezone = pytz.timezone('UTC')  # Replace 'UTC' with your desired timezone
+        timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
         date_start_utc = timezone.localize(date_start)
         date_end_utc = timezone.localize(date_end)
 
         sum = 0
         count = 0
+        print(date_start_utc, date_end_utc)
         joy_docs = self.db.collection(JOY).where(
             filter=FieldFilter("group_id", "==", group_id)).where(
                 filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
-                    filter=FieldFilter("timestamp", "<=", date_end_utc)).stream()
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).get()
         for doc in joy_docs:
             d = doc.to_dict()
-            print(d)
-            sum += d['joy_rating']
+            sum += int(d['joy_rating'])
             count +=1
-        
+        # print('SUM: ', sum)
+        # print('COUNT: ', count)
         if count > 0:
             avg = sum / count
             avg = round(avg, 2)
         else:
             avg = 'None'
-        
+        # print('AVG: ', avg)
         date = datetime.datetime.today()
         date= date.strftime("%d/%m/%Y")
         group = self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).get()
         if(group):
             g = group[0].to_dict()
             avg_joy = g.get('avg_joy',{})
-            if date in avg_joy:
-                avg_joy[date] = str(avg)
+            avg_joy[date] = avg
             group[0].reference.update({'avg_joy': avg_joy})
+
         return True
     
     def addScrumMasterToGroup(self, group_id:str, scrum_master:list[str]="")->bool:
@@ -370,7 +370,7 @@ class DbWrapper:
             d = doc.to_dict()
             if(d['student_id'] in user_ids):
                 continue
-            print('D: ', d)
+            # print('D: ', d)
             d['date'] = str(d['timestamp'])
             d.pop('timestamp', None)
             docList.append(d)

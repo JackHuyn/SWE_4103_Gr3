@@ -6,7 +6,7 @@ import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import '@/app/ui/stylesheets/metrics.css';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Metrics() {
     const router = useRouter();
@@ -36,13 +36,11 @@ export default function Metrics() {
 
     useEffect(() => {
         if (router.isReady) {
-            const pathSegments = router.asPath.split('/');
-            const lastSegment = pathSegments[pathSegments.length - 1].split('?')[0];
-            setGroupId(lastSegment);
-            console.log(groupId);
-            console.log("Group ID:", lastSegment);
+            const group_id = router.query.group_id;
+            setGroupId(group_id);
+            console.log("Group ID:", group_id);
         }
-    }, [router.isReady, router.asPath]);
+    }, [router.isReady, router.query]);
 
     return (
         <div className="metrics-container">
@@ -56,10 +54,10 @@ export default function Metrics() {
             </div>
 
             <div className="metrics-content">
-                <div className="chart-container"><ContributionsGraph groupId={groupId} /></div>
-                <div className="chart-container"><JoyAvgChart groupId={groupId} /></div>
-                <div className="chart-container"><JoyStudentRatingGraph groupId={groupId} /></div>
-                <div className="chart-container"><TeamVelocityGraph groupId={groupId} /></div>
+                <div className="chart-container"><ContributionsGraph group_id={groupId} /></div>
+                <div className="chart-container"><JoyAvgChart group_id={groupId} /></div>
+                <div className="chart-container"><JoyStudentRatingGraph group_id={groupId} /></div>
+                {/* <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div> */}
             </div>
 
             {(isPopupVisible || isPopup2Visible) && (
@@ -78,7 +76,7 @@ export default function Metrics() {
                     {isPopup2Visible && (
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
-                            <TeamVelocityInput />
+                            <TeamVelocityInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
