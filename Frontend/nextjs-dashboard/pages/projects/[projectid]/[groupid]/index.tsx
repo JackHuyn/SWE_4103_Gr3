@@ -4,15 +4,18 @@ import JoyAvgChart from '@/app/ui/metrics/joy-avg-chart';
 import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
+import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 export default function Metrics() {
     const router = useRouter();
     const [groupId, setGroupId] = useState(null);
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
+    const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
@@ -35,12 +38,27 @@ export default function Metrics() {
     }
 
     useEffect(() => {
+        checkSessionAndFetchData();
         if (router.isReady) {
             const group_id = router.query.group_id;
             setGroupId(group_id);
             console.log("Group ID:", group_id);
         }
     }, [router.isReady, router.query]);
+
+        
+    async function checkSessionAndFetchData() {
+        const localId = Cookies.get('localId');
+        const idToken = Cookies.get('idToken');
+
+        // // Validate session
+        // const sessionResponse = await fetch(`http://127.0.0.1:3001/auth/validate-session?localId=${localId}&idToken=${idToken}`);
+        // if (sessionResponse.status === 401) {
+        // // Redirect if unauthorized
+        // window.location.href = "/auth/login";
+        // return;
+        // }
+    }
 
     return (
         <div className="metrics-container">

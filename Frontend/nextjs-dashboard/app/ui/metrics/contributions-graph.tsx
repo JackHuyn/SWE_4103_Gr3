@@ -3,10 +3,14 @@ import { groupEnd } from 'console';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import GitHubAppAuthorizationDialog from './github-app-authorization-dialog';
 
 export default function ContributionsGraph( {group_id})
 {
     console.log('CONTRIBUTIONS GROUP ID RECEIVED: '+group_id)
+
+    const[authDialog,showAuthDialog] = useState(false);
+
     useEffect(() => {
         if (group_id) {
             const local_id = Cookies.get('localId')
@@ -26,8 +30,7 @@ export default function ContributionsGraph( {group_id})
 
                     if (response.status === 498) {// GitHub Authentication Error
                         // Show GitHub App Access Request Button
-                        document.getElementById('metrics-dialog-backdrop').style.display = 'block'
-                        document.getElementById('github-app-authorization-dialog').style.display = 'block'
+                        showAuthDialog(true);
                         return {
                             text: "GitHub Authentication Error",
                             status: "danger"
@@ -124,11 +127,12 @@ export default function ContributionsGraph( {group_id})
     return(
         <div id="charts">
             <h3>Commits</h3>
-            <div style={{width: '400px'}}><canvas id="commits"></canvas></div>
+            <div style={{width: '800px'}}><canvas id="commits"></canvas></div>
             <h3>Additions</h3>
-            <div style={{width: '400px'}}><canvas id="additions"></canvas></div>
+            {authDialog && <GitHubAppAuthorizationDialog />}
+            <div style={{width: '800px'}}><canvas id="additions"></canvas></div>
             <h3>Deletions</h3>
-            <div style={{width: '400px'}}><canvas id="deletions"></canvas></div>
+            <div style={{width: '800px'}}><canvas id="deletions"></canvas></div>
             
         </div>
     )

@@ -55,9 +55,9 @@ export default function GitHubAppAuthorizationDialog()
     }
 
     return(
-        <div id="github-app-authorization-dialog">
-            <h3>GitHub App Authorization Required</h3>
-            <button onClick={redirectToGitHubAppAuthorization}>Authorize App</button>
-        </div>
+            <div id="github-app-authorization-dialog">
+                <h3>GitHub App Authorization Required</h3>
+                <button onClick={redirectToGitHubAppAuthorization}>Authorize App</button>
+            </div>
     )
 }
