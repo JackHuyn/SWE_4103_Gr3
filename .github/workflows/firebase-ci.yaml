@@ -91,13 +91,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pylint ruff pytest pytest-cov pytest-flask pytest-repeat firebase_admin flask flask_cors pyGithub pytz
-      - name: Build
-        run: npm run build-prod
-      - name: Archive Production Artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: dist
-          path: dist
+      # - name: Build
+      #   run: npm run build-prod
+      # - name: Archive Production Artifact
+      #   uses: actions/upload-artifact@master
+      #   with:
+      #     name: dist
+      #     path: dist
   deploy:
     name: Deploy
     needs: build
@@ -113,6 +113,6 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting
+          args: firebase deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
