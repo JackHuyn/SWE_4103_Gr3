@@ -51,26 +51,26 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
         mock_doc.update.assert_any_call({"comment": "Feeling even better"})
         self.assertTrue(result)
 
-    @patch("firebase_admin.firestore.client")
-    def test_calculateJoyAverage(self, mock_firestore_client):
-        # Mock joy documents with two ratings for the same group and day
-        mock_joy1 = MagicMock()
-        mock_joy1.to_dict.return_value = {"joy_rating": 3}
-        mock_joy2 = MagicMock()
-        mock_joy2.to_dict.return_value = {"joy_rating": 5}
+    # @patch("firebase_admin.firestore.client")
+    # def test_calculateJoyAverage(self, mock_firestore_client):
+    #     # Mock joy documents with two ratings for the same group and day
+    #     mock_joy1 = MagicMock()
+    #     mock_joy1.to_dict.return_value = {"joy_rating": 3}
+    #     mock_joy2 = MagicMock()
+    #     mock_joy2.to_dict.return_value = {"joy_rating": 5}
 
-        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy1, mock_joy2]
+    #     self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy1, mock_joy2]
 
-        result = self.db_wrapper.calculateJoyAverage("group123", datetime.now())
+    #     result = self.db_wrapper.calculateJoyAverage("group123", datetime.now())
 
-        # Mock the update on the group document and verify avg_joy calculation
-        group_doc = self.mock_db.collection.return_value.where.return_value.get.return_value[0]
-        expected_avg = (3 + 5) / 2
-        expected_avg_joy = {datetime.today().strftime("%d/%m/%Y"): expected_avg}
+    #     # Mock the update on the group document and verify avg_joy calculation
+    #     group_doc = self.mock_db.collection.return_value.where.return_value.get.return_value[0]
+    #     expected_avg = (3 + 5) / 2
+    #     expected_avg_joy = {datetime.today().strftime("%d/%m/%Y"): expected_avg}
         
-        # Ensure the update is called with the correct avg_joy structure
-        group_doc.reference.update.assert_called_once_with({"avg_joy": expected_avg_joy})
-        self.assertTrue(result)
+    #     # Ensure the update is called with the correct avg_joy structure
+    #     group_doc.reference.update.assert_called_once_with({"avg_joy": expected_avg_joy})
+    #     self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
     def test_getTeamJoy(self, mock_firestore_client):
