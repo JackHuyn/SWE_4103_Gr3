@@ -6,6 +6,8 @@ from unittest.mock import MagicMock, patch
 from datetime import datetime
 from DbWrapper.DbWrapper import DbWrapper  
 from firebase_admin import firestore  # Importing to reference firestore.SERVER_TIMESTAMP
+import datetime
+import pytz
 
 class TestDbWrapperJoyManagement(unittest.TestCase):
 
@@ -23,7 +25,7 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
         result = self.db_wrapper.addJoyRating("student1", "group123", 4, "Feeling great")
 
         # Set the expected document data with SERVER_TIMESTAMP as the sentinel value
-        timestamp = int(datetime.now().timestamp())
+        timestamp = int(datetime.datetime.now().timestamp())
         doc_id = f"student1_group123_{timestamp}"
         expected_data = {
             "student_id": "student1",
@@ -39,7 +41,7 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
 
     @patch("firebase_admin.firestore.client")
     def test_updateJoyRating(self, mock_firestore_client):
-        timestamp = int(datetime.now().timestamp())
+        timestamp = int(datetime.datetime.now().timestamp())
         doc_id = f"student1_group123_{timestamp}"
         mock_doc = MagicMock()
         self.mock_db.collection.return_value.document.return_value = mock_doc
@@ -53,20 +55,30 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
 
     @patch("firebase_admin.firestore.client")
     def test_calculateJoyAverage(self, mock_firestore_client):
-        # Mock joy documents with two ratings for the same group and day
+        # Define the group_id and test date
+        group_id = "group123"
+        test_date = datetime.datetime(2024, 11, 7)
+        timezone = pytz.timezone('Etc/GMT+4')
+        
+        # Mock joy documents with joy ratings for the same group and day
         mock_joy1 = MagicMock()
         mock_joy1.to_dict.return_value = {"joy_rating": 3}
         mock_joy2 = MagicMock()
         mock_joy2.to_dict.return_value = {"joy_rating": 5}
 
-        self.mock_db.collection.return_value.where.return_value.stream.return_value = [mock_joy1, mock_joy2]
+        self.mock_db.collection.return_value.where.return_value.where.return_value.where.return_value.get.return_value = [mock_joy1, mock_joy2]
 
-        result = self.db_wrapper.calculateJoyAverage("group123", datetime.now())
+        # Mock the group document to be updated
+        group_doc = MagicMock()
+        group_doc.to_dict.return_value = {"avg_joy": {}}
+        self.mock_db.collection.return_value.where.return_value.get.return_value = [group_doc]
 
-        # Mock the update on the group document and verify avg_joy calculation
-        group_doc = self.mock_db.collection.return_value.where.return_value.get.return_value[0]
-        expected_avg = (3 + 5) / 2
-        expected_avg_joy = {datetime.today().strftime("%d/%m/%Y"): expected_avg}
+        # Call the function
+        result = self.db_wrapper.calculateJoyAverage(group_id, test_date)
+
+        # Calculate the expected average
+        expected_avg = round((3 + 5) / 2, 2)
+        expected_avg_joy = {test_date.strftime("%d/%m/%Y"): expected_avg}
         
         # Ensure the update is called with the correct avg_joy structure
         group_doc.reference.update.assert_called_once_with({"avg_joy": expected_avg_joy})
