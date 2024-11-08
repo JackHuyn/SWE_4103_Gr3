@@ -58,7 +58,7 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
         # Define the group_id and test date
         group_id = "group123"
         test_date = datetime.datetime(2024, 11, 7)
-        timezone = pytz.timezone('Etc/UTC-4')
+        timezone = pytz.timezone('Etc/GMT+3')
         
         # Mock joy documents with joy ratings for the same group and day
         mock_joy1 = MagicMock()
