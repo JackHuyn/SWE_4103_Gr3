@@ -267,7 +267,10 @@ if (projectData) {
             </div>
             <div className="projects-grid">
               {projectData?.projects?.map((projects, index) => (
-                <Link href={'/projects/' + projects.project_id}> 
+                <Link href={{
+                  pathname: '/c/[course_slug]/p/[project_slug]/',
+                  query: {course_slug: projects.course_id, project_slug: projects.project_id}}
+                  }> 
                 <div key={index} className="project-card">
                   
                   {projects.project_name}
