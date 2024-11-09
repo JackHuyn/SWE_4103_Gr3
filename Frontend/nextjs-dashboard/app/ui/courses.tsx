@@ -290,7 +290,11 @@ export default function Courses() {
                         <div className="courses">
                             {courseList.map((course, index) => (
                                 
-                                <Link href ={'/courses/' + course.course_id} className = "link">
+                                <Link 
+                                    href={{
+                                        pathname: '/c/[slug]',
+                                        query: {slug: course.course_id}}
+                                     } className = "link">
                                 <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                     <h3 className="course-title">{course.course_id}</h3>
 
