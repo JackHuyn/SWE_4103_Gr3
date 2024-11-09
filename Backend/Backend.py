@@ -636,6 +636,57 @@ def add_a_student():
         )
         return response
 #----------------------------------
+#Author: Sarun Weerakul
+#This route remove project from course
+@app.route('/remove-project', methods=['POST'])
+@cross_origin()
+def remove_project():
+    try:
+        data = request.get_json()
+        course_id = data.get('course_id',"")
+        project_name = data.get('project_name', "")
+        print(project_name)
+        print(type(project_name))
+        if not (project_name):
+            raise ValueError("Missing required fields")
+        course_data_projects = (dbWrapper.getCourseProjects(course_id))
+        project_id = ""
+        for project in course_data_projects:
+            if project_name == project['project_name']:
+                project_id = project['project_id']
+        if project_id == "":
+            raise ValueError("Project not found")
+        success = dbWrapper.removeProject(project_id)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Project removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove project'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])
