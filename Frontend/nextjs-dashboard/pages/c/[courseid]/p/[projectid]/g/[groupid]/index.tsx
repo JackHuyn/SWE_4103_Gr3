@@ -40,7 +40,7 @@ export default function Metrics() {
     useEffect(() => {
         checkSessionAndFetchData();
         if (router.isReady) {
-            const group_id = router.query.group_id;
+            const group_id = router.query.groupid;
             setGroupId(group_id);
             console.log("Group ID:", group_id);
         }

@@ -38,7 +38,7 @@ export default function ProjectDetails(){
 
     useEffect(() => {
 
-        setCourseId(searchParams.get('course_id'))
+        setCourseId(router.query.courseid)
         
         if (localId && projectid) {
           const fetchData = async () => {
@@ -172,13 +172,10 @@ export default function ProjectDetails(){
               </div>
               <div className="projects-grid" >
                 {groupDetails?.groups?.map((groups, index) => (
-                  <Link href={{pathname: '/projects/' + projectid + '/' + groups.group_id,
-                    query:{
-                      course_id: courseid,
-                      group_id: groups.group_id
-
-                    }
-                  }}> 
+                  <Link href={{
+                    pathname: '/c/[course_slug]/p/[project_slug]/g/[group_slug]',
+                    query: {course_slug: courseid, project_slug: projectid, group_slug: groups.group_id}}
+                  }> 
                   <div key={index} className="project-card">
                     {groups.group_name}
                   </div>
