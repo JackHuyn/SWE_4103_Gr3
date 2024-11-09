@@ -654,6 +654,7 @@ def remove_project():
         for project in course_data_projects:
             if project_name == project['project_name']:
                 project_id = project['project_id']
+                break
         if project_id == "":
             raise ValueError("Project not found")
         success = dbWrapper.removeProject(project_id)

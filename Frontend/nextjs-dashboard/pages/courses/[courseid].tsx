@@ -212,7 +212,7 @@ const handleRemoveProject = async () => {
             }
         } catch (error) {
             console.error('Error sending request:', error);
-            alert('Error adding project. Please try again later.');
+            alert('Error removing project. Please try again later.');
         }
     } else {
         alert('Please fill in all the fields.');
