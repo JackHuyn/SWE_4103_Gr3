@@ -341,7 +341,7 @@ if (projectData) {
                       <button className="popup_button" onClick={handleAddProject}>
                           Add Project
                       </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
+                      <button className="cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
                           Cancel
                       </button>
                   </div>
@@ -376,7 +376,7 @@ if (projectData) {
                       <button className="popup_button" onClick={handleAddStudent}>
                           Add Student
                       </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsStudentPopupVisible(false)}>
+                      <button className="cancel_button" onClick={() => setIsStudentPopupVisible(false)}>
                           Cancel
                       </button>
                   </div>

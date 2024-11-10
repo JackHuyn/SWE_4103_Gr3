@@ -94,8 +94,8 @@ async function validateInstructorKey(key) {
                 throw 'Invalid Instructor Key'
             closeDialogs()
             instructor_key = key
-            document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
-            document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
+            document.getElementById("instructor_type_selector").style.backgroundColor = "#9c88ff"
+            document.getElementById("student_type_selector").style.backgroundColor = "#ff7675"
             account_type = 1
             
         } catch(err) {
@@ -156,8 +156,8 @@ export default function SignupForm()
 
     async function studentTypeSelected() 
     {
-        document.getElementById("instructor_type_selector").style.backgroundColor = "var(--selectorItemNotSelected)"
-        document.getElementById("student_type_selector").style.backgroundColor = "var(--selectorItemSelected)"
+        document.getElementById("instructor_type_selector").style.backgroundColor = "#ff7675"
+        document.getElementById("student_type_selector").style.backgroundColor = "#9c88ff"
         account_type = 0
     }
 
