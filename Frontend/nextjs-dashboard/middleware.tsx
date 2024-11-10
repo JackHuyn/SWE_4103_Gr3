@@ -6,8 +6,10 @@ import {NextResponse, type NextRequest } from "next/server";
 //Ensures that the connection is not stale by verifying the user session is valid using idToken
 export async function middleware(request: NextRequest){
 
-    
-    if (request.nextUrl.pathname.startsWith('/courses') || request.nextUrl.pathname.startsWith('/projects')) {
+    console.log('PATH NAME:  ', request.nextUrl.pathname)
+    if (!request.nextUrl.pathname.startsWith('/auth/login') && 
+        !request.nextUrl.pathname.startsWith('/auth/signup') &&
+        !request.nextUrl.pathname.startsWith('/_next/')) {
 
         //get the cookies
         const tokenId = request.cookies.get("idToken")?.value
@@ -16,15 +18,16 @@ export async function middleware(request: NextRequest){
         //check if cookies exist ? 
         if(!tokenId || !localId) {
             return NextResponse.redirect(new URL('/auth/login', request.url))
-
         }
 
         const res = await fetch('http://localhost:3001/auth/validate-session?localId=' + localId + '&idToken=' + tokenId)
         const data = await res.json()
 
+        console.log(data)
+
         const approved = data.approved
         
-        if (approved!=false) {
+        if (approved.status == true) {
 
             const status = data.approved.status 
             const uid = data.approved.uid
@@ -40,7 +43,7 @@ export async function middleware(request: NextRequest){
         }
          
 
-       return NextResponse.next()
+        return NextResponse.redirect(new URL('/auth/login', request.url))
 
 
     }
