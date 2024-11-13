@@ -17,6 +17,8 @@ export default function CourseDetails() {
   const [courseDetails, setCourseDetails] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [studentList, setStudentList] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [removedStudents, setRemovedStudents] = useState([]);
   const [projectData, setProjectData] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [newStudentFName, setNewStudentFName] = useState('');
@@ -263,37 +265,60 @@ const handleAddStudent = async () => {
 };
 //-----------------------------------------------------
 //-------------------- Add Students -------------------
+//Function: set visibiliy of uploadStudent popup
 const uploadStudents = () =>{
-  setIsStudentPopup2Visible(true);
+    setIsStudentPopup2Visible(true);
 };
-
 //-----------------------------------------------------
 //------------------ Remove Students ------------------
-const removeStudent = () =>{
+//Function: set visibiliy of removeStudents popup
+const removeStudents = () =>{
     setIsStudentPopup3Visible(true);
 };
-
-/**useEffect(() => {
-  if (isProjectPopupVisible && inputRef.current) {
-      inputRef.current.focus(); // Focus the input field when the popup is shown
-  }
-}, [isProjectPopupVisible]);**/
-
-/**useEffect(() => {
-const handleEscapeKey = (event) => {
-    if (event.key === 'Escape' && isProjectPopupVisible) {
-        setIsProjectPopupVisible(false); // Close the popup when Escape is pressed
+//Function: handle checkbox change
+const handleCheckboxChange = (studentId) => {
+    setSelectedStudents((prevSelected) => {
+        if (prevSelected.includes(studentId)) {
+            return prevSelected.filter((id) => id !== studentId);
+        } else {
+            return [...prevSelected, studentId];
+        }
+    });
+};
+//Function: handle remove students
+const handleRemoveStudents = async () => {
+    const localId  = Cookies.get('localId')
+    if (!localId){
+        window.location.href = "/auth/login"
+    }
+    const studentsToRemove = studentData?.students?.filter(student => selectedStudents.includes(student.uid));
+    setRemovedStudents(studentsToRemove); // Store removed students in the state
+    setSelectedStudents([]); // Clear the selected students after removal
+    const removedList = {
+        course_id: courseid,
+        remove_list: studentsToRemove
+    };
+    try { 
+        const response = await fetch('http://localhost:3001/remove-students-course' , {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json',},
+            body: JSON.stringify(removedList),
+        });
+        const result = await response.json();
+        if (response.ok) {
+            window.location.reload();
+            alert('removed successfully!');
+            window.location.reload();
+        } else {
+            alert(`Error removing students: ${result.reason}`);
+        }
+    } catch (error) {
+    console.error('Error sending request:', error);
+    alert('Error removing student. Please try again later.');
     }
 };
+//-----------------------------------------------------
 
-// Add event listener for keydown
-document.addEventListener('keydown', handleEscapeKey);
-
-// Cleanup function to remove event listener when component unmounts
-return () => {
-    document.removeEventListener('keydown', handleEscapeKey);
-};
-}, [isProjectPopupVisible]);**/
 if (projectData) {
     return (
       <div className="page-wrapper">
@@ -344,7 +369,7 @@ if (projectData) {
                   <div className="options-menu">
                     <a onClick={addStudent}>Add a Student</a>
                     <a onClick={uploadStudents}>Upload list</a>
-                    <a onClick={removeStudent}>Remove Students</a>
+                    <a onClick={removeStudents}>Remove Students</a>
                   </div>
                 </div>
               )}
@@ -462,27 +487,34 @@ if (projectData) {
           <div className="popup_content">
             <h1>Select Student to Remove</h1>
             <div className="checkbox-list">
-              <div>
-                {"Student Name\tTo Remove"}
+              <div className="checkbox-header">
+                <div className="header-item">Student Name</div>
+                <div className="header-item">To Remove</div>
               </div>
               {studentData?.students?.map((student, index) => (
-                      <div className="checkbox-item" key={index}>
-                        <div>
-                          {student.first_name+"\t"+student.last_name}
-                        </div>
-                        <div>
-                          <input type="checkbox"/>
-                        </div>
-                      </div>
-                    ))}
+                <div className="checkbox-item" key={index}>
+                  <div className="student-name">
+                    {student.first_name+" "+student.last_name}
                   </div>
-                  <div className="popup_buttons">
-                      <Button className="popup_button" onClick={handleRemoveProject}>
-                          Remove
-                      </Button>
-                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
-                          Cancel
-                      </Button>
+                  <div className="checkbox-column">
+                    <div className="checkbox-wrapper">
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange(student.uid)}
+                        checked={selectedStudents.includes(student.uid)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="popup_buttons">
+              <Button className="popup_button" onClick={handleRemoveStudents}>
+                  Remove
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
+                  Cancel
+              </Button>
             </div>
           </div>
         </div>

@@ -239,23 +239,6 @@ def upload():
         print(list_of_emails)
         users_not_found = []
 
-        """
-        #------- add only students who have account -------
-        #Send emails to backend and retrieve their student id's
-        for email in list_of_emails:
-            user_dict = dbWrapper.findUser(email)
-            if user_dict != None:
-                user_id = user_dict['uid']
-                if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
-                    print(user_id + ':Add\tDone')
-                else:
-                    print(user_id + ':Add\tFail')
-            else:
-                # add not found emails to a not found list
-                users_not_found.append(email)
-        print('No accounts were found for the following email addresses: ', users_not_found)
-        #----------------------------------------------------------------------
-        """
         #------- create account for invalid student and all in the class -------
         for info in list_of_students:
             fname = info.split(",")[0]
@@ -488,23 +471,6 @@ def get_course_data():
         return response
 
     
-#Author: Sarun Weerakul
-#convert student id to email
-@app.route('/convert_id_to_email', methods=['GET', 'POST'])
-@cross_origin()
-def get_users_data():
-    data = request.args.get("uids","")
-    data_array = data.split(",") if data else []
-    users_data = []
-    for uid in data_array:
-        doc = dbWrapper.getUserData(uid)
-        if doc is None:
-            return {"error": "User not found"}, 404
-        else:
-            email = doc['email']
-            if email:
-                users_data.append(email)
-    return jsonify({"emails": users_data}) if users_data else jsonify({"message": "No valid emails found"}), 200
 #----------------------------------
 #Author: Sarun Weerakul
 #This route displays student info
@@ -678,6 +644,41 @@ def remove_project():
             status=400,
             mimetype='application/json'
         )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route remove students from course
+@app.route('/remove-students-course', methods=['POST'])
+@cross_origin()
+def remove_students_course():
+    try:
+        data = request.get_json()
+        course_id = data.get('course_id',"")
+        remove_list = data.get('remove_list', [])
+        success = False
+        for student in remove_list:
+            print(student['uid'])
+            success = True
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Project removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove project'}),
+                status=500,
+                mimetype='application/json'
+            )
         return response
     except Exception as e:
         print(e)
