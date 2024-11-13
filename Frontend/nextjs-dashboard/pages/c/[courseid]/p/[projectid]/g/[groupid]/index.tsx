@@ -69,6 +69,7 @@ export default function Metrics() {
             <div className="metrics-buttons">
                 <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
                 <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
+                <button className="metrics-button">Survey//soon</button>
             </div>
 
             <div className="metrics-content">
