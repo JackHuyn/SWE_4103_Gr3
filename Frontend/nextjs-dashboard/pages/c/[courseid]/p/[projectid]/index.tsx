@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import FileUpload from '@/app/ui/upload-form'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
@@ -91,8 +90,7 @@ const handleAddGroup = async () => {
     window.location.href = "/auth/login"
   }
   const groupData = {              
-    project_id: projectid,
-    group_name: newGroupName          
+    project_id: projectid,       
   };
   try {              
     //Need to have checks to ensure that the instructor is valid 
@@ -162,13 +160,6 @@ const handleAddGroup = async () => {
         <div className="popup">
           <div className="popup_content">
             <h2>Add New Group</h2>
-            <input
-              ref={inputRef}
-              type="text"
-              value={newGroupName}
-              onChange={(e) => setNewGroupName(e.target.value)}
-              placeholder="Group Name"
-            />
             <div className="popup_buttons">
               <Button className="popup_button" onClick={handleAddGroup}>
                   Add
