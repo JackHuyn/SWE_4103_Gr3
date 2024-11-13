@@ -427,7 +427,6 @@ def get_course_data():
             status = 200,
             mimetype='applicaion/json'
         )
-        print(course_data)
 
         if course_data:
             # Convert dictionary to JSON for frontend use
