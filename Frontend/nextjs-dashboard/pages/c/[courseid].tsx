@@ -4,6 +4,7 @@ import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
+import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
@@ -22,10 +23,11 @@ export default function CourseDetails() {
   const [newStudentLName, setNewStudentLName] = useState('');
   const [newStudentEmail, setNewStudentEmail] = useState('');
   const localId = Cookies.get('localId');
-  const [isProjectPopup1Visible, setIsProjectPopup1Visible] = useState(false); //To add
-  const [isProjectPopup2Visible, setIsProjectPopup2Visible] = useState(false); //To remove
-  const [isStudentPopup1Visible, setIsStudentPopup1Visible] = useState(false); //To add
-  const [isStudentPopup2Visible, setIsStudentPopup2Visible] = useState(false); //To remove
+  const [isProjectPopup1Visible, setIsProjectPopup1Visible] = useState(false); //add project
+  const [isProjectPopup2Visible, setIsProjectPopup2Visible] = useState(false); //remove project
+  const [isStudentPopup1Visible, setIsStudentPopup1Visible] = useState(false); //add a student
+  const [isStudentPopup2Visible, setIsStudentPopup2Visible] = useState(false); //add students
+  const [isStudentPopup3Visible, setIsStudentPopup3Visible] = useState(false); //remove students
   const [newProjectName, setNewProjectName] = useState('');
   const [isPopupVisible, setIsPopupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents
@@ -219,7 +221,7 @@ const handleRemoveProject = async () => {
     }
 };
 //-----------------------------------------------------
-//-------------------- Add Student --------------------
+//------------------- Add a Student -------------------
 //Function: set visibiliy of addStudent popup
 const addStudent = () => {
     setIsStudentPopup1Visible(true);
@@ -260,6 +262,17 @@ const handleAddStudent = async () => {
     }
 };
 //-----------------------------------------------------
+//-------------------- Add Students -------------------
+const uploadStudents = () =>{
+  setIsStudentPopup2Visible(true);
+};
+
+//-----------------------------------------------------
+//------------------ Remove Students ------------------
+const removeStudent = () =>{
+    setIsStudentPopup3Visible(true);
+};
+
 /**useEffect(() => {
   if (isProjectPopupVisible && inputRef.current) {
       inputRef.current.focus(); // Focus the input field when the popup is shown
@@ -326,7 +339,14 @@ if (projectData) {
             <div className="section-header">
               <h2>Students</h2>
               {userRole === '1' && (
-                <button className="add-button" onClick={addStudent}>+</button>
+                <div className="options-container">
+                  <button className="options-button">⋮</button>
+                  <div className="options-menu">
+                    <a onClick={addStudent}>Add a Student</a>
+                    <a onClick={uploadStudents}>Upload list</a>
+                    <a onClick={removeStudent}>Remove Students</a>
+                  </div>
+                </div>
               )}
             </div>
             <div className="students-list">
@@ -341,29 +361,7 @@ if (projectData) {
             <p className="view-all">View all</p>
           </div>
         </div>
-
-        {isPopupVisible && (
-          <div className="popup">
-            <div className="popup_content">
-              <h2>Upload CSV</h2>
-              <input type="file" accept=".csv" onChange={handleFileChange} />
-              <div className="popup_buttons">
-                <button className="popup_button upload" onClick={handleUpload}>
-                  Upload
-                </button>
-                <button className="popup_button cancel_button" onClick={() => setIsPopupVisible(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Reuse FileUpload Component */}
-        
-        {localId && courseid && userRole=='1' &&(
-          <FileUpload localId={localId} courseId={courseid as string} />
-        )}
+   
       {/*Handle add project*/}
       {isProjectPopup1Visible && (
           <div className="popup">
@@ -377,12 +375,12 @@ if (projectData) {
                       placeholder="Project Name"/>
 
                   <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleAddProject}>
+                      <Button className="popup_button" onClick={handleAddProject}>
                           Add Project
-                      </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsProjectPopup1Visible(false)}>
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup1Visible(false)}>
                           Cancel
-                      </button>
+                      </Button>
                   </div>
               </div>
           </div>
@@ -410,7 +408,7 @@ if (projectData) {
               </div>
           </div>
       )}          
-
+      {/*Handle add student*/}
       {isStudentPopup1Visible && (
           <div className="popup">
               <div className="popup_content">
@@ -435,17 +433,60 @@ if (projectData) {
                       placeholder="Email"/>
 
                   <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleAddStudent}>
+                      <Button className="popup_button" onClick={handleAddStudent}>
                           Add Student
-                      </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsStudentPopup1Visible(false)}>
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup1Visible(false)}>
                           Cancel
-                      </button>
+                      </Button>
                   </div>
               </div>
           </div>
         )}
-
+      {/*Handle upload students*/}
+      {isStudentPopup2Visible && (
+        <div className="popup">
+          <div className="popup_content">
+            <FileUpload localId={localId} courseId={courseid as string} />
+            <div className="popup_buttons">
+                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
+                          Cancel
+                      </Button>
+                  </div>
+          </div>
+        </div>
+      )}
+      {/*Handle remove student////////////////////////////*/}
+      {isStudentPopup3Visible && (
+        <div className="popup">
+          <div className="popup_content">
+            <h1>Select Student to Remove</h1>
+            <div className="checkbox-list">
+              <div>
+                {"Student Name\tTo Remove"}
+              </div>
+              {studentData?.students?.map((student, index) => (
+                      <div className="checkbox-item" key={index}>
+                        <div>
+                          {student.first_name+"\t"+student.last_name}
+                        </div>
+                        <div>
+                          <input type="checkbox"/>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="popup_buttons">
+                      <Button className="popup_button" onClick={handleRemoveProject}>
+                          Remove
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
+                          Cancel
+                      </Button>
+            </div>
+          </div>
+        </div>
+      )}          
       </div>
 
       
