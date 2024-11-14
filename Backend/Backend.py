@@ -668,13 +668,50 @@ def remove_students_course():
             success = True
         if success:
             response = app.response_class(
-                response=json.dumps({'approved': True, 'message': 'Project removed successfully'}),
+                response=json.dumps({'approved': True, 'message': 'Students removed successfully'}),
                 status=200,
                 mimetype='application/json'
             )
         else:
             response = app.response_class(
-                response=json.dumps({'approved': False, 'reason': 'Failed to remove project'}),
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove students'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route remove groups from project
+@app.route('/remove-groups', methods=['POST'])
+@cross_origin()
+def remove_groups():
+    try:
+        data = request.get_json()
+        remove_list = data.get('remove_list', [])
+        success = False
+        for group in remove_list:
+            if dbWrapper.removeGroup(group['group_id']):
+                success = True
+            else:
+                success = False
+                break
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Groups removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove groups'}),
                 status=500,
                 mimetype='application/json'
             )

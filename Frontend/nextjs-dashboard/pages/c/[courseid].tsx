@@ -481,7 +481,7 @@ if (projectData) {
           </div>
         </div>
       )}
-      {/*Handle remove student////////////////////////////*/}
+      {/*Handle remove student*/}
       {isStudentPopup3Visible && (
         <div className="popup">
           <div className="popup_content">
@@ -493,7 +493,7 @@ if (projectData) {
               </div>
               {studentData?.students?.map((student, index) => (
                 <div className="checkbox-item" key={index}>
-                  <div className="student-name">
+                  <div className="checkbox-name">
                     {student.first_name+" "+student.last_name}
                   </div>
                   <div className="checkbox-column">

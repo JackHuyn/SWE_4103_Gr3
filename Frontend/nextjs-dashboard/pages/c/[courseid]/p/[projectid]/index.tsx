@@ -25,10 +25,13 @@ export default function ProjectDetails(){
   const { projectid } = router.query;
   const [groupDetails, setGroupDetails] = useState(null);
   const localId = Cookies.get('localId');
-  const [isGroupPopupVisible, setIsGroupPopupVisible] = useState(false);
   const [courseid, setCourseId] = useState(null);
   const [newGroupName, setNewGroupName] = useState('');
   const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
+  const [isRemoveGroupVisible, setIsRemoveGroupVisible] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState([]);
+  const [removedGroups, setRemovedGroups] = useState([]);
+  const [groupData, setgroupData] = useState([]);
   const [userRole, setUserRole] = useState('')  
   const [loading,setLoading] = useState(true) // Loading state
   const inputRef = useRef(null); // Create a ref for the input field
@@ -90,7 +93,7 @@ const handleAddGroup = async () => {
     window.location.href = "/auth/login"
   }
   const groupData = {              
-    project_id: projectid,       
+    project_id: projectid
   };
   try {              
     //Need to have checks to ensure that the instructor is valid 
@@ -115,6 +118,53 @@ const handleAddGroup = async () => {
   }    
 };
 //-------------------------------------------------
+//------------------ Remove Group -----------------
+//Function: set visibiliy of removeGroups popup
+const removeGroups = () =>{
+  setIsRemoveGroupVisible(true);
+};
+//Function: handle checkbox change
+const handleCheckboxChange = (groupId) => {
+  setSelectedGroups((prevSelected) => {
+      if (prevSelected.includes(groupId)) {
+          return prevSelected.filter((id) => id !== groupId);
+      } else {
+          return [...prevSelected, groupId];
+      }
+  });
+};
+//Function: handle remove groups
+const handleRemoveGroups = async () => {
+  const localId  = Cookies.get('localId')
+  if (!localId){
+      window.location.href = "/auth/login"
+  }
+  const groupsToRemove = groupDetails?.groups?.filter(group => selectedGroups.includes(group.group_id));
+  setRemovedGroups(groupsToRemove); // Store removed groups in the state
+  setSelectedGroups([]); // Clear the selected groups after removal
+  const removedList = {
+      remove_list: groupsToRemove
+  };
+  try { 
+      const response = await fetch('http://localhost:3001/remove-groups' , {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(removedList),
+      });
+      const result = await response.json();
+      if (response.ok) {
+          window.location.reload();
+          alert('removed successfully!');
+          window.location.reload();
+      } else {
+          alert(`Error removing groups: ${result.reason}`);
+      }
+  } catch (error) {
+  console.error('Error sending request:', error);
+  alert('Error removing group. Please try again later.');
+  }
+};
+//-------------------------------------------------
 
   return (
     <div className="page-wrapper">
@@ -133,7 +183,7 @@ const handleAddGroup = async () => {
                 <button className="options-button">⋮</button>
                 <div className="options-menu">
                   <a onClick={addGroup}>Add Group</a>
-                  <a >Remove Group//</a>
+                  <a onClick={removeGroups}>Remove Group</a>
                   <a >Group Mambers//</a>
                   <a >Set Scrum Masters//</a>
                 </div>
@@ -171,6 +221,44 @@ const handleAddGroup = async () => {
           </div>
         </div>
       )}
+      {/*Handle remove student*/}
+      {isRemoveGroupVisible && (
+        <div className="popup">
+          <div className="popup_content">
+            <h2>Select Group to Remove</h2>
+            <div className="checkbox-list">
+              <div className="checkbox-header">
+                <div className="header-item">Group Name</div>
+                <div className="header-item">To Remove</div>
+              </div>
+              {groupDetails?.groups?.map((group, index) => (
+                <div className="checkbox-item" key={index}>
+                  <div className="checkbox-name">
+                    {group.group_name}
+                  </div>
+                  <div className="checkbox-column">
+                    <div className="checkbox-wrapper">
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange(group.group_id)}
+                        checked={selectedGroups.includes(group.group_id)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="popup_buttons">
+              <Button className="popup_button" onClick={handleRemoveGroups}>
+                  Remove
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsRemoveGroupVisible(false)}>
+                  Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}          
   
         
     </div> 

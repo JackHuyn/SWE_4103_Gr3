@@ -112,7 +112,7 @@
     width: 100%;
 }
 
-.student-name {
+.checkbox-name {
     flex: 1;
     text-align: left;
     padding-left: 10px;
