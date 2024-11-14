@@ -6,7 +6,7 @@ import {NextResponse, type NextRequest } from "next/server";
 //Ensures that the connection is not stale by verifying the user session is valid using idToken
 export async function middleware(request: NextRequest){
 
-    console.log('PATH NAME:  ', request.nextUrl.pathname)
+    // console.log('PATH NAME:  ', request.nextUrl.pathname)
     if (!request.nextUrl.pathname.startsWith('/auth/login') && 
         !request.nextUrl.pathname.startsWith('/auth/signup') &&
         !request.nextUrl.pathname.startsWith('/_next/')) {

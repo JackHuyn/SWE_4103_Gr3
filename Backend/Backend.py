@@ -179,16 +179,73 @@ def check_instructor_role():
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
 def validate_session():
-    local_id = request.args.get("localId", default = -1, type = str)
-    id_token = request.args.get("idToken", default = -1, type = str)
+    local_id = request.args.get("localId", default = "", type = str)
+    id_token = request.args.get("idToken", default = "", type = str)
     valid = firebase_auth.validate_token(local_id, id_token)
     response = app.response_class(
         response=json.dumps({'approved': valid}),
         status=200 if valid else 401,
         mimetype='application/json'
     )
-    print(response.response)
+    # print(response.response)
     return response
+
+@app.route('/auth/password-reset', methods=['POST'])
+@cross_origin()
+def password_change():
+    local_id = request.args.get("localId", default = "", type = str)
+    current_password = request.args.get("currentPassword", default = "", type = str)
+    password = request.args.get("password", default = "", type = str)
+    try:
+        userdata = firebase_auth.active_sessions[local_id]
+        uid = userdata.uid
+        email = userdata.email
+
+        login_resp = firebase_auth.sign_in_with_email_and_password(email, current_password, False)
+        if not login_resp:
+            raise fb_auth.InvalidLogin
+        valid = firebase_auth.change_password(uid, password)
+        print(valid)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except (KeyError, fb_auth.InvalidLogin) as ke:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Invlid Login'}),
+            status=401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/auth/forgot-password', methods=['POST'])
+@cross_origin()
+def forgot_password():
+    email = request.args.get("email", default = '', type = str)
+    try:
+        if email == '':
+            raise Exception
+        valid = firebase_auth.forgot_password(email)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
 
 @app.route('/auth/logout', methods=['POST'])
 @cross_origin()

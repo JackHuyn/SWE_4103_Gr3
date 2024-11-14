@@ -5,6 +5,9 @@ from  User import User as User
 class InvalidInstructorKeyException(Exception):
     pass
 
+class InvalidLogin(Exception):
+    pass
+
 class FirebaseAuth:
 
     def __init__(self, db, auth, api_key) -> None:
@@ -12,6 +15,11 @@ class FirebaseAuth:
         self.auth = auth
         self.api_key = api_key
         self.active_sessions = {}
+        self.action_code_settings = self.auth.ActionCodeSettings(
+            url='http://localhost:3000/auth/password-reset',
+            handle_code_in_app=False
+        )
+
 
 
     def sign_up_with_email_and_password(self, fname, lname, email, password):
@@ -66,12 +74,26 @@ class FirebaseAuth:
         try:
             decoded_token = self.auth.verify_id_token(id_token)
         except Exception as e:
-            print("INVALID TOKEN")
+            print("INVALID TOKEN: ", e)
             self.end_session(local_id)
             return False
         uid = decoded_token['uid']
         
         return {'status': True, 'uid':uid}
+    
+    def change_password(self, uid:str, new_password:str):
+        return True if (self.auth.update_user(uid, password=new_password)) else False
+
+    def forgot_password(self, email:str):
+        payload = json.dumps({"email":email, "requestType": "PASSWORD_RESET"})
+        rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
+
+        r = requests.post(rest_api_url,
+                    params={"key": self.api_key},
+                    data=payload)
+        reset_resp = r.json()
+        print(reset_resp)
+        return r.status_code == 200
     
     def validate_instructor_key(self, provided_key):
         return provided_key == 'D6B74'

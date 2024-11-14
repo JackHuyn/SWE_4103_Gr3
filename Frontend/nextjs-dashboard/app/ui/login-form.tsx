@@ -107,6 +107,7 @@ export default function LoginForm() {
                   />
                   
               </div>
+              <a href="/auth/forgot-password">Forgot Password?</a>
               <Button type="submit" id="login_button">Sign in</Button>
             </div>
           </div>

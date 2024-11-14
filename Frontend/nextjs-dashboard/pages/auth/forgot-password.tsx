@@ -6,19 +6,9 @@ import Cookies from 'js-cookie';
 export default function PasswordReset() {
     async function submitPasswordChangeRequest() 
     {
-        const local_id = Cookies.get('localId')
+        const email = document.getElementById('email').value
 
-        const current_password = document.getElementById('current-password').value
-        const password = document.getElementById('password').value
-        const confirm_password = document.getElementById('confirm-password').value
-
-        if(password != confirm_password)
-        {
-            document.getElementById('password-reset-error').innerText = 'Passwords Do Not Match'
-            return false;
-        }
-
-        await fetch("http://127.0.0.1:3001/auth/password-reset?localId="+local_id+"&currentPassword="+current_password+"&password="+password,
+        await fetch("http://127.0.0.1:3001/auth/forgot-password?email="+email,
             {
                 method: 'POST'
             }
@@ -54,9 +44,11 @@ export default function PasswordReset() {
                 
             } catch(err) {
                 console.log(err)
+                document.getElementById('password-reset-error').innerText = err
             }
         }).catch((error) => {
             console.log(error)
+            
         })
     }
 
@@ -64,12 +56,8 @@ export default function PasswordReset() {
         <form onSubmit={submitPasswordChangeRequest} id="password-reset-form">
             <h1>PASSWORD RESET</h1>
             <div>
-                <label htmlFor="current-password">Current Password:</label>
-                <input type="password" name="current-password" id="current-password" />
-                <label htmlFor="password">New Password:</label>
-                <input type="password" name="password" id="password" />
-                <label htmlFor="confirm-password">Confirm New Password:</label>
-                <input type="password" name="confirm-password" id="confirm-password" />
+                <label htmlFor="email">Email:</label>
+                <input type="email" name="email" id="email" />
             </div>
             <span id="password-reset-error"></span>
             <button type='button' onClick={submitPasswordChangeRequest}>Submit</button>
