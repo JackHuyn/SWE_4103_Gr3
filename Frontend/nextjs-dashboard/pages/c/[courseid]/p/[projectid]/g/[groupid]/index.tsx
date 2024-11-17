@@ -16,6 +16,7 @@ export default function Metrics() {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
+    const [isScrumMaster, setIsScrumMaster] = useState(false)
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
@@ -68,7 +69,7 @@ export default function Metrics() {
 
             <div className="metrics-buttons">
                 <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
-                <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
+                {isScrumMaster && (<button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>)}
             </div>
 
             <div className="metrics-content">
@@ -91,7 +92,7 @@ export default function Metrics() {
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
-                    {isPopup2Visible && (
+                    {isPopup2Visible &&  (
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
                             <TeamVelocityInput closeDialogs={closeDialogs}/>
