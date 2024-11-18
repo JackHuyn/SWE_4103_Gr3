@@ -133,7 +133,11 @@
 .students-list {
     display: flex;
     flex-direction: column;
+    padding: 8px;
+    border-radius: 4px;
     gap: 10px;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 .student-card {
