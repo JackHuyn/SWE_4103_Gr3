@@ -246,23 +246,6 @@ def upload():
         print(list_of_emails)
         users_not_found = []
 
-        """
-        #------- add only students who have account -------
-        #Send emails to backend and retrieve their student id's
-        for email in list_of_emails:
-            user_dict = dbWrapper.findUser(email)
-            if user_dict != None:
-                user_id = user_dict['uid']
-                if dbWrapper.addStudentToCourse(user_id, course_id): #add students to cs1073 for now
-                    print(user_id + ':Add\tDone')
-                else:
-                    print(user_id + ':Add\tFail')
-            else:
-                # add not found emails to a not found list
-                users_not_found.append(email)
-        print('No accounts were found for the following email addresses: ', users_not_found)
-        #----------------------------------------------------------------------
-        """
         #------- create account for invalid student and all in the class -------
         for info in list_of_students:
             fname = info.split(",")[0]
@@ -451,7 +434,6 @@ def get_course_data():
             status = 200,
             mimetype='applicaion/json'
         )
-        print(course_data)
 
         if course_data:
             # Convert dictionary to JSON for frontend use
@@ -495,23 +477,6 @@ def get_course_data():
         return response
 
     
-#Author: Sarun Weerakul
-#convert student id to email
-@app.route('/convert_id_to_email', methods=['GET', 'POST'])
-@cross_origin()
-def get_users_data():
-    data = request.args.get("uids","")
-    data_array = data.split(",") if data else []
-    users_data = []
-    for uid in data_array:
-        doc = dbWrapper.getUserData(uid)
-        if doc is None:
-            return {"error": "User not found"}, 404
-        else:
-            email = doc['email']
-            if email:
-                users_data.append(email)
-    return jsonify({"emails": users_data}) if users_data else jsonify({"message": "No valid emails found"}), 200
 #----------------------------------
 #Author: Sarun Weerakul
 #This route displays student info
@@ -642,6 +607,130 @@ def add_a_student():
             mimetype='application/json'
         )
         return response
+#----------------------------------
+#Author: Sarun Weerakul
+#This route remove project from course
+@app.route('/remove-project', methods=['POST'])
+@cross_origin()
+def remove_project():
+    try:
+        data = request.get_json()
+        course_id = data.get('course_id',"")
+        project_name = data.get('project_name', "")
+        print(project_name)
+        print(type(project_name))
+        if not (project_name):
+            raise ValueError("Missing required fields")
+        course_data_projects = (dbWrapper.getCourseProjects(course_id))
+        project_id = ""
+        for project in course_data_projects:
+            if project_name == project['project_name']:
+                project_id = project['project_id']
+                break
+        if project_id == "":
+            raise ValueError("Project not found")
+        success = dbWrapper.removeProject(project_id)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Project removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove project'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route remove students from course
+@app.route('/remove-students-course', methods=['POST'])
+@cross_origin()
+def remove_students_course():
+    try:
+        data = request.get_json()
+        course_id = data.get('course_id',"")
+        remove_list = data.get('remove_list', [])
+        success = False
+        for student in remove_list:
+            print(student['uid'])
+            success = True
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Students removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove students'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route remove groups from project
+@app.route('/remove-groups', methods=['POST'])
+@cross_origin()
+def remove_groups():
+    try:
+        data = request.get_json()
+        remove_list = data.get('remove_list', [])
+        success = False
+        for group in remove_list:
+            if dbWrapper.removeGroup(group['group_id']):
+                success = True
+            else:
+                success = False
+                break
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Groups removed successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to remove groups'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
 #----------------------------------
 
 # Jack Huynh _ Show courses 
