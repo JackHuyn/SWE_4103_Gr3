@@ -4,9 +4,11 @@ import { useEffect, useState, useRef } from 'react';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
+import HandleLogout from '@/app/ui/logout'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
+
 
 
 
@@ -259,6 +261,7 @@ if (projectData) {
           {/* Projects Section */}
 
           <div className="projects-section">
+          <button id="logout" onClick={HandleLogout}>Log Out</button>
             <div className="section-header">
               <h2>Projects</h2>
               {userRole === '1' && (

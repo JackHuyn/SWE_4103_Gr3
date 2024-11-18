@@ -190,16 +190,23 @@ def validate_session():
     print(response.response)
     return response
 
-@app.route('/auth/logout', methods=['POST'])
+@app.route('/auth/logout', methods=['GET'])
 @cross_origin()
 def logout_user():
+    print('in logout')
     local_id = request.args.get("localId", default = -1, type = str)
-    firebase_auth.end_session(local_id)
-    response = app.response_class(
-        response=json.dumps({}),
-        status=200,
-        mimetype='application/json'
-    )
+    if firebase_auth.end_session(local_id):
+        response = app.response_class(
+            response=json.dumps({'approved': True }),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        response = app.response_class(
+            response = json.dumps({'approved': False}),
+            status = 401,
+            mimetype = 'application/json'
+        )
     return response
 
 

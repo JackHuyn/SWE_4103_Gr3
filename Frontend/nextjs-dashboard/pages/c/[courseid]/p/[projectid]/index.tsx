@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
+import HandleLogout from '@/app/ui/logout';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
@@ -153,6 +154,7 @@ export default function ProjectDetails(){
 
     return (
         <div className="page-wrapper">
+          <button id="logout" onClick={HandleLogout}>Log Out</button>
           <div className="course-header">
             {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
             {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}

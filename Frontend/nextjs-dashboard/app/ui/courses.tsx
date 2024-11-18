@@ -12,6 +12,7 @@ import { Button } from './button';
 import Cookies from 'js-cookie';
 import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
 import { Router } from 'next/router';
+import HandleLogout from './logout';
 
 
 
@@ -81,16 +82,6 @@ export default function Courses() {
         fetchData();
     }, []);
 
-    const handleLogout = async() =>{
-        const localId = Cookies.get('localId')
-        if (localId) {
-            Cookies.remove('localId');  
-            Cookies.remove('idToken');  
-            window.location.href = "/auth/login";  
-        } else {
-            alert("You are already logged out.");
-        }
-    }
 
     // Show popup for adding a course
     const addCourse = () => {
@@ -251,7 +242,7 @@ export default function Courses() {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
-                <button id="logout" onClick={handleLogout}>Log Out</button>
+                <button id="logout" onClick={HandleLogout}>Log Out</button>
                     <div className="header">
                         {/* Left Section: Toggle Button and Title */}
                         <div className="header_left">

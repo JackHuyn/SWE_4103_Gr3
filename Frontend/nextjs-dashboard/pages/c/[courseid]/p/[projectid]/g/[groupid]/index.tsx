@@ -9,6 +9,7 @@ import '@/app/ui/stylesheets/metrics.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import HandleLogout from '@/app/ui/logout';
 
 export default function Metrics() {
     const router = useRouter();
@@ -17,6 +18,7 @@ export default function Metrics() {
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
     const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
     const [isScrumMaster, setIsScrumMaster] = useState(false)
+    const [userRole, setUserRole] = useState('')
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
@@ -66,6 +68,8 @@ export default function Metrics() {
             <div className="metrics-header">
                 {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
             </div>
+
+            <button id="logout" onClick={HandleLogout}>Log Out</button>
 
             <div className="metrics-buttons">
                 <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
