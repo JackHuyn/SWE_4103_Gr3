@@ -40,20 +40,22 @@ jobs:
           find . -name "__pycache__" -type d -exec rm -r {} +
           find . -name "*.pyc" -exec rm -f {} +
 
+      # Lint with Ruff
+      - name: Lint with Ruff
+        run: |
+          ruff check --output-format=github --exit-zero
+        continue-on-error: true
+      # CI
       - name: Testing
         run: |
           python -m pytest Backend/Unit_Test/
-      # # Lint with Ruff
-      # - name: Lint with Ruff
-      #   run: |
-      #     ruff check --output-format=github --exit-zero
-      #   continue-on-error: true
 
-      # Compress and upload files
-      # - name: Compress and upload log files
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: log_File
-      #     path: logFile/
-      #     if-no-files-found: error
-      #     retention-days: 7
+      # create artifact
+      Compress and upload files
+      - name: Compress and upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: log_File
+          path: logFile/
+          if-no-files-found: error
+          retention-days: 7
