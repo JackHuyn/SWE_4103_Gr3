@@ -71,7 +71,7 @@ jobs:
         run: |
           python -m pytest Backend/Unit_Test/ --junitxml=logFile/test-results.xml --cov=Backend --cov-report=xml
           
-# - name: Compress and upload log files
+      - name: Compress and upload log files
         uses: actions/upload-artifact@v4
         with:
           name: log_File
