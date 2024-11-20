@@ -3,10 +3,10 @@ name: CI Pipeline
 on: 
   push:
     branches: 
-      - '*'
+      - '*'  # Trigger on all branches for push
   pull_request:
     branches:
-      - '*'
+      - '*'  # Trigger on all branches for pull requests
 
 jobs:
   build:
@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      # Set up Python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -32,7 +34,6 @@ jobs:
           mkdir -p logFile
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-flask pytest-repeat
 
       # Remove Python cache files
       - name: Remove Python cache files
@@ -43,15 +44,37 @@ jobs:
   testing:
     runs-on: ${{ matrix.os }}
     needs:
-      - build
+      - build  # Testing depends on build
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.12.0"]
-    step:
-      # CI
-      - name: Testing
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install dependencies (same as build to ensure consistency)
+      - name: Install dependencies
         run: |
-          python -m pytest Backend/Unit_Test/
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-flask pytest-repeat
 
-
+      # Run Tests
+      - name: Run Tests
+        run: |
+          python -m pytest Backend/Unit_Test/ --junitxml=logFile/test-results.xml --cov=Backend --cov-report=xml
+          
+# - name: Compress and upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: log_File
+          path: logFile/
+          if-no-files-found: error
+          retention-days: 7
