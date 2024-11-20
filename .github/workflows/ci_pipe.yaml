@@ -72,9 +72,31 @@ jobs:
           python -m pytest Backend/Unit_Test/ --junitxml=logFile/test-results.xml --cov=Backend --cov-report=xml
           
       - name: Compress and upload log files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@master
         with:
-          name: log_File
+          name: logFile
           path: logFile/
           if-no-files-found: error
           retention-days: 7
+
+
+  deploy:
+    name: Deploy
+    needs: 
+      - build
+      - testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+      - name: Download Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: logFile
+          path: logFile/
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
