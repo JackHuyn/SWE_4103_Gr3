@@ -17,8 +17,7 @@ jobs:
         python-version: ["3.12.0"]
 
     env:
-      CI: true  # Set CI environment variable to skip Firebase initialization
-      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      CI: true  # Set CI environment variable to true
 
     steps:
       - uses: actions/checkout@v4
@@ -41,22 +40,20 @@ jobs:
           find . -name "__pycache__" -type d -exec rm -r {} +
           find . -name "*.pyc" -exec rm -f {} +
 
-      # # Lint with Ruff
-      # - name: Lint with Ruff
-      #   run: |
-      #     ruff check --output-format=github --exit-zero
-      #   continue-on-error: true
+  testing:
+    runs-on: ${{ matrix.os }}
+    needs:
+      - build
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12.0"]
+    env:
+      CI: true  # Set CI environment variable to true
+
       # CI
       - name: Testing
         run: |
           python -m pytest Backend/Unit_Test/
 
-      # create artifact
-      # Compress and upload files
-      # - name: Compress and upload log files
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: log_File
-      #     path: logFile/
-      #     if-no-files-found: error
-      #     retention-days: 7
+
