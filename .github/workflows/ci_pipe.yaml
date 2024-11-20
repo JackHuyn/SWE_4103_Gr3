@@ -51,7 +51,7 @@ jobs:
           python -m pytest Backend/Unit_Test/
 
       # create artifact
-      Compress and upload files
+      # Compress and upload files
       - name: Compress and upload log files
         uses: actions/upload-artifact@v4
         with:
