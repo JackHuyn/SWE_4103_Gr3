@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public",
+    "public": "JackHuyn/SWE_4103_Gr3",
     "ignore": [
       "firebase.json",
       "**/.*",
