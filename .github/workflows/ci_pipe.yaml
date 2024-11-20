@@ -53,10 +53,10 @@ jobs:
 
       # create artifact
       # Compress and upload files
-      - name: Compress and upload log files
-        uses: actions/upload-artifact@v4
-        with:
-          name: log_File
-          path: logFile/
-          if-no-files-found: error
-          retention-days: 7
+      # - name: Compress and upload log files
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: log_File
+      #     path: logFile/
+      #     if-no-files-found: error
+      #     retention-days: 7
