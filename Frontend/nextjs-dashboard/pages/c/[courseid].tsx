@@ -4,6 +4,7 @@ import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
+import HandleLogout from '@/app/ui/logout';
 import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';

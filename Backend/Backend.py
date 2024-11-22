@@ -1229,10 +1229,13 @@ def add_group():
         # Extract the fields from the JSON object
         #course_id = data.get('group_name', "")
         project_id = data.get('project_id', "")
+        n_groups = int(data.get('n_groups',"1"))
         #github_repo_address = data.get('github_repo_addres', "")
     
         #print('course id: ', course_id)
         print('project id : ', project_id)
+
+        
         #print('project name: ', project_name)
         #print('github_repo_address', github_repo_address) 
         # Check if all required fields are provided
@@ -1240,12 +1243,18 @@ def add_group():
             raise ValueError("Missing required fields")
 
         # Call the `addCourse` function from `DbWrapper`
-        success = dbWrapper.addGroup(
-            project_id,
-            #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
-            ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
-        )  
 
+        if (n_groups == 1):
+            success = dbWrapper.addGroup(
+                project_id,
+                #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
+                ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
+            )
+        
+        else:
+            success = dbWrapper.addNGroups(project_id,n_groups)
+
+        
         if success:
             response = app.response_class(
                 response=json.dumps({'approved': True, 'message': 'Group added successfully'}),
