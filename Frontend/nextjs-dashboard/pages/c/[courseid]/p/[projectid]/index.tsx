@@ -29,6 +29,7 @@ export default function ProjectDetails(){
   const [newGroupName, setNewGroupName] = useState('');
   const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [isRemoveGroupVisible, setIsRemoveGroupVisible] = useState(false);
+  const [isManageGroupVisible, setIsManageGroupVisible] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState([]);
   const [removedGroups, setRemovedGroups] = useState([]);
   const [groupData, setgroupData] = useState([]);
@@ -165,6 +166,12 @@ const handleRemoveGroups = async () => {
   }
 };
 //-------------------------------------------------
+//------------------ Manage Group -----------------
+//Function: set visibiliy of manageGroup popup
+const manageGroups = () =>{
+  setIsManageGroupVisible(true);
+};
+//-------------------------------------------------
 
   return (
     <div className="page-wrapper">
@@ -184,7 +191,7 @@ const handleRemoveGroups = async () => {
                 <div className="options-menu">
                   <a onClick={addGroup}>Add Group</a>
                   <a onClick={removeGroups}>Remove Group</a>
-                  <a >Group Mambers//</a>
+                  <a onClick={manageGroups}>Group Mambers</a>
                   <a >Set Scrum Masters//</a>
                 </div>
               </div>
@@ -221,7 +228,7 @@ const handleRemoveGroups = async () => {
           </div>
         </div>
       )}
-      {/*Handle remove student*/}
+      {/*Handle remove group*/}
       {isRemoveGroupVisible && (
         <div className="popup">
           <div className="popup_content">
@@ -259,7 +266,63 @@ const handleRemoveGroups = async () => {
           </div>
         </div>
       )}          
-  
+      {/*Handle set students in group*/}
+      {isManageGroupVisible && (
+        <div className="popup">
+        <div className="popup_content">
+          <h1>Set Students in Groups</h1>
+          <div className="table-container">
+            {/*Header Row*/}
+            <div className="table-header">
+              <div className="header-item">List</div>
+              {groupDetails?.groups?.map((group, index) => (
+                <div className="header-item">
+                  {group.group_name.match(/Group (.*)/)?.[1]||"N/A"}
+                </div>
+              ))}
+            </div>
+      
+            {/*Scrollable Content */}
+            <div className="table-body">
+              <div className="table-row">
+                <div className="list-item">Item 1</div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+              </div>
+              <div className="table-row">
+                <div className="list-item">Item 2</div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+                <div className="cell">
+                  <input type="checkbox" />
+                </div>
+              </div>
+              {/* Add more rows dynamically as needed */}
+            </div>
+          </div>
+          <div className="popup_buttons">
+              <Button className="popup_button" >
+                  Ok
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsManageGroupVisible(false)}>
+                  Cancel
+              </Button>
+            </div>
+        </div>
+      </div>
+      
+      )}      
         
     </div> 
   );  

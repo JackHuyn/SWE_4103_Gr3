@@ -497,13 +497,11 @@ if (projectData) {
                     {student.first_name+" "+student.last_name}
                   </div>
                   <div className="checkbox-column">
-                    <div className="checkbox-wrapper">
-                      <input
-                        type="checkbox"
-                        onChange={() => handleCheckboxChange(student.uid)}
-                        checked={selectedStudents.includes(student.uid)}
-                      />
-                    </div>
+                    <input
+                      type="checkbox"
+                      onChange={() => handleCheckboxChange(student.uid)}
+                      checked={selectedStudents.includes(student.uid)}
+                    />
                   </div>
                 </div>
               ))}

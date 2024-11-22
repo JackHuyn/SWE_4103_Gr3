@@ -137,7 +137,9 @@
     border-radius: 4px;
     gap: 10px;
     max-height: 600px;
-    overflow-y: auto;
+    overflow-y: scroll;
+    padding-right: 16px;
+    box-sizing: content-box;
 }
 
 .student-card {
