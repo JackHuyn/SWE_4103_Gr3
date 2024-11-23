@@ -131,7 +131,7 @@
     display: grid;
     grid-template-rows: auto 1fr;
     max-height: 300px;
-    width: 100%;
+    max-width: 300px;
     overflow: hidden;
     border: 1px solid #5b5b5b;
     border-radius: 10px;
