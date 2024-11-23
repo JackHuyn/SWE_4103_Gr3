@@ -149,6 +149,45 @@ def getStudentList(local_id):
     course_data = dbWrapper.getCourseData(local_id)
     return course_data['student_ids']
 
+#Helper to get group data
+def getGroupData(group_id):
+    group_data = dbWrapper.getGroupData(group_id)
+    return group_data
+
+
+@app.route('/check-scrum-master',methods=['GET'])
+@cross_origin()
+def check_scrum_master_role():
+
+    group_id = request.args.get("groupId",default="-1",type=str)
+    local_id = request.args.get("localId",default="-1",type=str)
+    group_data = getGroupData(group_id)
+    scrum_master_list = group_data['scrum_master']
+    is_scrum_master = False
+
+    if(scrum_master_list == local_id):
+        is_scrum_master = True
+            
+    
+    if(is_scrum_master):
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    else:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    return response
+    
+
+
+
 #Author: Raphael Ferreira 
 @app.route('/check-instructor',methods=['GET'])
 @cross_origin()

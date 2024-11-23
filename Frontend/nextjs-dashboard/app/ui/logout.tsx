@@ -14,12 +14,14 @@ export default async function HandleLogout(){
 
                 //end session on firebase
                 const logout_response = await fetch('http://localhost:3001/auth/logout?localId=' + localId)
+
+                const data = await logout_response.json()
                 
-                if(!logout_response.ok){
+                /**if(!data.approved){
 
                     throw new Error(await logout_response.text())
     
-                }
+                }**/
                 
                 Cookies.remove('localId');  
                 Cookies.remove('idToken');  
