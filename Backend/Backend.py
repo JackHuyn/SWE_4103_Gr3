@@ -1096,7 +1096,12 @@ def show_groups():
     try:  
         
         list_of_groups = dbWrapper.getProjectGroups(project_id)
-      
+        course_id = dbWrapper.getProjectData(project_id)['course_id']
+        list_of_students = dbWrapper.getCourseData(course_id)['student_ids']
+        students = []
+        for student in list_of_students:
+            toadd = dbWrapper.getUserData(student)
+            students.append(toadd)
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
@@ -1105,13 +1110,14 @@ def show_groups():
         )
 
 
-        if list_of_groups:
+        if list_of_groups or list_of_students:
             
             print("converting")
             response = app.response_class(
                 response=json.dumps({
                     'approved': True,
-                    'groups': list_of_groups
+                    'groups': list_of_groups,
+                    'students': students
                 }),
                 status=200,
                 mimetype='application/json'

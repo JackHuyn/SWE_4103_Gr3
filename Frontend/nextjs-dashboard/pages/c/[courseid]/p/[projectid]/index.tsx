@@ -30,9 +30,11 @@ export default function ProjectDetails(){
   const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [isRemoveGroupVisible, setIsRemoveGroupVisible] = useState(false);
   const [isManageGroupVisible, setIsManageGroupVisible] = useState(false);
-  const [selectedGroups, setSelectedGroups] = useState([]);
+  const [selectedGroups1, setSelectedGroups1] = useState([]);
+  const [selectedGroups2, setSelectedGroups2] = useState([]);
   const [removedGroups, setRemovedGroups] = useState([]);
   const [groupData, setgroupData] = useState([]);
+  const [studentList, setStudentList] = useState([]);
   const [userRole, setUserRole] = useState('')  
   const [loading,setLoading] = useState(true) // Loading state
   const inputRef = useRef(null); // Create a ref for the input field
@@ -61,6 +63,7 @@ export default function ProjectDetails(){
             const data = await res.json();
             if(data.approved) {
               setGroupDetails(data);
+              setStudentList(data.students)
             }
           }
           else  {
@@ -125,8 +128,8 @@ const removeGroups = () =>{
   setIsRemoveGroupVisible(true);
 };
 //Function: handle checkbox change
-const handleCheckboxChange = (groupId) => {
-  setSelectedGroups((prevSelected) => {
+const handleCheckboxChange1 = (groupId) => {
+  setSelectedGroups1((prevSelected) => {
       if (prevSelected.includes(groupId)) {
           return prevSelected.filter((id) => id !== groupId);
       } else {
@@ -140,9 +143,9 @@ const handleRemoveGroups = async () => {
   if (!localId){
       window.location.href = "/auth/login"
   }
-  const groupsToRemove = groupDetails?.groups?.filter(group => selectedGroups.includes(group.group_id));
+  const groupsToRemove = groupDetails?.groups?.filter(group => selectedGroups1.includes(group.group_id));
   setRemovedGroups(groupsToRemove); // Store removed groups in the state
-  setSelectedGroups([]); // Clear the selected groups after removal
+  setSelectedGroups1([]); // Clear the selected groups after removal
   const removedList = {
       remove_list: groupsToRemove
   };
@@ -170,6 +173,51 @@ const handleRemoveGroups = async () => {
 //Function: set visibiliy of manageGroup popup
 const manageGroups = () =>{
   setIsManageGroupVisible(true);
+};
+//Function: handle checkbox change
+const handleCheckboxChange2 = (studentId, groupId) => {
+  setSelectedGroups2((prevSelected) => {
+    const newPair = JSON.stringify([studentId, groupId]);
+    if (prevSelected.some(pair => JSON.stringify(pair) === newPair)) {
+        return prevSelected.filter(pair => JSON.stringify(pair) !== newPair);
+    } else {
+          return [...prevSelected, [studentId, groupId]];
+      }
+  });
+};
+//Function: handle manage groups
+const handleManageGroups = async () => {
+  const localId  = Cookies.get('localId')
+  if (!localId){
+      window.location.href = "/auth/login"
+  }
+  const studentToAdd = groupDetails?.students?.filter(student => selectedGroups2.some(
+                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
+                        ));
+  const thisGroup = groupDetails?.groups?.filter(group => selectedGroups2.includes(group.group_id));
+  setRemovedGroups(groupsToRemove); // Store removed groups in the state
+  setSelectedGroups1([]); // Clear the selected groups after removal
+  const removedList = {
+      remove_list: groupsToRemove
+  };
+  try { 
+      const response = await fetch('http://localhost:3001/remove-groups' , {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(removedList),
+      });
+      const result = await response.json();
+      if (response.ok) {
+          window.location.reload();
+          alert('removed successfully!');
+          window.location.reload();
+      } else {
+          alert(`Error removing groups: ${result.reason}`);
+      }
+  } catch (error) {
+  console.error('Error sending request:', error);
+  alert('Error removing group. Please try again later.');
+  }
 };
 //-------------------------------------------------
 
@@ -247,8 +295,8 @@ const manageGroups = () =>{
                     <div className="checkbox-wrapper">
                       <input
                         type="checkbox"
-                        onChange={() => handleCheckboxChange(group.group_id)}
-                        checked={selectedGroups.includes(group.group_id)}
+                        onChange={() => handleCheckboxChange1(group.group_id)}
+                        checked={selectedGroups1.includes(group.group_id)}
                       />
                     </div>
                   </div>
@@ -271,48 +319,36 @@ const manageGroups = () =>{
         <div className="popup">
         <div className="popup_content">
           <h1>Set Students in Groups</h1>
-          <div className="table-container">
-            {/*Header Row*/}
-            <div className="table-header">
-              <div className="header-item">List</div>
+          <div className="checkbox-list">
+            <div className="checkbox-header">
+              <div className="header-name">List</div>
               {groupDetails?.groups?.map((group, index) => (
                 <div className="header-item">
                   {group.group_name.match(/Group (.*)/)?.[1]||"N/A"}
                 </div>
               ))}
             </div>
-      
-            {/*Scrollable Content */}
-            <div className="table-body">
-              <div className="table-row">
-                <div className="list-item">Item 1</div>
-                <div className="cell">
-                  <input type="checkbox" />
+            {groupDetails?.students?.map((student, index1) => (
+                <div className="checkbox-item" key={index1}>
+                  <div className="checkbox-name">
+                    {student.first_name+" "+student.last_name}
+                  </div>
+                  {groupDetails?.groups?.map((group, index2) => (
+                    <div className="checkbox-column" key={index2}>
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange2(student.uid, group.group_id)}
+                        checked={selectedGroups2.some(
+                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
+                        )}
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div className="cell">
-                  <input type="checkbox" />
-                </div>
-                <div className="cell">
-                  <input type="checkbox" />
-                </div>
-              </div>
-              <div className="table-row">
-                <div className="list-item">Item 2</div>
-                <div className="cell">
-                  <input type="checkbox" />
-                </div>
-                <div className="cell">
-                  <input type="checkbox" />
-                </div>
-                <div className="cell">
-                  <input type="checkbox" />
-                </div>
-              </div>
-              {/* Add more rows dynamically as needed */}
-            </div>
+              ))}
           </div>
           <div className="popup_buttons">
-              <Button className="popup_button" >
+              <Button className="popup_button" onClick={handleManageGroups}>
                   Ok
               </Button>
               <Button className="popup_button cancel_button" onClick={() => setIsManageGroupVisible(false)}>
