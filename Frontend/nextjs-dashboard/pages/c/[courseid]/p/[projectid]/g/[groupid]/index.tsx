@@ -6,6 +6,7 @@ import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
+import '@/app/ui/stylesheets/coursePage.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
@@ -17,10 +18,16 @@ export default function Metrics() {
     const [groupId, setGroupId] = useState(null);
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
-    const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
+    const [isGithubDialogVisible, setIsGithubDialogVisible] = useState(false);
     const [isScrumMaster, setIsScrumMaster] = useState(false)
     const [userRole, setUserRole] = useState('')
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
+    const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
+
+
+    function openAddGithubRepoDialog(){
+        setIsGithubDialogVisible(true);
+    }
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
@@ -33,6 +40,7 @@ export default function Metrics() {
     function closeDialogs() {
         setIsPopupVisible(false);
         setIsPopup2Visible(false);
+        setIsGithubDialogVisible(false);
     }
 
     // Close dialog only if click is on backdrop
@@ -98,21 +106,44 @@ export default function Metrics() {
         }
 
         setIsRoleLoaded(true)
+    }
 
-        // // Validate session
-        // const sessionResponse = await fetch(`http://127.0.0.1:3001/auth/validate-session?localId=${localId}&idToken=${idToken}`);
-        // if (sessionResponse.status === 401) {
-        // // Redirect if unauthorized
-        // window.location.href = "/auth/login";
-        // return;
-        // }
+
+    async function submitGithubRepo(){
+
+        if(githubRepo)
+        {
+            console.log(githubRepo)
+
+            const response = await fetch('http://localhost:3001//add-github-repo?groupId=' + groupId + '&githubRepo=' + githubRepo)
+
+            const data = await response.json()
+
+            if(data.approved){
+
+                console.log('The github repository has been added')
+
+            }
+
+            else{
+
+                console.log('The github repository could not be added')
+
+            }
+
+            closeDialogs()
+
+
+        }
+
+        else{
+            alert('please enter a repository')
+        }
+
     }
 
     return (
 
-       /**  {isScrumMaster && 
-            (<button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>)
-        }**/
         <div className="metrics-container">
             <div className="metrics-header">
                 {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
@@ -128,7 +159,13 @@ export default function Metrics() {
                            <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
-                            (<button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>)}
+                            (
+                                <>
+                                <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
+                                <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
+                                </>
+                            )}
+                            
                     </>
                     )}
 
@@ -148,7 +185,7 @@ export default function Metrics() {
                 <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
-            {(isPopupVisible || isPopup2Visible) && (
+            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
@@ -167,6 +204,27 @@ export default function Metrics() {
                             <TeamVelocityInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
+                    )}
+                    {isGithubDialogVisible &&  (
+
+                            <div id="addGithub-dialog">
+                                <h1>Add Github Repo</h1>
+                                 
+                                <div>
+                                    <h2>add</h2>
+                                <input className='github-input'
+                                //ref={inputRef} // Attach the ref to the input field
+                                type="text"
+                                //value={newCourseName}
+                                onChange={(e) => setGithubRepo(e.target.value)}
+                                placeholder="Add the name of your github repository "
+                                />
+                                </div>
+
+                                <button id="github-button" onClick={submitGithubRepo}>Submit</button>
+
+                            </div>
+                          
                     )}
                 </div>
             )}

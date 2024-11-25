@@ -9,6 +9,7 @@ import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/groups.css';
+import '@/app/ui/stylesheets/coursePage.css';
 import { group } from 'console';
 
 
@@ -229,13 +230,14 @@ const handleChangeNumber = (event) => {
         <div className="popup">
           <div className="popup_content">
             <h2>Add New Group</h2>
+            <p>Select the number of groups to add</p>
             <div className="popup_buttons">
 
             <select
-        id="number-select"
+        className="number-select"
         //value = {nGroups}
         onChange={handleChangeNumber}
-        style={{ padding: "5px" }}
+        //style={{ padding: "5px" }}
       >
         
         {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (

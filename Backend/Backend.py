@@ -1327,6 +1327,41 @@ def add_group():
         )
         return response
     
+@app.route('/add-github-repo', methods=['GET','POST'])
+@cross_origin()  # Enable CORS for this route
+def add_github_repo():
+
+    try:
+        group_id = request.args.get("groupId",default="-1",type=str)
+        github_repo = request.args.get("githubRepo",default="-1",type=str)
+        success = dbWrapper.addGithubRepoToGroup(group_id,github_repo)
+
+        if success:
+                response = app.response_class(
+                    response=json.dumps({'approved': True, 'message': 'Github repository added successfully'}),
+                    status=200,
+                    mimetype='application/json'
+                )
+        else:
+                response = app.response_class(
+                    response=json.dumps({'approved': False, 'reason': 'Failed to add github repository'}),
+                    status=500,
+                    mimetype='application/json'
+                )
+        
+        return response
+
+    except Exception as e:
+  
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+    
+
+    
 if __name__ == '__main__':
     print("Start")
     app.run(port=3001, debug=True)
