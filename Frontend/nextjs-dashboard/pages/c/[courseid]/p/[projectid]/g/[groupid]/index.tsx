@@ -122,6 +122,7 @@ export default function Metrics() {
             if(data.approved){
 
                 console.log('The github repository has been added')
+                window.location.reload();
 
             }
 

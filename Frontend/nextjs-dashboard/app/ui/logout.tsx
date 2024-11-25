@@ -27,7 +27,8 @@ export default async function HandleLogout(){
                 Cookies.remove('idToken');  
                 window.location.href = "/auth/login";  
             } else {
-                alert("You are already logged out.");
+                console.log('you are already logged out')
+                window.location.href = "/auth/login"; 
             }
 
         }
