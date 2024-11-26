@@ -658,7 +658,7 @@ def add_a_student():
                 print(student_id + ': Add\tFail')
         else:
             student_resp = firebase_auth.sign_up_with_email_and_password(student_fname,student_lname,student_email,student_email) #password is email by default
-            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid):
+            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid, force_password_reset=True):
                 student_id = student_resp.uid
                 print(student_id + ': Create\tDone')
                 if dbWrapper.addStudentToCourse(student_id, course_id):
