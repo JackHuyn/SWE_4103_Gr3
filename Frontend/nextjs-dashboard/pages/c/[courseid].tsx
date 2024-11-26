@@ -367,8 +367,8 @@ if (projectData) {
               <h2>Projects</h2>
               {userRole === '1' && (
                 <div className="addandremove">
-                  <Button className="add-button" onClick={addProject}> + </Button>
-                  <Button className="remove-button" onClick = {removeProject}> - </Button>    
+                  <button className="add-button" onClick={addProject}> + </button>
+                  <button className="remove-button" onClick = {removeProject}> - </button>    
                 </div>
               )}
             </div>
@@ -537,9 +537,9 @@ if (projectData) {
           <div className="popup_content">
             <FileUpload localId={localId} courseId={courseid as string} />
             <div className="popup_buttons">
-                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
+                      <button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
                           Cancel
-                      </Button>
+                      </button>
                   </div>
           </div>
         </div>
@@ -573,12 +573,12 @@ if (projectData) {
               ))}
             </div>
             <div className="popup_buttons">
-              <Button className="popup_button" onClick={handleRemoveStudents}>
+              <button className="popup_button" onClick={handleRemoveStudents}>
                   Remove
-              </Button>
-              <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
+              </button>
+              <button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
                   Cancel
-              </Button>
+              </button>
             </div>
           </div>
         </div>
