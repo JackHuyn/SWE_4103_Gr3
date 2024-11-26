@@ -179,6 +179,8 @@ def getGroupStudents():
             status = 401,
             mimetype = 'application/json'
         )
+         
+    return response
 
 
     
