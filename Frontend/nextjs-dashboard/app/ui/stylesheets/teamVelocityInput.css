@@ -68,3 +68,20 @@
     background-color: #0056b3;
     transform: scale(1.04);
 }
+
+/* Team Velocity Dialog */
+#team-velocity-dialog label {
+    display: block;
+    margin-bottom: 5px;
+    color: #b0b0b0;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+#team-velocity-dialog input {
+    margin-bottom: 10px;
+}
+
+#team-velocity-dialog button {
+    margin-top: 15px;
+}

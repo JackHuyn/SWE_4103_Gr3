@@ -5,6 +5,8 @@ import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
+import '@/app/ui/stylesheets/joyRatingInput.css'
+
 import Link from 'next/link';
 
 import '@/app/ui/stylesheets/metrics.css';
@@ -20,6 +22,7 @@ export default function Metrics() {
     const [isTeamVelocityDialogVisible, setIsTeamVelocityDialogVisible] = useState(false);
     const [selectedGraphType, setSelectedGraphType] = useState('team'); // State for dropdown selection
     const [username, setUsername] = useState('');
+    const [userRole, setUserRole] = useState('');
 
 
     // Close dialog only if click is on backdrop
@@ -30,25 +33,80 @@ export default function Metrics() {
     }
 
     useEffect(() => {
-        checkSessionAndFetchData();
         if (router.isReady) {
             const group_id = router.query.groupid;
             setGroupId(group_id);
-            console.log("Group ID:", group_id);
-            const githubUsername = Cookies.get('githubUsername');
-            if (githubUsername) {
-                setUsername(githubUsername);
-            } else {
-                console.log("No GitHub username found in cookies.");
-            }
+            console.log('Group ID:', group_id);
+            fetchUsername(group_id);
         }
     }, [router.isReady, router.query]);
 
     useEffect(() => {
         if (username) {
-            console.log("Fetched GitHub Username:", username);
+            console.log('Fetched GitHub Username:', username);
         }
     }, [username]);
+
+    async function fetchUsername(group_id) {
+        const localId = Cookies.get('localId');
+        try {
+            const response = await fetch(
+                `http://127.0.0.1:3001/metrics/contributions?localId=${localId}&groupId=${group_id}`,
+                {
+                    method: 'GET',
+                }
+            );
+            const data = await response.json();
+            if (data.approved) {
+                setUsername(data.active_user);
+                const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
+
+                    //check if instructor role ? If not show student display
+                    if (!role_response.ok) {
+                        setUserRole('0')
+                    }
+                    else {
+                        //fetching same for instructor
+                        setUserRole('1')
+                    }
+                    console.log(userRole);
+            } else {
+                
+                console.error('WHY THE FKCUK IS IT NOT WROKING', data);
+            }
+        } catch (error) {
+            console.error('Error fetching username:', error);
+        }
+    }
+
+    useEffect(() => {
+        async function handleOAuthRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+    
+            if (code) {
+                try {
+                    const localId = Cookies.get('localId');
+                    const response = await fetch(
+                        `http://127.0.0.1:3001/auth/github-code-request?localId=${localId}&code=${code}`,
+                        { method: 'POST' }
+                    );
+    
+                    const data = await response.json();
+                    if (data.approved) {
+                        console.log('GitHub authorization successful.');
+                    } else {
+                        console.error('GitHub authorization failed:', data.reason);
+                    }
+                } catch (error) {
+                    console.error('Error handling GitHub OAuth redirect:', error);
+                }
+            }
+        }
+    
+        handleOAuthRedirect();
+    }, []);
+    
 
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
@@ -141,9 +199,9 @@ export default function Metrics() {
                         <div className="chart-container">
                             <JoyAvgChart group_id={groupId} />
                         </div>
-                        <div className="chart-container">
+                        {userRole=='1' && <div className="chart-container">
                             <JoyStudentRatingGraph group_id={groupId} />
-                        </div>
+                        </div>}
                     </>
                 ) : (
                     <>
