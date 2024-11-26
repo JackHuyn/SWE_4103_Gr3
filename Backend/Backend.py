@@ -149,6 +149,45 @@ def getStudentList(local_id):
     course_data = dbWrapper.getCourseData(local_id)
     return course_data['student_ids']
 
+#Helper to get group data
+def getGroupData(group_id):
+    group_data = dbWrapper.getGroupData(group_id)
+    return group_data
+
+
+@app.route('/check-scrum-master',methods=['GET'])
+@cross_origin()
+def check_scrum_master_role():
+
+    group_id = request.args.get("groupId",default="-1",type=str)
+    local_id = request.args.get("localId",default="-1",type=str)
+    group_data = getGroupData(group_id)
+    scrum_master_list = group_data['scrum_master']
+    is_scrum_master = False
+
+    if(scrum_master_list == local_id):
+        is_scrum_master = True
+            
+    
+    if(is_scrum_master):
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    else:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    return response
+    
+
+
+
 #Author: Raphael Ferreira 
 @app.route('/check-instructor',methods=['GET'])
 @cross_origin()
@@ -190,16 +229,23 @@ def validate_session():
     print(response.response)
     return response
 
-@app.route('/auth/logout', methods=['POST'])
+@app.route('/auth/logout', methods=['GET'])
 @cross_origin()
 def logout_user():
+    print('in logout')
     local_id = request.args.get("localId", default = -1, type = str)
-    firebase_auth.end_session(local_id)
-    response = app.response_class(
-        response=json.dumps({}),
-        status=200,
-        mimetype='application/json'
-    )
+    if firebase_auth.end_session(local_id):
+        response = app.response_class(
+            response=json.dumps({'approved': True }),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        response = app.response_class(
+            response = json.dumps({'approved': False}),
+            status = 401,
+            mimetype = 'application/json'
+        )
     return response
 
 
@@ -1274,10 +1320,13 @@ def add_group():
         # Extract the fields from the JSON object
         #course_id = data.get('group_name', "")
         project_id = data.get('project_id', "")
+        n_groups = int(data.get('n_groups',"1"))
         #github_repo_address = data.get('github_repo_addres', "")
     
         #print('course id: ', course_id)
         print('project id : ', project_id)
+
+        
         #print('project name: ', project_name)
         #print('github_repo_address', github_repo_address) 
         # Check if all required fields are provided
@@ -1285,12 +1334,18 @@ def add_group():
             raise ValueError("Missing required fields")
 
         # Call the `addCourse` function from `DbWrapper`
-        success = dbWrapper.addGroup(
-            project_id,
-            #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
-            ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
-        )  
 
+        if (n_groups == 1):
+            success = dbWrapper.addGroup(
+                project_id,
+                #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
+                ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
+            )
+        
+        else:
+            success = dbWrapper.addNGroups(project_id,n_groups)
+
+        
         if success:
             response = app.response_class(
                 response=json.dumps({'approved': True, 'message': 'Group added successfully'}),
@@ -1323,6 +1378,41 @@ def add_group():
             mimetype='application/json'
         )
         return response
+    
+@app.route('/add-github-repo', methods=['GET','POST'])
+@cross_origin()  # Enable CORS for this route
+def add_github_repo():
+
+    try:
+        group_id = request.args.get("groupId",default="-1",type=str)
+        github_repo = request.args.get("githubRepo",default="-1",type=str)
+        success = dbWrapper.addGithubRepoToGroup(group_id,github_repo)
+
+        if success:
+                response = app.response_class(
+                    response=json.dumps({'approved': True, 'message': 'Github repository added successfully'}),
+                    status=200,
+                    mimetype='application/json'
+                )
+        else:
+                response = app.response_class(
+                    response=json.dumps({'approved': False, 'reason': 'Failed to add github repository'}),
+                    status=500,
+                    mimetype='application/json'
+                )
+        
+        return response
+
+    except Exception as e:
+  
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+    
+
     
 if __name__ == '__main__':
     print("Start")
