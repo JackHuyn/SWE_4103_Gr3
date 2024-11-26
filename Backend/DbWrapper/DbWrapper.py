@@ -179,6 +179,7 @@ class DbWrapper:
         }
         template["github_repo_address"] = github_repo_address
         template["scrum_master"] = scrum_master
+        template['show_survey'] = 0
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -459,6 +460,24 @@ class DbWrapper:
     def updateGithubOAuthToken(self, uid:str, github_oauth_token:str) -> bool:
         print("UID: ", uid)
         return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
+    
+    def showSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 1})
+        except:
+            return False
+        return True
+    
+    def hideSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 0})
+        except:
+            return False
+        return True
     
 
 if __name__ == "__main__":

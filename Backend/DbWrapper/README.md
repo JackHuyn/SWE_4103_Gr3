@@ -154,3 +154,7 @@ Note:
 - Velocity ID is derived from {group_id}_Sprint{sprint_num}
 
 `findUser(email)` - Given an email, returns a user entry in the database. Returns None if entry is not found.
+
+`showSurveys(group_id)` - Given a group ID, toggle surveys to show
+
+`hideSurveys(group_id)` - Given a group ID, toggle surveys to hide
