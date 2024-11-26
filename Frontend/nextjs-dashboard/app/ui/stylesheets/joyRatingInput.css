@@ -1,50 +1,196 @@
 @import url('./colors.css');
 @import url('./default.css');
 
+/* Dialog Container */
 #joy-rating-dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 380px;
-    background-color: #2d2d2d;
-    padding: 20px;
-    border-radius: 12px;
+    width: 400px; /* Slightly wider for better readability */
+    max-width: 90%; /* Ensure it fits smaller screens */
+    background-color: #2b2b2b; /* Updated to a slightly darker shade */
+    padding: 25px; /* Added more padding for better spacing */
+    border-radius: 16px; /* Softer edges */
     text-align: center;
     color: white;
-    font-family: 'Jura', sans-serif;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    font-family: 'Jura';
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); /* Stronger shadow */
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px; /* More gap for cleaner look */
+    animation: fadeIn 0.3s ease-out; /* Subtle fade-in animation */
 }
 
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Dialog Header */
 #joy-rating-dialog h1 {
-    font-size: 1.8rem;
-    font-weight: normal;
+    font-size: 2rem; /* Larger font for prominence */
+    font-weight: bold;
     margin: 0;
-    color: #e0e0e0;
+    color: #ffffff;
 }
 
+/* Stars Container */
 #joy-stars {
     display: flex;
-    gap: 8px;
+    justify-content: center;
+    gap: 12px; /* Slightly wider gap */
+    margin-top: 10px; /* Added margin for better spacing */
 }
 
+/* Star Buttons */
 #joy-stars .star_button {
     background-color: transparent;
     border: none;
-    font-size: 2.25rem;
-    color: whitesmoke;
+    font-size: 2.5rem; /* Larger stars */
+    color: #d3d3d3; /* Neutral gray for unselected stars */
+    cursor: pointer;
+    transition: transform 0.2s, color 0.3s;
+}
+
+#joy-stars .star_button:hover {
+    transform: scale(1.2); /* More pronounced hover effect */
+    color: gold; /* Highlight color */
+}
+
+/* Comment Section */
+#joy-comment-textarea {
+    width: 100%;
+    height: 120px; /* Taller for easier typing */
+    padding: 12px;
+    border: 1px solid #4b4b4b;
+    border-radius: 12px;
+    background-color: #3a3a3a;
+    color: white;
+    font-size: 1rem; /* Slightly larger font */
+    outline: none;
+    transition: border-color 0.3s;
+    margin-top: 10px; /* Added spacing */
+}
+
+#joy-comment-textarea:focus {
+    border-color: #007bff;
+}
+
+/* Submit Button */
+#submit-joy-rating-button {
+    padding: 12px; /* Increased padding */
+    width: 100%;
+    border: none;
+    border-radius: 12px; /* Softer edges */
+    background-color: #0066cc; /* Subtle color adjustment */
+    color: white;
+    font-size: 1rem; /* Larger text */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#submit-joy-rating-button:hover {
+    background-color: #004d99; /* Slightly darker hover */
+    transform: scale(1.05); /* Subtle hover scaling */
+}
+
+/* Additional Dialog-Specific Styles */
+#joy-rating-dialog textarea {
+    resize: none;
+    height: 100px;
+}
+
+#joy-rating-dialog .star_button.selected {
+    color: gold; /* Highlight selected stars */
+}
+
+/* Backdrop styling */
+#dialog-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 9998; /* Behind the dialog */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Dialog container */
+#joy-rating-dialog {
+    background-color: #2d2d2d; /* Dark background */
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 9999; /* Above the backdrop */
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+}
+
+/* Close button */
+#close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
     cursor: pointer;
     transition: transform 0.2s;
 }
 
-#joy-stars .star_button:hover {
-    transform: scale(1.1);
+#close-button:hover {
+    transform: scale(1.2);
 }
 
+/* Header */
+#joy-rating-dialog h1 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin-bottom: 15px;
+    color: #e0e0e0;
+}
+
+/* Stars container */
+#joy-stars {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Individual star */
+#joy-stars .star_button {
+    background-color: transparent;
+    border: none;
+    font-size: 2rem;
+    color: whitesmoke;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.3s;
+}
+
+#joy-stars .star_button:hover {
+    transform: scale(1.2);
+    color: gold;
+}
+
+/* Textarea */
 #joy-comment-textarea {
     width: 100%;
     padding: 10px;
@@ -56,12 +202,14 @@
     resize: none;
     outline: none;
     transition: border-color 0.3s;
+    margin-bottom: 15px;
 }
 
 #joy-comment-textarea:focus {
     border-color: #007bff;
 }
 
+/* Submit button */
 #submit-joy-rating-button {
     padding: 10px;
     width: 100%;
@@ -69,12 +217,13 @@
     border-radius: 8px;
     background-color: #007bff;
     color: white;
-    font-size: 0.95rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 }
 
 #submit-joy-rating-button:hover {
     background-color: #0056b3;
-    transform: scale(1.04);
+    transform: scale(1.02);
 }
+

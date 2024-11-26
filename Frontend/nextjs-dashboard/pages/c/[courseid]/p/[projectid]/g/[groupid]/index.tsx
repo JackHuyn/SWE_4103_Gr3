@@ -5,8 +5,13 @@ import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
+import '@/app/ui/stylesheets/joyRatingInput.css'
+
+import Link from 'next/link';
+
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
+import '@/app/ui/stylesheets/homelogout.css'
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
@@ -16,11 +21,13 @@ import { group } from 'console';
 export default function Metrics() {
     const router = useRouter();
     const [groupId, setGroupId] = useState(null);
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [isPopup2Visible, setIsPopup2Visible] = useState(false);
+    const [isJoyRatingDialogVisible, setIsJoyRatingDialogVisible] = useState(false)
+    const [isTeamVelocityDialogVisible, setIsTeamVelocityDialogVisible] = useState(false);
+    const [selectedGraphType, setSelectedGraphType] = useState('team'); // State for dropdown selection
+    const [username, setUsername] = useState('');
+    const [userRole, setUserRole] = useState('');
     const [isGithubDialogVisible, setIsGithubDialogVisible] = useState(false);
     const [isScrumMaster, setIsScrumMaster] = useState(false)
-    const [userRole, setUserRole] = useState('')
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
     const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
 
@@ -29,19 +36,6 @@ export default function Metrics() {
         setIsGithubDialogVisible(true);
     }
 
-    function openJoyRatingDialog() {
-        setIsPopupVisible(true);
-    }
-
-    function openTeamVelocityDialog() {
-        setIsPopup2Visible(true);
-    }
-
-    function closeDialogs() {
-        setIsPopupVisible(false);
-        setIsPopup2Visible(false);
-        setIsGithubDialogVisible(false);
-    }
 
     // Close dialog only if click is on backdrop
     function handleBackdropClick(event) {
@@ -51,19 +45,23 @@ export default function Metrics() {
     }
 
     useEffect(() => {
-        
         if (router.isReady) {
 
             const group_id = router.query.groupid;
             setGroupId(group_id);
-            
-            console.log("Group ID:", group_id);
-            
+            console.log('Group ID:', group_id);
+            fetchUsername(group_id);
         }
 
        
 
     }, [router.isReady, router.query]);
+
+    useEffect(() => {
+        if (username) {
+            console.log('Fetched GitHub Username:', username);
+        }
+    }, [username]);
 
     useEffect(() => {
         if (groupId) {
@@ -72,6 +70,69 @@ export default function Metrics() {
       }, [groupId]);
 
         
+      
+
+    async function fetchUsername(group_id) {
+        const localId = Cookies.get('localId');
+        try {
+            const response = await fetch(
+                `http://127.0.0.1:3001/metrics/contributions?localId=${localId}&groupId=${group_id}`,
+                {
+                    method: 'GET',
+                }
+            );
+            const data = await response.json();
+            if (data.approved) {
+                setUsername(data.active_user);
+                const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
+
+                    //check if instructor role ? If not show student display
+                    if (!role_response.ok) {
+                        setUserRole('0')
+                    }
+                    else {
+                        //fetching same for instructor
+                        setUserRole('1')
+                    }
+                    console.log(userRole);
+            } else {
+                
+                console.error('WHY THE FKCUK IS IT NOT WROKING', data);
+            }
+        } catch (error) {
+            console.error('Error fetching username:', error);
+        }
+    }
+
+    useEffect(() => {
+        async function handleOAuthRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+    
+            if (code) {
+                try {
+                    const localId = Cookies.get('localId');
+                    const response = await fetch(
+                        `http://127.0.0.1:3001/auth/github-code-request?localId=${localId}&code=${code}`,
+                        { method: 'POST' }
+                    );
+    
+                    const data = await response.json();
+                    if (data.approved) {
+                        console.log('GitHub authorization successful.');
+                    } else {
+                        console.error('GitHub authorization failed:', data.reason);
+                    }
+                } catch (error) {
+                    console.error('Error handling GitHub OAuth redirect:', error);
+                }
+            }
+        }
+    
+        handleOAuthRedirect();
+    }, []);
+    
+
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
@@ -107,6 +168,36 @@ export default function Metrics() {
 
         setIsRoleLoaded(true)
     }
+
+    function openJoyRatingDialog() {
+        setIsJoyRatingDialogVisible(true);
+    }
+
+    function openTeamVelocityDialog() {
+        setIsTeamVelocityDialogVisible(true);
+    }
+
+    function closeDialogs() {
+        setIsJoyRatingDialogVisible(false);
+        setIsTeamVelocityDialogVisible(false);
+        setIsGithubDialogVisible(false);
+    }
+
+    // Dropdown change handler
+    const handleGraphTypeChange = (event) => {
+        setSelectedGraphType(event.target.value);
+    };
+
+    const handleLogout = async () => {
+        const localId = Cookies.get('localId')
+        if (localId) {
+          Cookies.remove('localId');
+          Cookies.remove('idToken');
+          window.location.href = "/auth/login";
+        } else {
+          alert("You are already logged out.");
+        }
+      }
 
 
     async function submitGithubRepo(){
@@ -146,64 +237,103 @@ export default function Metrics() {
     return (
 
         <div className="metrics-container">
-            <div className="metrics-header">
-                {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
+            <div className="button-bar">
+                <div className="left-buttons">
+                    <Link href="/">
+                        <button id="home">Home</button>
+                    </Link>
+                    <button id="logout" onClick={handleLogout}>
+                        Log Out
+                    </button>
+                </div>
+                
             </div>
 
-            <button id="logout" onClick={HandleLogout}>Log Out</button>
+            <div className="group-id">
+                    {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
+                </div>
+
             {isRoleLoaded && (
-            <div className="metrics-buttons">
+                <div className="metrics-controls">
+                <div className="right-buttons">
 
                     {/* Check if student  */}
                     {userRole === '0' && (
                     <>
-                           <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
+                           <button className="metrics-button" onClick={() => setIsJoyRatingDialogVisible(true)}>
+                            Joy Rating Input
+                           </button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
                                 <>
-                                <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
+                                <button className="metrics-button" onClick={() => setIsTeamVelocityDialogVisible(true)}>
+                                Team Velocity Input
+                                </button>
                                 <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
                                 </>
                             )}
                             
                     </>
                     )}
+                </div>
+                <select
+                    className="metrics-dropdown"
+                    value={selectedGraphType}
+                    onChange={(e) => setSelectedGraphType(e.target.value)}
+                >
+                    <option value="team">Team Metrics</option>
+                    <option value="individual">Individual Metrics</option>
+                </select>
 
-
-                    
-                    {/* Add checks once surveys are ready  */}
-                    <button className="metrics-button">Survey//soon</button>
             
             </div>
 
             )}
 
             <div className="metrics-content">
-                <div className="chart-container"><ContributionsGraph group_id={groupId} /></div>
-                <div className="chart-container"><JoyAvgChart group_id={groupId} /></div>
-                <div className="chart-container"><JoyStudentRatingGraph group_id={groupId} /></div>
-                <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
+                {selectedGraphType === 'team' ? (
+                    <>
+                        <div className="chart-container">
+                            <ContributionsGraph group_id={groupId} />
+                        </div>
+                        <div className="chart-container">
+                            <TeamVelocityGraph group_id={groupId} />
+                        </div>
+                        <div className="chart-container">
+                            <JoyAvgChart group_id={groupId} />
+                        </div>
+                        {userRole=='1' && <div className="chart-container">
+                            <JoyStudentRatingGraph group_id={groupId} />
+                        </div>}
+                    </>
+                ) : (
+                    <>
+                        <div className="chart-container">
+                            
+                            <ContributionsGraph group_id={groupId} username={username} />
+                        </div>
+                    </>
+                )}
             </div>
 
-            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible) && (
+            {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
-                    onClick={handleBackdropClick}
-                    aria-hidden={!isPopupVisible && !isPopup2Visible}
+                    onClick={(e) => e.target.id === 'metrics-dialog-backdrop' && setIsJoyRatingDialogVisible(false)}
                 >
-                    {isPopupVisible && (
+                    {isJoyRatingDialogVisible && (
                         <div id="joy-rating-dialog" className="dialog">
                             <h2>Joy Rating Input</h2>
-                            <JoyRatingInput closeDialogs={closeDialogs}/>
-                            <button onClick={closeDialogs}>Close</button>
+                            <JoyRatingInput closeDialogs={() => setIsJoyRatingDialogVisible(false)} />
+                            <button onClick={() => setIsJoyRatingDialogVisible(false)}>Close</button>
                         </div>
                     )}
-                    {isPopup2Visible &&  (
+                    {isTeamVelocityDialogVisible && (
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
-                            <TeamVelocityInput closeDialogs={closeDialogs}/>
-                            <button onClick={closeDialogs}>Close</button>
+                            <TeamVelocityInput closeDialogs={() => setIsTeamVelocityDialogVisible(false)} />
+                            <button onClick={() => setIsTeamVelocityDialogVisible(false)}>Close</button>
                         </div>
                     )}
                     {isGithubDialogVisible &&  (

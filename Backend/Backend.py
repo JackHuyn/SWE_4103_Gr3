@@ -955,7 +955,7 @@ def get_github_contribution_stats():
         resp = metrics.get_github_contribution_stats(auth, group_id)
         print(resp)
         response = app.response_class(
-            response=json.dumps({'approved': True, 'contributions': resp}),
+            response=json.dumps({'approved': True, 'contributions': resp, 'active_user': user_obj.github_login}),
             status=200,
             mimetype='application/json'
         )

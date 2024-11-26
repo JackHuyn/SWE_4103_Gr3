@@ -10,6 +10,7 @@ import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/groups.css';
 import '@/app/ui/stylesheets/coursePage.css';
+import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';
 
 
@@ -175,6 +176,17 @@ const handleRemoveGroups = async () => {
   }
 };
 
+const handleLogout = async () => {
+  const localId = Cookies.get('localId')
+  if (localId) {
+    Cookies.remove('localId');
+    Cookies.remove('idToken');
+    window.location.href = "/auth/login";
+  } else {
+    alert("You are already logged out.");
+  }
+}
+
 const handleChangeNumber = (event) => {
   const value = event.target.value;
 
@@ -187,7 +199,17 @@ const handleChangeNumber = (event) => {
 
   return (
     <div className="page-wrapper">
-      <button id="logout" onClick={HandleLogout}>Log Out</button>
+      <div className="button-bar">
+          {/* Home Button on the Left */}
+          <Link href="/">
+            <button id="home">Home</button>
+          </Link>
+
+          {/* Logout Button on the Right */}
+          <button id="logout" onClick={handleLogout}>
+            Log Out
+          </button>
+        </div>
       <div className="course-header">
         {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
         {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}

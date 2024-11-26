@@ -7,8 +7,8 @@
     justify-content: center;
     align-items: center;
     height: 100vh; /* Full page height */
-    background-color: #1a1a1a; /* Same background as the page */
-    background-image:var(--imageBackground);
+    background-color: #1a1a1a00; /* Same background as the page */
+    background-image:none;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

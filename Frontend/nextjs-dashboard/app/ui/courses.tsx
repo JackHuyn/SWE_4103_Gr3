@@ -3,23 +3,25 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import '@/app/ui/stylesheets/coursePage.css'; 
-import '@/app/ui/stylesheets/loading.css'; 
+import '@/app/ui/stylesheets/coursePage.css';
+import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
+import '@/app/ui/stylesheets/homelogout.css';
 
 
 import { Button } from './button';
 import Cookies from 'js-cookie';
-import {Card, CardHeader, CardBody, CardFooter} from "@nextui-org/card";
+import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Router } from 'next/router';
 import HandleLogout from './logout';
+import Loading from '@/app/ui/Loading';
 
 
 
 export default function Courses() {
 
     const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState("");
     const [showCourses, setShowCourses] = useState(true); // Track whether to show/hide courses
     const [courseList, setCourseList] = useState([]); // Store the list of courses
     const [isPopupVisible, setIsPopupVisible] = useState(false); // Control the popup visibility
@@ -29,24 +31,24 @@ export default function Courses() {
     const [newCourseTerm, setNewCourseTerm] = useState(''); // Store the new course term
     const [newCourseSection, setNewCourseSection] = useState(''); // Store the new course section
     const [userRole, setUserRole] = useState('')
-    const [loading,setLoading] = useState(true) // Loadign state
+    const [loading, setLoading] = useState(true) // Loadign state
     const inputRef = useRef(null); // Create a ref for the input field
 
     // Fetch courses data when the component mounts
     useEffect(() => {
         async function fetchData() {
-            
+
             try {
                 console.log('Courses .tsx is displayed')
-                
+
                 const localId = Cookies.get('localId')
-                
-                if(localId) {
+
+                if (localId) {
 
                     const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
 
                     //check if instructor role ? If not show student display
-                    if(!role_response.ok){
+                    if (!role_response.ok) {
                         setUserRole('0')
                     }
                     else {
@@ -55,27 +57,27 @@ export default function Courses() {
                     }
 
                     const res = await fetch('http://localhost:3001/auth/courses?localId=' + localId)
-                        if (!res.ok) {
+                    if (!res.ok) {
 
-                            throw new Error('Failed to fetch data');
-                        }
-                        const result = await res.json();
-                        setData(result);
-                        // Set the initial courses to the state if the response is approved
-                        if (result.approved && result.courses) {
-                            setCourseList(result.courses);
-                            setLoading(false);
-                        }  
+                        throw new Error('Failed to fetch data');
+                    }
+                    const result = await res.json();
+                    setData(result);
+                    // Set the initial courses to the state if the response is approved
+                    if (result.approved && result.courses) {
+                        setCourseList(result.courses);
+                        setLoading(false);
+                    }
                 }
-                else{
+                else {
                     window.location.href = "/auth/login"
                 }
-                
+
             } catch (error) {
                 console.error('Error fetching courses:', error);
                 setError('Error loading courses. Please try again later.');
             }
-            finally{
+            finally {
                 setLoading(false);
             }
         }
@@ -88,18 +90,30 @@ export default function Courses() {
         setIsPopupVisible(true); // Show the popup
     };
 
-    const removeCourse = () =>{
+    const removeCourse = () => {
         setIsPopup2Visible(true); // Show the popup2
     };
+
+    const handleLogout = async () => {
+        const localId = Cookies.get('localId')
+        if (localId) {
+            Cookies.remove('localId');
+            Cookies.remove('idToken');
+            window.location.href = "/auth/login";
+        } else {
+            alert("You are already logged out.");
+        }
+    }
+
 
     // Handle adding a new course with name, description, and term
     const handleAddCourse = async () => {
         if (newCourseName && newCourseDescription && newCourseTerm && newCourseSection) {
-            
-            //Ensure localId cookie is valid
-            const localId  = Cookies.get('localId')
 
-            if (!localId){
+            //Ensure localId cookie is valid
+            const localId = Cookies.get('localId')
+
+            if (!localId) {
                 window.location.href = "/auth/login"
             }
             const courseData = {
@@ -109,21 +123,21 @@ export default function Courses() {
                 course_section: newCourseSection,
                 instructor_ids: [localId]
             };
-    
+
             try {
-                
+
                 //Need to have checks to ensure that the instructor is valid 
-                const response = await fetch('http://localhost:3001/add-course' , {
+                const response = await fetch('http://localhost:3001/add-course', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        
+
                     },
                     body: JSON.stringify(courseData),  // Send JSON data in request body
                 });
-    
+
                 const result = await response.json();
-    
+
                 if (response.ok) {
                     window.location.reload();
                     alert('Course added successfully!');
@@ -151,32 +165,32 @@ export default function Courses() {
 
     const handleRemoveCourse = async () => {
         if (newCourseName) {
-            
-            //Ensure localId cookie is valid
-            const localId  = Cookies.get('localId')
 
-            if (!localId){
+            //Ensure localId cookie is valid
+            const localId = Cookies.get('localId')
+
+            if (!localId) {
                 window.location.href = "/auth/login"
             }
             const courseData = {
                 course_name: newCourseName
             };
-    
+
             try {
-                
-                
+
+
                 //Need to have checks to ensure that the instructor is valid 
-                const response = await fetch('http://localhost:3001/remove-course' , {
+                const response = await fetch('http://localhost:3001/remove-course', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        
+
                     },
                     body: JSON.stringify(courseData),  // Send JSON data in request body
                 });
-    
+
                 const result = await response.json();
-    
+
                 if (response.ok) {
                     alert('Course removed successfully!');
                     window.location.reload();
@@ -194,7 +208,7 @@ export default function Courses() {
             alert('Please fill in all the fields.');
         }
     };
-    
+
 
 
     // Toggle the visibility of the course list
@@ -230,10 +244,10 @@ export default function Courses() {
         return <p>{error}</p>;
     }
 
-    if (loading){
+    if (loading) {
         return (
             <div className="spinner-wrapper">
-            <div className="spinner"></div>
+                <div className="spinner"></div>
             </div>
         );
     }
@@ -242,7 +256,19 @@ export default function Courses() {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
-                <button id="logout" onClick={HandleLogout}>Log Out</button>
+
+                    <div className="button-bar">
+                        {/* Home Button on the Left */}
+                        <Link href="/">
+                            <button id="home">Home</button>
+                        </Link>
+
+                        {/* Logout Button on the Right */}
+                        <button id="logout" onClick={handleLogout}>
+                            Log Out
+                        </button>
+                    </div>
+
                     <div className="header">
                         {/* Left Section: Toggle Button and Title */}
                         <div className="header_left">
@@ -265,14 +291,14 @@ export default function Courses() {
                                 <Button className="addCourse" onClick={addCourse}>
                                     +
                                 </Button>
-                                <Button className="removeCourse" onClick = {removeCourse}>
+                                <Button className="removeCourse" onClick={removeCourse}>
                                     -
                                 </Button>
-                                
+
                             </div>
                         )}
 
-                        
+
                     </div>
 
 
@@ -280,17 +306,18 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
-                                
-                                <Link 
+
+                                <Link
                                     href={{
                                         pathname: '/c/[slug]',
-                                        query: {slug: course.course_id}}
-                                     } className = "link">
-                                <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
-                                    <h3 className="course-title">{course.course_id}</h3>
+                                        query: { slug: course.course_id }
+                                    }
+                                    } className="link">
+                                    <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
+                                        <h3 className="course-title">{course.course_id}</h3>
 
 
-                                    {/* 
+                                        {/* 
                                     <Card shadow="sm" key={index} isPressable onPress={() => console.log(course.course_id)}>
                                     
                                     <CardHeader className="justify-between">
@@ -299,12 +326,12 @@ export default function Courses() {
                                     </CardHeader>
                                     
                                     <CardBody className="overflow-visible p-0"></Card>*/}
-                                    <p className="course-detail">Description: {course.course_description}</p>
-                                    <p className="course-detail">Section: {course.section}</p>
-                                    <p className="course-detail">Term: {course.term}</p>
-                                    {/*</CardBody>*/}
-                                    
-                                </div>
+                                        <p className="course-detail">Description: {course.course_description}</p>
+                                        <p className="course-detail">Section: {course.section}</p>
+                                        <p className="course-detail">Term: {course.term}</p>
+                                        {/*</CardBody>*/}
+
+                                    </div>
                                 </Link>
                             ))}
                         </div>
@@ -325,7 +352,7 @@ export default function Courses() {
                                 placeholder="Course Name"
                             />
                             <input
-                                type="text"  className='desc'
+                                type="text" className='desc'
                                 value={newCourseDescription}
                                 onChange={(e) => setNewCourseDescription(e.target.value)}
                                 placeholder="Course Description"
@@ -356,8 +383,8 @@ export default function Courses() {
                 )}
 
 
-            {/* Popup Window for Removing Course */}
-            {isPopup2Visible && (
+                {/* Popup Window for Removing Course */}
+                {isPopup2Visible && (
                     <div className="popup">
                         <div className="popup_content">
                             <h2>Enter Course ID</h2>
@@ -380,25 +407,20 @@ export default function Courses() {
                             </div>
                         </div>
                     </div>
-                )}          
+                )}
 
 
             </main>
         );
-    } 
+    }
 
     //else if(courseList.length == 0 && userRole == '0')
     //{
-        //return <p>You have not yet been added to any courses. Contact your Instructor for information.</p>
+    //return <p>You have not yet been added to any courses. Contact your Instructor for information.</p>
     //}
 
-    
+
     else {
-        return (
-            <div className="spinner-wrapper">
-            <div className="spinner"></div>
-            </div>
-        );
-          
+        return <Loading />;
     }
 }
