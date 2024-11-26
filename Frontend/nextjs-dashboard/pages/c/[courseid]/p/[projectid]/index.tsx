@@ -8,7 +8,7 @@ import FileUpload from '@/app/ui/upload-form'
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
-import '@/app/ui/stylesheets/groups.css';
+import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';
 
 
@@ -102,7 +102,16 @@ export default function ProjectDetails(){
       }, [localId, projectid]);
 
 
-
+      const handleLogout = async () => {
+        const localId = Cookies.get('localId')
+        if (localId) {
+          Cookies.remove('localId');
+          Cookies.remove('idToken');
+          window.location.href = "/auth/login";
+        } else {
+          alert("You are already logged out.");
+        }
+      }
 
       const handleAddGroup = async () => {
             
@@ -152,82 +161,70 @@ export default function ProjectDetails(){
 
 
     return (
-        <div className="page-wrapper">
-          <div className="course-header">
-            {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
-            {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
-            {/*<p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>*/}
+      <div className="page-wrapper">
+        <div className="button-bar">
+          {/* Home Button on the Left */}
+          <Link href="/">
+            <button id="home">Home</button>
+          </Link>
+
+          {/* Logout Button on the Right */}
+          <button id="logout" onClick={handleLogout}>
+            Log Out
+          </button>
+        </div>
   
-          </div>
+        <div className="course-header">
+          <h1>{projectid?.split('_').slice(1).join(' ')}</h1>
+        </div>
   
-          <div className="content-grid">
-  
-            {/* Groups Section */}
-  
-            <div className="projects-section full-width-section">
-              <div className="section-header">
-                <h2>Groups</h2>
-                {userRole == '1' && 
-                  (<button className="add-button" onClick={()=>setIsAddGroupVisible(true)}>+ </button>)}
-              </div>
-              <div className="projects-grid" >
-                {groupDetails?.groups?.map((groups, index) => (
-                  <Link href={{
-                    pathname: '/c/[course_slug]/p/[project_slug]/g/[group_slug]',
-                    query: {course_slug: courseid, project_slug: projectid, group_slug: groups.group_id}}
-                  }> 
-                  <div key={index} className="project-card">
-                    {groups.group_name}
-                  </div>
-                  </Link>
-                ))}
-              </div>
-              <p className="view-all">View all</p>
+        <div className="content-grid-group">
+          <div className="projects-section">
+            <div className="section-header">
+              <h2>Groups</h2>
+              {userRole === '1' && (
+                <button className="add-button" onClick={() => setIsAddGroupVisible(true)}>
+                  +
+                </button>
+              )}
             </div>
   
-            {/* Students Section */}
-  
-           
+            <div className="projects-grid">
+              {groupDetails?.groups?.map((group, index) => (
+                <Link
+                  key={index}
+                  href={{
+                    pathname: '/c/[course_slug]/p/[project_slug]/g/[group_slug]',
+                    query: { course_slug: courseid, project_slug: projectid, group_slug: group.group_id }
+                  }}
+                >
+                  <div className="project-card">{group.group_name}</div>
+                </Link>
+              ))}
+            </div>
+            <p className="view-all">View all</p>
           </div>
-
-
-          {isaddGroupVisible && (
+        </div>
+  
+        {isaddGroupVisible && (
           <div className="popup">
-              <div className="popup_content">
-                  <h2>Add New Group</h2>
-                  {/**<input
-                      //ref={inputRef} // Attach the ref to the input field
-                      type="text"
-                      value={newGroupName}
-                      onChange={(e) => setNewGroupName(e.target.value)}
-                      placeholder="Project Name"/>**/}
-
-
-                  
-
-                  <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleAddGroup}>
-                          Add Group
-                      </button>
-                      <button className="popup_button cancel_button" onClick={() => setIsAddGroupVisible(false)}>
-                          Cancel
-                      </button>
-                  </div>
+            <div className="popup_content">
+              <h2>Add New Group</h2>
+              <div className="popup_buttons">
+                <button className="popup_button" onClick={handleAddGroup}>
+                  Add Group
+                </button>
+                <button
+                  className="popup_button cancel_button"
+                  onClick={() => setIsAddGroupVisible(false)}
+                >
+                  Cancel
+                </button>
               </div>
+            </div>
           </div>
         )}
-  
-          
-  
-          
-  
-        </div>
-
-
-
-        
-  
-        
-      );
+      </div>
+    );
     
 }

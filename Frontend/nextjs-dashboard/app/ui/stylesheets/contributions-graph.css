@@ -1,0 +1,40 @@
+#charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    gap: 20px;
+    padding: 20px;
+}
+
+
+.graph {
+    background-color: #2b2b2b; /* A subtle background for the graph container */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.loading {
+    height: 100%;           /* Fill available height */
+    width: 100%;            /* Fill available width */
+    grid-row-start: 1;
+    grid-column-start: 1;
+    grid-row-end: 3;
+    grid-column-end: 3;
+}
+
+.desc{
+    font-size: 50px;
+}
+
+
+.graph:hover {
+    transform: scale(1.02);
+    background-color: #232323;
+    border-color: white;
+}
+
+canvas {
+    width: 100% !important; /* Ensure canvas takes full width of the container */
+    height: auto !important; /* Maintain aspect ratio */
+}

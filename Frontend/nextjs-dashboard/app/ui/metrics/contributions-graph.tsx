@@ -4,12 +4,18 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import GitHubAppAuthorizationDialog from './github-app-authorization-dialog';
+import Loading from '@/app/ui/Loading.tsx';
+import '@/app/ui/stylesheets/loading.css'; 
+import '@/app/ui/stylesheets/contributions-graph.css'; 
+
+
 
 export default function ContributionsGraph( {group_id})
 {
     console.log('CONTRIBUTIONS GROUP ID RECEIVED: '+group_id)
 
     const[authDialog,showAuthDialog] = useState(false);
+    const [loading, setLoading] = useState(true); // Add loading state
 
     useEffect(() => {
         if (group_id) {
@@ -121,19 +127,29 @@ export default function ContributionsGraph( {group_id})
             }).catch((error) => {
                 console.log(error)
             })
+            .finally(() => {
+                setLoading(false); // Set loading to false after charts are ready
+              });
         }
-    }, [group_id])
+    }, [group_id]);
+
 
     return(
+        <>
+        
         <div id="charts">
-            <h3>Commits</h3>
-            <div style={{width: '800px'}}><canvas id="commits"></canvas></div>
-            <h3>Additions</h3>
-            {authDialog && <GitHubAppAuthorizationDialog />}
-            <div style={{width: '800px'}}><canvas id="additions"></canvas></div>
-            <h3>Deletions</h3>
-            <div style={{width: '800px'}}><canvas id="deletions"></canvas></div>
             
-        </div>
+            <div className="graph">
+            {!loading && <h3>Commits</h3>}
+            <div style={{width: '100%'}}><canvas id="commits"></canvas></div></div>
+            <div className="graph">
+            {!loading && <h3>Additions</h3>}
+            {authDialog && <GitHubAppAuthorizationDialog />}
+            <div style={{width: '100%'}}><canvas id="additions"></canvas></div></div>
+            <div className="graph">
+            {!loading && <h3>Deletions</h3>}
+            <div style={{width: '100%'}}><canvas id="deletions"></canvas></div></div>
+            
+        </div></>
     )
 }
