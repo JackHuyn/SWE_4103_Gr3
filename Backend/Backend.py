@@ -57,6 +57,7 @@ def signup_user():
     password = request.args.get("password", default = "", type = str)
     account_type = request.args.get("accountType", default = -1, type = int)
     instructor_key = request.args.get("instructorKey", default = "", type = str)
+    display_name = f"{fname} {lname}"
     try:
         if(account_type == 1 and not firebase_auth.validate_instructor_key(instructor_key)):
             raise fb_auth.InvalidInstructorKeyException
@@ -64,7 +65,7 @@ def signup_user():
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
 
-        dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid)
+        dbWrapper.addUser(account_type,email,fname,lname, signup_resp.uid, display_name)
         
         
         print(signup_resp)
@@ -179,16 +180,78 @@ def check_instructor_role():
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
 def validate_session():
-    local_id = request.args.get("localId", default = -1, type = str)
-    id_token = request.args.get("idToken", default = -1, type = str)
+    local_id = request.args.get("localId", default = "", type = str)
+    id_token = request.args.get("idToken", default = "", type = str)
     valid = firebase_auth.validate_token(local_id, id_token)
     response = app.response_class(
         response=json.dumps({'approved': valid}),
         status=200 if valid else 401,
         mimetype='application/json'
     )
-    print(response.response)
+    # print(response.response)
     return response
+
+@app.route('/auth/password-reset', methods=['POST'])
+@cross_origin()
+def password_change():
+    local_id = request.args.get("localId", default = "", type = str)
+    current_password = request.args.get("currentPassword", default = "", type = str)
+    password = request.args.get("password", default = "", type = str)
+    try:
+        userdata = firebase_auth.active_sessions[local_id]
+        uid = userdata.uid
+        email = userdata.email
+
+        login_resp = firebase_auth.sign_in_with_email_and_password(email, current_password, False)
+        if not login_resp:
+            raise fb_auth.InvalidLogin
+        valid = firebase_auth.change_password(uid, password)
+        print(valid)
+        if not dbWrapper.updateForceResetPassword(uid, False):
+            raise Exception
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except (KeyError, fb_auth.InvalidLogin) as ke:
+        print(ke)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Invlid Login'}),
+            status=401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    # print(response)
+    return response
+
+@app.route('/auth/forgot-password', methods=['POST'])
+@cross_origin()
+def forgot_password():
+    email = request.args.get("email", default = '', type = str)
+    try:
+        if email == '':
+            raise Exception
+        valid = firebase_auth.forgot_password(email)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
 
 @app.route('/auth/logout', methods=['POST'])
 @cross_origin()
@@ -270,7 +333,7 @@ def upload():
                     print(student_id + ': Add\tFail')
             else:
                 student_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, email) #password is email by default
-                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid):
+                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, force_password_reset=True):
                     student_id = student_resp.uid
                     print(student_id + ': Create\tDone')
                     if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -596,7 +659,7 @@ def add_a_student():
                 print(student_id + ': Add\tFail')
         else:
             student_resp = firebase_auth.sign_up_with_email_and_password(student_fname,student_lname,student_email,student_email) #password is email by default
-            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid):
+            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid, force_password_reset=True):
                 student_id = student_resp.uid
                 print(student_id + ': Create\tDone')
                 if dbWrapper.addStudentToCourse(student_id, course_id):
