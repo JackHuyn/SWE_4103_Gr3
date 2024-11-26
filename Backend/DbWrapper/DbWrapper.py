@@ -91,7 +91,7 @@ class DbWrapper:
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, display_name:str, github_personal_access_token:str="")->bool:
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, display_name:str, github_personal_access_token:str="", force_password_reset:bool=False)->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False
@@ -103,6 +103,7 @@ class DbWrapper:
         template["uid"] = uid
         template["display_name"] = display_name
         template["github_personal_access_token"] = github_personal_access_token
+        template["force_password_reset"] = force_password_reset
         self.db.collection(USERS).document(uid).set(template)
         return True
     def addGithubTokenToUser(self, uid:str, github_personal_access_token:str)->bool:
@@ -179,6 +180,7 @@ class DbWrapper:
         }
         template["github_repo_address"] = github_repo_address
         template["scrum_master"] = scrum_master
+        template['show_survey'] = 0
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -235,7 +237,7 @@ class DbWrapper:
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
         template["comment"] = comment
-        template["timestamp"] = firestore.SERVER_TIMESTAMP
+        template["timestamp"] = firestore.firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
             return True
@@ -328,7 +330,7 @@ class DbWrapper:
         try:
             doc.update({"joy_rating": joy_rating})
             doc.update({"comment": comment})
-            doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
+            doc.update({"timestamp": firestore.firestore.SERVER_TIMESTAMP})
         except:
             return False
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
@@ -437,7 +439,7 @@ class DbWrapper:
     # Project Access Functions
     def getRecentStudentJoyRatings(self, group_id:str) -> dict:
         group_id = group_id.lower()
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.firestore.Query.DESCENDING).stream()
         user_ids = []
         docList = []
         for doc in docs:
@@ -460,6 +462,31 @@ class DbWrapper:
         print("UID: ", uid)
         return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
     
+    def updateForceResetPassword(self, uid:str, force_password_reset:bool) -> bool:
+        docs = self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()
+        result = False
+        for doc in docs:
+            doc.reference.set({'force_password_reset': force_password_reset}, merge=True)
+            result = True
+        return result
+
+    def showSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 1})
+        except:
+            return False
+        return True
+    
+    def hideSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 0})
+        except:
+            return False
+        return True
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'
