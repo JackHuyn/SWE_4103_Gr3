@@ -31,6 +31,9 @@ def getOAuthTokenFromCode(client_id, client_secret, code):
     # return r.json()
     return {}
 
+def getGitHubLogin(auth):
+    g = Github(auth=auth, base_url=GITHUB_BASE_URL)
+    return g.get_user().login
 
 class GitHubManager:
 
