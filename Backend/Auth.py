@@ -79,7 +79,7 @@ class FirebaseAuth:
             return False
         uid = decoded_token['uid']
         
-        return {'status': True, 'uid':uid}
+        return {'status': True, 'uid': uid, 'force_password_reset': user_session.force_password_reset}
     
     def change_password(self, uid:str, new_password:str):
         return True if (self.auth.update_user(uid, password=new_password)) else False

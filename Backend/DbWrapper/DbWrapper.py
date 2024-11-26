@@ -83,7 +83,7 @@ class DbWrapper:
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="", force_password_reset:bool=False)->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False
@@ -94,6 +94,7 @@ class DbWrapper:
         template["last_name"] = last_name
         template["uid"] = uid
         template["github_personal_access_token"] = github_personal_access_token
+        template["force_password_reset"] = force_password_reset
         self.db.collection(USERS).document(uid).set(template)
         return True
     def addGithubTokenToUser(self, uid:str, github_personal_access_token:str)->bool:
@@ -385,6 +386,14 @@ class DbWrapper:
         print("UID: ", uid)
         return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
     
+    def updateForceResetPassword(self, uid:str, force_password_reset:bool) -> bool:
+        docs = self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()
+        result = False
+        for doc in docs:
+            doc.reference.set({'force_password_reset': force_password_reset}, merge=True)
+            result = True
+        return result
+
 
 if __name__ == "__main__":
     FIREBASE_WEB_API_KEY = 'AIzaSyD-f3Vq6kGVXcfjnMmXFuoP1T1mRx7VJXo'

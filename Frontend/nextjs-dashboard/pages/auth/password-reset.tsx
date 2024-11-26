@@ -1,5 +1,6 @@
 import '@/app/ui/stylesheets/password-reset.css'
 import Cookies from 'js-cookie';
+import { redirect } from 'next/navigation';
 
 
 
@@ -51,6 +52,8 @@ export default function PasswordReset() {
                 if(!r['approved'])
                     throw 'idek bro'
                 console.log(r)
+
+                window.location.href = '/auth/login'
                 
             } catch(err) {
                 console.log(err)

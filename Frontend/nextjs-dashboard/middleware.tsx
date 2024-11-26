@@ -7,8 +7,7 @@ import {NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest){
 
     // console.log('PATH NAME:  ', request.nextUrl.pathname)
-    if (!request.nextUrl.pathname.startsWith('/auth/login') && 
-        !request.nextUrl.pathname.startsWith('/auth/signup') &&
+    if (!request.nextUrl.pathname.startsWith('/auth/') &&
         !request.nextUrl.pathname.startsWith('/_next/')) {
 
         //get the cookies
@@ -31,10 +30,17 @@ export async function middleware(request: NextRequest){
 
             const status = data.approved.status 
             const uid = data.approved.uid
+            const force_password_reset = data.approved.force_password_reset
             console.log('status', status)
             console.log('uid: ', uid)
 
-            const response = NextResponse.next()
+            
+            let response = NextResponse.next()
+
+            if(force_password_reset)
+            {
+                response = NextResponse.redirect(new URL('/auth/password-reset', request.url))
+            }
 
             //response.headers.set('user-id',uid)
 

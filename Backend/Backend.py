@@ -206,23 +206,28 @@ def password_change():
             raise fb_auth.InvalidLogin
         valid = firebase_auth.change_password(uid, password)
         print(valid)
+        if not dbWrapper.updateForceResetPassword(uid, False):
+            raise Exception
         response = app.response_class(
             response=json.dumps({'approved': valid}),
             status=200 if valid else 401,
             mimetype='application/json'
         )
     except (KeyError, fb_auth.InvalidLogin) as ke:
+        print(ke)
         response = app.response_class(
             response=json.dumps({'approved': False, 'reason': 'Invlid Login'}),
             status=401,
             mimetype='application/json'
         )
     except Exception as e:
+        print(e)
         response = app.response_class(
             response=json.dumps({'approved': False}),
             status=401,
             mimetype='application/json'
         )
+    # print(response)
     return response
 
 @app.route('/auth/forgot-password', methods=['POST'])
@@ -327,7 +332,7 @@ def upload():
                     print(student_id + ': Add\tFail')
             else:
                 student_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, email) #password is email by default
-                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid):
+                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, force_password_reset=True):
                     student_id = student_resp.uid
                     print(student_id + ': Create\tDone')
                     if dbWrapper.addStudentToCourse(student_id, course_id):
