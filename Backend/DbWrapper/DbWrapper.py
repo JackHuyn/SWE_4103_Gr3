@@ -13,6 +13,7 @@ PROJECTS = "projectdata"
 USERS = "userdata"
 JOY = "joydata"
 VELOCITY = "velocitydata"
+ASSESSMENT = "pointdistribution"
 
 class DbWrapper:
     def __init__(self, dbObject):
@@ -76,13 +77,18 @@ class DbWrapper:
     def getTeamJoy(self, group_id:str)->list[dict]:
         doc = self.db.collection(GROUPS).document(group_id).get()
         return doc.to_dict()['avg_joy']
-
     def getTeamVelocity(self, group_id:str)->list[dict]:
         docs = self.db.collection(VELOCITY).where(filter=FieldFilter("group_id", "==", group_id)).stream()
         docList = []
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
+    def getStudentScalingFactor(self, group_id:str, student_id:str=""):
+        doc = self.db.collection(ASSESSMENT).document(group_id).get()
+        try:
+            return doc.to_dict()["scaling_factors"][student_id]
+        except: 
+            return False
     def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
@@ -144,6 +150,32 @@ class DbWrapper:
         self.db.collection(PROJECTS).document(project_id).set(template)
         return True
     
+    def addTenPointPeerAssessment(self, project_id:str,group_id:str, student_ids:list[str]=[],scrum_master:list[str]="")->bool:
+        template = {}
+        template["group_id"] = group_id
+        template["project_id"] = project_id
+        template["assessment_table"] = {}
+        template["scaling_factors"] = {}
+        for student_id in student_ids:
+            template["assessment_table"] = {student_id: "N/A"}
+            template["scaling_factors"] = {student_id: "N/A"}
+        self.db.collection(ASSESSMENT).document(group_id).set(template)
+        return True
+
+    def addStudentTenPointPeerAssessmentEntry(self, group_id:str, student_id:str, points: int)->bool:
+        try:
+            assess = self.db.collection(ASSESSMENT).document(group_id)
+            toAdd = assess.to_dict()["assessment_table"][student_id]
+            if toAdd == "N/A":
+                toAdd = 0
+            assess.update({"assessment_table": {student_id: toAdd + points }})
+            self.updateTenPointPeerAssessment()
+            return True
+        except:
+            return False
+
+
+
     def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]="")->bool:
         x = self.getProjectGroups(project_id)
         group_n = len(x) + 1
@@ -170,7 +202,9 @@ class DbWrapper:
                 template["group_id"] = group_id
             else:
                 self.db.collection(GROUPS).document(group_id).set(template)
+                self.addTenPointPeerAssessment(project_id, group_id, student_ids, scrum_master,)
                 inserted = True
+        
         return True
     
     def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
@@ -188,8 +222,12 @@ class DbWrapper:
     
     def addStudentToGroup(self, group_id:str, student_id:str)->bool:
         doc = self.db.collection(GROUPS).document(group_id)
+        assess = self.db.collection(ASSESSMENT).document(group_id)
         try:
             doc.update({"student_ids": ArrayUnion([student_id])})
+            assess.update({"assessment_table": {student_id: "N/A" }})
+            assess.update({"scaling_factors": {student_id: "N/A" }})
+            
         except:
             return False
         return True
@@ -316,6 +354,14 @@ class DbWrapper:
             return False
         return True
 
+    def updateTenPointPeerAssessment(self, group_id):
+        assess = self.db.collection(ASSESSMENT).document(group_id)
+        rawAssessments = assess.to_dict()["assessment_table"]
+        divisor = (len(rawAssessments) * 10) - 10
+        for key, val in rawAssessments:
+            assess.update({"scaling_factors": {key: val/divisor}})
+
+
     def removeCourse(self, course_id:str)->bool:
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         print(course_id)
@@ -346,6 +392,7 @@ class DbWrapper:
             return False
         try:
             self.db.collection(GROUPS).document(group_id).delete()
+            self.db.collection(ASSESSMENT).document(group_id).delete()
         except:
             return False
         return True
@@ -395,26 +442,29 @@ if __name__ == "__main__":
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     test = DbWrapper(db)
-    docs = test.getStudentCourses("3713652")
-    print(docs)
+    # docs = test.getStudentCourses("3713652")
+    # print(docs)
     print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
     print(test.addStudentToCourse("3713652", "TestCourse"))
-    print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
-    print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
+    # print(test.getUserData("TestUser"))
+    # # print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+    # print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
     print(test.activateCourse("TestCourseAgain"))
     print(test.getInstructorCourses("some_prof"))
     print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
+    print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
     print(test.addGroup("java3_proj1"))
     print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
-    print(test.addNGroups("java3_proj1", 5))
-    print(test.removeGroup("java3_proj1_gr1"))
-    print(test.addGroup("java3_proj1"))
-    print(test.removeProject("java3_proj1"))
-    print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
-    print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
-    print(test.getTeamVelocity("java3_proj1_gr1"))
-    print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
+    print(test.getStudentScalingFactor("ECE2711_abc1_gr13","vTRZQxoDzWTtPYCOPr8LxIcJk702"))
+    #print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
+    #print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
+    # print(test.addNGroups("java3_proj1", 5))
+    # print(test.removeGroup("ECE2711_abc1"))
+    # print(test.addGroup("java3_proj1"))
+    print(test.removeProject("ECE2711_abc1"))
+    # print(test.removeProject("java3_proj1"))
+    # print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
+    # print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
+    # print(test.getTeamVelocity("java3_proj1_gr1"))
+    # print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
     #print(test.removeCourse("TestCourseAgain"))

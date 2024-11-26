@@ -70,7 +70,7 @@ class StudentMetrics:
     def get_team_velocity(self, group_id):
         return self.db.getTeamVelocity(group_id)
 
-    def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
+    def add_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
         return self.db.addVelocityData(group_id, start_date, end_date, planned_story_points, completed_story_points)
 
     def modify_team_velocity(self, velocity_id, sprint_start, sprint_end, points):
@@ -78,6 +78,12 @@ class StudentMetrics:
     
     def remove_team_velocity(self, velocity_id):
         return self.db.removeVelocity(velocity_id)
+
+    def add_student_10point_assessment(self, group_id, student_id, points):
+        return self.db.addStudentTenPointPeerAssessmentEntry(group_id, student_id, points)
+    
+    def get_student_scaling_factor(self, group_id, student_id):
+        return self.db.getStudentScalingFactor(self, group_id, student_id)
 
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
