@@ -166,7 +166,7 @@ def getGroupStudents():
         list_of_students = group_data['student_ids']
 
         response = app.response_class(
-            response=json.dumps({'approved': True}),
+            response=json.dumps({'approved': True, 'student_list': list_of_students}),
             status=200,
             mimetype='application/json'
         )
