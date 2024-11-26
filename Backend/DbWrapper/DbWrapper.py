@@ -85,7 +85,7 @@ class DbWrapper:
         return doc.to_dict()['avg_joy']
 
     def getTeamVelocity(self, group_id:str)->list[dict]:
-        group_id.lower(group_id)
+        group_id = group_id.lower()
         docs = self.db.collection(VELOCITY).where(filter=FieldFilter("group_id", "==", group_id)).stream()
         docList = []
         for doc in docs:
