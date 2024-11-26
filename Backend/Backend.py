@@ -155,6 +155,35 @@ def getGroupData(group_id):
     return group_data
 
 
+@app.route('/get-group-students',methods=['GET'])
+@cross_origin()
+def getGroupStudents():
+
+    try:
+        group_id = request.args.get("groupId", default="-1",type=str)
+        local_id = request.args.get("localId", default="-1",type=str)
+        group_data = getGroupData(group_id)
+        list_of_students = group_data['student_ids']
+
+        response = app.response_class(
+            response=json.dumps({'approved': True}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    
+
+    except:
+         response = app.response_class(
+            response = json.dumps({'approved': False, 'message':'Sever error'}),
+            status = 401,
+            mimetype = 'application/json'
+        )
+
+
+    
+
+
 @app.route('/check-scrum-master',methods=['GET'])
 @cross_origin()
 def check_scrum_master_role():
