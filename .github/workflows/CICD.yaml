@@ -1,0 +1,105 @@
+name: CI Pipeline
+
+on: 
+  push:
+    branches: 
+      - '*'  # Trigger on all branches for push
+  pull_request:
+    branches:
+      - '*'  # Trigger on all branches for pull requests
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12.0"]
+
+    env:
+      CI: false  
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          mkdir -p logFile
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Remove Python cache files
+      - name: Remove Python cache files
+        run: |
+          find . -name "__pycache__" -type d -exec rm -r {} +
+          find . -name "*.pyc" -exec rm -f {} +
+
+  testing:
+    name: CI
+    runs-on: ${{ matrix.os }}
+    needs:
+      - build  # Testing depends on build
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install dependencies (same as build to ensure consistency)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-flask pytest-repeat
+
+      # Run Tests
+      - name: Run Tests
+        run: |
+          python -m pytest Backend/Unit_Test/ --junitxml=logFile/test-results.xml --cov=Backend --cov-report=xml
+          
+      - name: Compress and upload log files
+        uses: actions/upload-artifact@master
+        with:
+          name: logFile
+          path: logFile/
+          if-no-files-found: error
+          retention-days: 7
+
+
+  deploy:
+    name: Deploy
+    needs: 
+      - build
+      - testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+      - name: Download Artifact
+        uses: actions/download-artifact@master
+        with:
+          name: logFile
+          path: logFile/
+
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
