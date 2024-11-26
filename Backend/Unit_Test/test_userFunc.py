@@ -23,6 +23,7 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             first_name="Test",
             last_name="User",
             uid="testuser",
+            display_name="Tester",
             github_personal_access_token="github_token"
         )
         
@@ -33,6 +34,7 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             "first_name": "Test",
             "last_name": "User",
             "uid": "testuser",
+            "display_name": "Tester",
             "github_personal_access_token": "github_token"
         })
         self.assertTrue(result)
@@ -49,6 +51,7 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             first_name="Test",
             last_name="User",
             uid="testuser",
+            display_name="Tester",
             github_personal_access_token="github_token"
         )
         

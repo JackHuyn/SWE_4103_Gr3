@@ -1,6 +1,5 @@
 import firebase_admin
 from firebase_admin import auth, credentials, firestore
-import firebase_admin.firestore
 from google.cloud.firestore_v1.base_query import FieldFilter, And
 from google.cloud.firestore_v1 import ArrayUnion
 import os
@@ -18,6 +17,7 @@ class DbWrapper:
     def __init__(self, dbObject):
         self.db = dbObject
     def archiveCourse(self, course_id:str)->bool:
+        course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
         try:
             doc.update({"status": 1})
@@ -25,6 +25,7 @@ class DbWrapper:
             return False
         return True
     def activateCourse(self, course_id:str)->bool:
+        course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
         try:
             doc.update({"status": 0})
@@ -35,6 +36,7 @@ class DbWrapper:
         docs = self.db.collection(USERS).document(uid).get()
         return docs.to_dict()
     def getCourseData(self, course_id:str) -> dict:
+        course_id = course_id.lower()
         docs = self.db.collection(COURSES).document(course_id).get()
         return docs.to_dict()
     def getStudentCourses(self, student_id:str) -> list[dict]:
@@ -50,21 +52,25 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getProjectData(self, project_id:str)->dict:
+        project_id = project_id.lower()
         docs = self.db.collection(PROJECTS).document(project_id).get()
         return docs.to_dict()
     def getProjectGroups(self, project_id:str)->list[dict]:
+        project_id = project_id.lower()
         docs = self.db.collection(GROUPS).where(filter=FieldFilter("project_id", "==", project_id)).stream()
         docList = []
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def getCourseProjects(self, course_id:str)->dict:
+    def getCourseProjects(self, course_id:str)->list[dict]:
+        course_id = course_id.lower()
         docs = self.db.collection(PROJECTS).where(filter=FieldFilter("course_id", "==", course_id)).stream()
         docList = []
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
     def getGroupData(self, group_id:str)->dict:
+        group_id = group_id.lower()
         docs = self.db.collection(GROUPS).document(group_id).get()
         return docs.to_dict()
     def getStudentGroups(self, student_id:str)->list[dict]:
@@ -74,16 +80,18 @@ class DbWrapper:
             docList.append(doc.to_dict())
         return docList
     def getTeamJoy(self, group_id:str)->list[dict]:
+        group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id).get()
         return doc.to_dict()['avg_joy']
 
     def getTeamVelocity(self, group_id:str)->list[dict]:
+        group_id = group_id.lower()
         docs = self.db.collection(VELOCITY).where(filter=FieldFilter("group_id", "==", group_id)).stream()
         docList = []
         for doc in docs:
             docList.append(doc.to_dict())
         return docList
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, display_name:str, github_personal_access_token:str="")->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False
@@ -93,6 +101,7 @@ class DbWrapper:
         template["first_name"] = first_name
         template["last_name"] = last_name
         template["uid"] = uid
+        template["display_name"] = display_name
         template["github_personal_access_token"] = github_personal_access_token
         self.db.collection(USERS).document(uid).set(template)
         return True
@@ -104,6 +113,7 @@ class DbWrapper:
             return False
         return True
     def addStudentToCourse(self, student_id:str, course_id:str) -> bool:
+        course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
         try:
             doc.update({"student_ids": ArrayUnion([student_id])})
@@ -111,6 +121,7 @@ class DbWrapper:
             return False
         return True
     def addInstructorToCourse(self, instructor_id:str, course_id:str) -> bool:
+        course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
         try:
             doc.update({"instructor_ids": ArrayUnion([instructor_id])})
@@ -118,6 +129,7 @@ class DbWrapper:
             return False
         return True
     def addCourse(self, course_description:str, course_id:str, instructor_ids:list[str], section:str, term:str, student_ids=[], status=0)->bool:
+        course_id = course_id.lower()
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
         if len(x) > 0:  
             return False
@@ -133,6 +145,8 @@ class DbWrapper:
         return True
     
     def addProject(self, course_id:str, project_id:str, project_name:str, github_repo_address:str="")->bool:
+        course_id = course_id.lower()
+        project_id = project_id.lower()
         x = [i for i in self.db.collection(PROJECTS).where(filter=FieldFilter("project_id", "==", project_id)).stream()]
         if len(x) > 0:
             return False
@@ -144,14 +158,18 @@ class DbWrapper:
         self.db.collection(PROJECTS).document(project_id).set(template)
         return True
     
-    def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]="")->bool:
+    def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]=[])->bool:
+        project_id = project_id.lower()
         x = self.getProjectGroups(project_id)
         group_n = len(x) + 1
         template = {}
         group_id = f"{project_id}_gr{group_n}"
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
-        #template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        try:
+            template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+        except TypeError:
+            return False
         template["project_id"] = project_id
         template["student_ids"] = student_ids
         today = datetime.datetime.today()
@@ -161,6 +179,7 @@ class DbWrapper:
         }
         template["github_repo_address"] = github_repo_address
         template["scrum_master"] = scrum_master
+        template['show_survey'] = 0
         inserted = False
         while(not inserted):
             x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
@@ -168,12 +187,14 @@ class DbWrapper:
                 group_n -= 1
                 group_id = f"{project_id}_gr{group_n}"
                 template["group_id"] = group_id
+                template["group_name"] = f"{projData["project_name"]} Group {group_n}"
             else:
                 self.db.collection(GROUPS).document(group_id).set(template)
                 inserted = True
         return True
     
     def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
+        group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
         try:
             doc.update({"github_repo_address": github_repo_address})
@@ -182,11 +203,13 @@ class DbWrapper:
         return True
 
     def addNGroups(self, project_id:str, n:int)->bool:
+        project_id = project_id.lower()
         for i in range(n):
             self.addGroup(project_id)
         return True
     
     def addStudentToGroup(self, group_id:str, student_id:str)->bool:
+        group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
         try:
             doc.update({"student_ids": ArrayUnion([student_id])})
@@ -195,6 +218,7 @@ class DbWrapper:
         return True
     
     def addJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
+        group_id = group_id.lower()
         now = datetime.datetime.now()
         current_date = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
         timezone = pytz.timezone('Etc/GMT-4')  # Replace 'UTC' with your desired timezone
@@ -212,13 +236,14 @@ class DbWrapper:
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
         template["comment"] = comment
-        template["timestamp"] = firestore.SERVER_TIMESTAMP
+        template["timestamp"] = firestore.firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
             return True
         return False
     
     def calculateJoyAverage(self, group_id:str, date):
+        group_id = group_id.lower()
         date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
         date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
         timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
@@ -255,16 +280,18 @@ class DbWrapper:
 
         return True
     
-    def addScrumMasterToGroup(self, group_id:str, scrum_master:list[str]="")->bool:
+    def addScrumMasterToGroup(self, group_id:str, scrum_master:str)->bool:
+        group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
         try:
-            doc.update({"scrum_master": scrum_master})
+            doc.update({"scrum_master": ArrayUnion(scrum_master)})
         except:
             return False
         return True
     
     
     def addVelocityData(self, group_id:str, sprint_start:datetime.datetime, sprint_end:datetime.datetime, planned_points:int, completed_points:int=0)->bool:
+        group_id = group_id.lower()
         sprints = self.getTeamVelocity(group_id)
         sprint_num = len(sprints) + 1
         docId = f"{group_id}_Sprint{sprint_num}"
@@ -287,14 +314,22 @@ class DbWrapper:
                 inserted = True
         return True
 
+    def updateDisplayName(self, uid:str, display_name:str)->bool:
+        doc = self.db.collection(USERS).document(f"{uid}")
+        try:
+            doc.update({"display_name": display_name})
+        except:
+            return False
+        return True
 
     def updateJoyRating(self, student_id:str, group_id:str, joy_rating:int, comment:str)->bool:
+        group_id = group_id.lower()
         timestamp = int(datetime.datetime.strptime(datetime.datetime.now().strftime("%d/%m/%Y"), "%d/%m/%Y").timestamp())
         doc = self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}")
         try:
             doc.update({"joy_rating": joy_rating})
             doc.update({"comment": comment})
-            doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
+            doc.update({"timestamp": firestore.firestore.SERVER_TIMESTAMP})
         except:
             return False
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
@@ -316,18 +351,56 @@ class DbWrapper:
             return False
         return True
 
+    def removeStudentFromCourse(self, student_id:str, course_id:str)->bool:
+        course_id = course_id.lower()
+        doc = self.db.collection(COURSES).document(course_id)
+        stu_grps = self.getStudentGroups(student_id)
+        course_projs_dict = self.getCourseProjects(course_id)
+        course_projs = []
+        for e in course_projs_dict:
+            course_projs.append(e['project_id'])
+        for e in stu_grps:
+            if course_projs.count(e['project_id']) > 0:
+                self.removeStudentFromGroup(student_id, e['group_id'])
+        try:
+            doc.update({'student_ids': firestore.firestore.ArrayRemove(student_id)})
+        except:
+            return False
+        return True
+
+    def removeStudentFromGroup(self, student_id:str, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'scrum_master': firestore.firestore.ArrayRemove(student_id)})
+            doc.update({'student_ids': firestore.firestore.ArrayRemove(student_id)})
+        except:
+            return False
+        return True
+
+    def removeScrumMaster(self, student_id, group_id)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'scrum_master': firestore.firestore.ArrayRemove(student_id)})
+        except:
+            return False
+        return True
+
     def removeCourse(self, course_id:str)->bool:
+        course_id = course_id.lower()
         x = [i for i in self.db.collection(COURSES).where(filter=FieldFilter("course_id", "==", course_id)).stream()]
-        print(course_id)
-        print(x)
         if len(x) == 0:
             return False
+        for e in self.getCourseProjects(course_id):
+            self.removeProject(e["project_id"])
         try:
             self.db.collection(COURSES).document(course_id).delete()
         except:
             return False
         return True
     def removeProject(self, project_id:str)->bool:
+        project_id = project_id.lower()
         x = [i for i in self.db.collection(PROJECTS).where(filter=FieldFilter("project_id", "==", project_id)).stream()]
         if len(x) == 0:
             return False
@@ -341,6 +414,7 @@ class DbWrapper:
             return False
         return True
     def removeGroup(self, group_id:str)->bool:
+        group_id = group_id.lower()
         x = [i for i in self.db.collection(GROUPS).where(filter=FieldFilter("group_id", "==", group_id)).stream()]
         if len(x) == 0:
             return False
@@ -363,7 +437,8 @@ class DbWrapper:
     
     # Project Access Functions
     def getRecentStudentJoyRatings(self, group_id:str) -> dict:
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        group_id = group_id.lower()
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.firestore.Query.DESCENDING).stream()
         user_ids = []
         docList = []
         for doc in docs:
@@ -378,12 +453,31 @@ class DbWrapper:
         return docList
     
     def getGithubRepoAddress(self, group_id:str):
+        group_id = group_id.lower()
         docs = self.db.collection(GROUPS).document(group_id).get()
         return docs.to_dict()['github_repo_address']
 
     def updateGithubOAuthToken(self, uid:str, github_oauth_token:str) -> bool:
         print("UID: ", uid)
         return self.db.collection(USERS).document(uid).update({"github_personal_access_token": github_oauth_token})
+    
+    def showSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 1})
+        except:
+            return False
+        return True
+    
+    def hideSurveys(self, group_id:str)->bool:
+        group_id = group_id.lower()
+        doc = self.db.collection(GROUPS).document(group_id)
+        try:
+            doc.update({'show_survey': 0})
+        except:
+            return False
+        return True
     
 
 if __name__ == "__main__":
@@ -397,24 +491,25 @@ if __name__ == "__main__":
     test = DbWrapper(db)
     docs = test.getStudentCourses("3713652")
     print(docs)
-    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+    #print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
     print(test.addStudentToCourse("3713652", "TestCourse"))
     print(test.getUserData("TestUser"))
-    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
+    print(test.addUser(1,"test111@unb.ca","Test","Account","some_student", "Tester"))
     print(test.addCourse("Another Test Course", "TestCourseAgain", ["some_prof"], "FR01A", "FA2024"))
     print(test.activateCourse("TestCourseAgain"))
     print(test.getInstructorCourses("some_prof"))
     print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
     print(test.addGroup("java3_proj1"))
     print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
-    print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
-    print(test.addNGroups("java3_proj1", 5))
-    print(test.removeGroup("java3_proj1_gr1"))
-    print(test.addGroup("java3_proj1"))
+    print(test.removeStudentFromCourse(3713652, "java3"))
+    # print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
+    # print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
+    # print(test.addNGroups("java3_proj1", 5))
+    # print(test.removeGroup("java3_proj1_gr1"))
+    # print(test.addGroup("java3_proj1"))
     print(test.removeProject("java3_proj1"))
-    print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
-    print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
-    print(test.getTeamVelocity("java3_proj1_gr1"))
-    print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
-    #print(test.removeCourse("TestCourseAgain"))
+    # print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
+    # print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
+    # print(test.getTeamVelocity("java3_proj1_gr1"))
+    # print(test.removeVelocity("java3_proj1_gr1_Sprint1"))
+    print(test.removeCourse("TestCourseAgain"))
