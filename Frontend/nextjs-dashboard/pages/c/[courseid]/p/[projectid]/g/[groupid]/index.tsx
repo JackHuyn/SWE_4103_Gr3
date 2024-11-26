@@ -12,6 +12,8 @@ import { useState, useEffect } from 'react';
 import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import HandleLogout from '@/app/ui/logout';
+import '@/app/ui/stylesheets/popup.css';
+import '@/app/ui/stylesheets/courseDetails.css';
 import { group } from 'console';
 
 export default function Metrics() {
@@ -57,6 +59,7 @@ export default function Metrics() {
         if (router.isReady) {
 
             const group_id = router.query.groupid;
+            /////////
             setGroupId(group_id);
             
             console.log("Group ID:", group_id);
@@ -73,7 +76,7 @@ export default function Metrics() {
         }
       }, [groupId]);
 
-//------------------ Remove Project -------------------
+//------------------ Survey -------------------
 const survey = () =>{
     setIsSurveyPopupVisible(true);
 };
@@ -110,7 +113,7 @@ const handleRemoveProject = async () => {
         alert('Please fill in all the fields.');
     }
 };
-//-----------------------------------------------------
+//---------------------------------------------
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
@@ -224,6 +227,31 @@ const handleRemoveProject = async () => {
                 <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
+                    {/*Handle survey*/}
+                    {isSurveyPopupVisible && (
+                        <div className="popup">
+                            <div className="popup_content">
+                                <h2>Survey</h2>
+                                <h3>10-point distribution: total points = studentNum*10</h3>
+                                <div className="checkbox-list">
+                                    <div className="checkbox-header">
+                                        <div className="header-item">Student Name</div>
+                                        <div className="header-item">Point</div>
+                                    </div>       
+                                </div>
+                                
+                                <div className="popup_buttons">
+                                    <Button className="popup_button" >
+                                          Ok
+                                    </Button>
+                                    <Button className="popup_button cancel_button" onClick={() => setIsSurveyPopupVisible(false)}>
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
             {(isPopupVisible || isPopup2Visible || isGithubDialogVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
@@ -265,29 +293,6 @@ const handleRemoveProject = async () => {
                             </div>
                           
                     )}
-                    {/*Handle survey*/}
-                    {isSurveyPopupVisible && (
-                        <div className="popup">
-                            <div className="popup_content">
-                                <h2>Survey</h2>
-            <div className="checkbox-list">
-              <div className="checkbox-header">
-                <div className="header-item">Group Name</div>
-                <div className="header-item">To Remove</div>
-              </div>
-              
-            </div>
-            <div className="popup_buttons">
-              <Button className="popup_button" >
-                  Ok
-              </Button>
-              <Button className="popup_button cancel_button" onClick={() => setIsSurveyPopupVisible(false)}>
-                  Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
                 </div>
             )}
         </div>

@@ -28,13 +28,19 @@
 .popup_content h1 {
     font-size: 1.5rem;
     color: white;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .popup_content h2 {
     font-size: 2rem;
     color: white;
     margin-bottom: 20px;
+}
+
+.popup_content h3 {
+    font-size: 1rem;
+    color: white;
+    margin-bottom: 10px;
 }
 
 .popup_content input {
