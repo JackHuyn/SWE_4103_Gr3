@@ -67,9 +67,18 @@ class StudentMetrics:
         # ]
         return self.db.getTeamVelocity(group_id)
     
+    def get_team_velocity(self, group_id):
+        return self.db.getTeamVelocity(group_id)
+
     def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
         return self.db.addVelocityData(group_id, start_date, end_date, planned_story_points, completed_story_points)
+
+    def modify_team_velocity(self, velocity_id, sprint_start, sprint_end, points):
+        return self.db.updateVelocityData(velocity_id, sprint_start, sprint_end, points)
     
+    def remove_team_velocity(self, velocity_id):
+        return self.db.removeVelocity(velocity_id)
+
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
         git = github.GitHubManager(auth, repo_address)
