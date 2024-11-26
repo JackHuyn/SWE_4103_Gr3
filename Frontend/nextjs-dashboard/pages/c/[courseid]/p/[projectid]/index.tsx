@@ -4,11 +4,17 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
+import HandleLogout from '@/app/ui/logout';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/groups.css';
+<<<<<<< HEAD
 import { groups } from 'console';
+=======
+import '@/app/ui/stylesheets/coursePage.css';
+import { group } from 'console';
+>>>>>>> role_scrum_master
 
 
 /**
@@ -39,6 +45,8 @@ export default function ProjectDetails(){
   const [userRole, setUserRole] = useState('')  
   const [loading,setLoading] = useState(true) // Loading state
   const inputRef = useRef(null); // Create a ref for the input field
+  const [nGroups, setNGroups] = useState("1");
+  
 
   useEffect(() => {
     setCourseId(router.query.courseid)
@@ -91,17 +99,22 @@ const addGroup = () =>{
   setIsAddGroupVisible(true);
 };
 //Function: handle add group
-const handleAddGroup = async () => {            
+const handleAddGroup = async () => {
+  //console.log("The number found is : ", nGroups)  
+  //return          
   //Ensure localId cookie is valid
   const localId  = Cookies.get('localId')  
   if (!localId){
     window.location.href = "/auth/login"
   }
   const groupData = {              
-    project_id: projectid
+    project_id: projectid,
+    n_groups: nGroups
   };
   try {              
     //Need to have checks to ensure that the instructor is valid 
+
+    
     const response = await fetch('http://localhost:3001/add-group' , {
       method: 'POST',
       headers: {
@@ -109,6 +122,7 @@ const handleAddGroup = async () => {
       },
       body: JSON.stringify(groupData),  // Send JSON data in request body
     });
+
     const result = await response.json();
     if (response.ok) {
       window.location.reload();
@@ -169,6 +183,15 @@ const handleRemoveGroups = async () => {
   alert('Error removing group. Please try again later.');
   }
 };
+
+const handleChangeNumber = (event) => {
+  const value = event.target.value;
+
+  setNGroups(value)
+  
+};
+
+
 //-------------------------------------------------
 //------------------ Manage Group -----------------
 //Function: set visibiliy of manageGroup popup
@@ -230,6 +253,7 @@ const handleManageGroups = async () => {
 
   return (
     <div className="page-wrapper">
+      <button id="logout" onClick={HandleLogout}>Log Out</button>
       <div className="course-header">
         {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
         {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
@@ -271,7 +295,25 @@ const handleManageGroups = async () => {
         <div className="popup">
           <div className="popup_content">
             <h2>Add New Group</h2>
+            <p>Select the number of groups to add</p>
             <div className="popup_buttons">
+
+            <select
+        className="number-select"
+        //value = {nGroups}
+        onChange={handleChangeNumber}
+        //style={{ padding: "5px" }}
+      >
+        
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+          <option key={num} value={num}>
+            {num}
+          </option>
+        ))}
+      </select>
+      
+
+            
               <Button className="popup_button" onClick={handleAddGroup}>
                   Add
               </Button>
