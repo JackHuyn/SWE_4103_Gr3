@@ -79,6 +79,21 @@ class StudentMetrics:
     def remove_team_velocity(self, velocity_id):
         return self.db.removeVelocity(velocity_id)
 
+    def ten_point_assessment_handler(self, group_id, current_student_id ,student_ids: list[str], points: list[int]):
+        if len(student_ids) <= 1 or sum(points) > len(student_ids) * 10:
+            return False
+        
+        if len(student_ids) != len(points):
+            raise ValueError("Number of students and points must be equal.")
+        try:
+            for student, point in zip(student_ids, points):
+                if studen != current_student_id:
+                    self.add_student_10point_assessment(group_id, student, point)
+            return True
+        except:
+            print("Error adding assessments")
+            return False
+    
     def add_student_10point_assessment(self, group_id, student_id, points):
         return self.db.addStudentTenPointPeerAssessmentEntry(group_id, student_id, points)
     

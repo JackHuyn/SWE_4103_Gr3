@@ -164,14 +164,19 @@ class DbWrapper:
 
     def addStudentTenPointPeerAssessmentEntry(self, group_id:str, student_id:str, points: int)->bool:
         try:
-            assess = self.db.collection(ASSESSMENT).document(group_id)
-            toAdd = assess.to_dict()["assessment_table"][student_id]
-            if toAdd == "N/A":
-                toAdd = 0
-            assess.update({"assessment_table": {student_id: toAdd + points }})
-            self.updateTenPointPeerAssessment()
+            doc = self.db.collection(ASSESSMENT).document(group_id)
+            assess = doc.get()
+            toAdd = assess.to_dict()["assessment_table"]
+            print(toAdd)
+            if toAdd[student_id] == "N/A":
+                print("replacing N/A")
+                toAdd[student_id] = 0
+            doc.update({"assessment_table": {student_id: toAdd[student_id] + points }})
+            self.updateTenPointPeerAssessment(group_id)
             return True
-        except:
+        except Exception as e:
+            print("big func")
+            print(e)
             return False
 
 
@@ -355,11 +360,20 @@ class DbWrapper:
         return True
 
     def updateTenPointPeerAssessment(self, group_id):
-        assess = self.db.collection(ASSESSMENT).document(group_id)
-        rawAssessments = assess.to_dict()["assessment_table"]
-        divisor = (len(rawAssessments) * 10) - 10
-        for key, val in rawAssessments:
-            assess.update({"scaling_factors": {key: val/divisor}})
+        try:
+            doc = self.db.collection(ASSESSMENT).document(group_id)
+            assess = self.db.collection(ASSESSMENT).document(group_id).get()
+            rawAssessments = assess.to_dict()["assessment_table"]
+            divisor = (len(rawAssessments) * 10) - 10
+            if divisor == 0: 
+                return False
+            for key, val in rawAssessments.items():
+                factor = val/divisor
+                doc.update({"scaling_factors": {key: factor}})
+        except Exception as fuck:
+            print("little func")
+            print(fuck)
+
 
 
     def removeCourse(self, course_id:str)->bool:
@@ -444,7 +458,7 @@ if __name__ == "__main__":
     test = DbWrapper(db)
     # docs = test.getStudentCourses("3713652")
     # print(docs)
-    print(test.addGroup('ECE2711_abc1',['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
+    # print(test.addGroup("ECE2711_abc1",['vTRZQxoDzWTtPYCOPr8LxIcJk702']))
     print(test.addStudentToCourse("3713652", "TestCourse"))
     # print(test.getUserData("TestUser"))
     # # print(test.addUser(1,"test111@unb.ca","Test","Account","some_student"))
@@ -452,17 +466,20 @@ if __name__ == "__main__":
     print(test.activateCourse("TestCourseAgain"))
     print(test.getInstructorCourses("some_prof"))
     print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
-    print(test.addProject("java3", "java3_proj1", "Java Project 1", 5))
+    print(test.addProject("ECE2711", "ECE2711_abc1", "Java Project 1", 5))
     print(test.addGroup("java3_proj1"))
     print(test.addStudentToGroup("java3_proj1_gr1", "3713652"))
-    print(test.getStudentScalingFactor("ECE2711_abc1_gr13","vTRZQxoDzWTtPYCOPr8LxIcJk702"))
+    print("getting student factor")
+    print(test.getStudentScalingFactor("ECE2711_abc1_gr1","vTRZQxoDzWTtPYCOPr8LxIcJk702"))
+    print("Adding a student entry")
+    print(test.addStudentTenPointPeerAssessmentEntry("ECE2711_abc1_gr1","vTRZQxoDzWTtPYCOPr8LxIcJk702", 10))
     #print(test.addJoyRating("3713652", "java3_proj1_gr1", 5))
     #print(test.addJoyRating("3713652", "java3_proj1_gr1", 3))
     # print(test.addNGroups("java3_proj1", 5))
     # print(test.removeGroup("ECE2711_abc1"))
     # print(test.addGroup("java3_proj1"))
-    print(test.removeProject("ECE2711_abc1"))
-    # print(test.removeProject("java3_proj1"))
+    # print(test.removeProject("ECE2711_abc1"))
+    print(test.removeProject("java3_proj1"))
     # print(test.addVelocityData("java3_proj1_gr1", datetime.datetime.strptime("2024/11/01", "%Y/%m/%d"), datetime.datetime.strptime("2024/11/05", "%Y/%m/%d"), 20))
     # print(test.updateVelocityData("java3_proj1_gr1_Sprint1", completed_points=15))
     # print(test.getTeamVelocity("java3_proj1_gr1"))
