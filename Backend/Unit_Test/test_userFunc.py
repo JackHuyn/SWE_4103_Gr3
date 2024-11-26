@@ -23,7 +23,9 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             first_name="Test",
             last_name="User",
             uid="testuser",
-            github_personal_access_token="github_token"
+            github_personal_access_token="github_token",
+            force_password_reset=False,
+            display_name="Tester"
         )
         
         # Check that the user is added with the correct data
@@ -33,7 +35,9 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             "first_name": "Test",
             "last_name": "User",
             "uid": "testuser",
-            "github_personal_access_token": "github_token"
+            "github_personal_access_token": "github_token",
+            "force_password_reset": False,
+            "display_name": "Tester"
         })
         self.assertTrue(result)
 
@@ -49,7 +53,9 @@ class TestDbWrapperUserManagement(unittest.TestCase):
             first_name="Test",
             last_name="User",
             uid="testuser",
-            github_personal_access_token="github_token"
+            github_personal_access_token="github_token",
+            force_password_reset=False,
+            display_name="Tester"
         )
         
         # Since the user exists, it should return False

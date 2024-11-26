@@ -453,12 +453,12 @@ if (projectData) {
                       placeholder="Project Name"
                   />
                   <div className="popup_buttons">
-                      <Button className="popup_button" onClick={handleRemoveProject}>
+                      <button className="popup_button" onClick={handleRemoveProject}>
                           Remove
-                      </Button>
-                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
+                      </button>
+                      <button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
                           Cancel
-                      </Button>
+                      </button>
                   </div>
               </div>
           </div>

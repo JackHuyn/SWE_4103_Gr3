@@ -128,16 +128,25 @@
 }
 
 .login_form form button {
-    width: 41%;
+    width: 100%;
     border-color: transparent;
     border-radius: 7px;
     background-color: var(--lightBackground1);
     color: var(--fontColorDark);
     height: 34px;
     font-size: larger;
-    margin-top: 2%;
+    margin: 2% 0% auto 0%;
+    padding: 0%;
 }
 
+.login_form form a {
+    width: 100%;
+    color: var(--fontLinkLightBlue);
+    font-size: small;
+    margin: 2% 0% 2% 0%;
+    padding: 0%;
+    text-align: right;
+}
 
 
 
