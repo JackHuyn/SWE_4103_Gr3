@@ -161,10 +161,11 @@ def getGroupStudents():
 
     try:
         group_id = request.args.get("groupId", default="-1",type=str)
-        local_id = request.args.get("localId", default="-1",type=str)
         group_data = getGroupData(group_id)
-        list_of_students = group_data['student_ids']
-
+        list_of_ids = group_data['student_ids']
+        list_of_students = []
+        for student in list_of_ids:
+            list_of_students.append(dbWrapper.getUserData(student))
         response = app.response_class(
             response=json.dumps({'approved': True, 'student_list': list_of_students}),
             status=200,
@@ -741,8 +742,17 @@ def remove_students_course():
         remove_list = data.get('remove_list', [])
         success = False
         for student in remove_list:
-            print(student['uid'])
-            success = True
+            student_id = student['uid']
+            print(student_id)
+            print(course_id)
+            success = dbWrapper.removeStudentFromCourse(student_id, course_id)
+            projects = dbWrapper.getCourseProjects(course_id)
+            for project in projects:
+                project_id = project['project_id']
+                groups = dbWrapper.getProjectGroups(project_id)
+                for group in groups:
+                    group_id = group['group_id']
+                    dbWrapper.removeStudentFromGroup(student_id, group_id)  
         if success:
             response = app.response_class(
                 response=json.dumps({'approved': True, 'message': 'Students removed successfully'}),

@@ -4,6 +4,7 @@ import JoyAvgChart from '@/app/ui/metrics/joy-avg-chart';
 import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
+import Survey10point from '@/app/ui/metrics/survey-10-point';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
@@ -18,6 +19,7 @@ import { group } from 'console';
 
 export default function Metrics() {
     const router = useRouter();
+    const localId = Cookies.get('localId');
     const [groupId, setGroupId] = useState(null);
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
@@ -27,7 +29,7 @@ export default function Metrics() {
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
     const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
     const [isSurveyPopupVisible, setIsSurveyPopupVisible] = useState(false);
-
+    const [studentList, setStudentList] = useState([]);
 
     function openAddGithubRepoDialog(){
         setIsGithubDialogVisible(true);
@@ -35,6 +37,10 @@ export default function Metrics() {
 
     function openJoyRatingDialog() {
         setIsPopupVisible(true);
+    }
+
+    function survey() {
+        setIsSurveyPopupVisible(true);
     }
 
     function openTeamVelocityDialog() {
@@ -45,6 +51,7 @@ export default function Metrics() {
         setIsPopupVisible(false);
         setIsPopup2Visible(false);
         setIsGithubDialogVisible(false);
+        setIsSurveyPopupVisible(false);
     }
 
     // Close dialog only if click is on backdrop
@@ -59,11 +66,9 @@ export default function Metrics() {
         if (router.isReady) {
 
             const group_id = router.query.groupid;
-            /////////
             setGroupId(group_id);
             
             console.log("Group ID:", group_id);
-            
         }
 
        
@@ -77,9 +82,6 @@ export default function Metrics() {
       }, [groupId]);
 
 //------------------ Survey -------------------
-const survey = () =>{
-    setIsSurveyPopupVisible(true);
-};
 const handleSurvey = async () => {
     if (newProjectName) {
         const localId  = Cookies.get('localId')
@@ -199,6 +201,7 @@ const handleSurvey = async () => {
                     {userRole === '0' && (
                     <>
                            <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
+                           <button className="metrics-button" onClick={survey}>Survey</button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
@@ -214,7 +217,6 @@ const handleSurvey = async () => {
 
                     
                     {/* Add checks once surveys are ready  */}
-                    <Button className="add-button" onClick={survey}> Survey </Button>
             
             </div>
 
@@ -227,36 +229,11 @@ const handleSurvey = async () => {
                 <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
-                    {/*Handle survey*/}
-                    {isSurveyPopupVisible && (
-                        <div className="popup">
-                            <div className="popup_content">
-                                <h2>Survey</h2>
-                                <h3>10-point distribution: total points = studentNum*10</h3>
-                                <div className="checkbox-list">
-                                    <div className="checkbox-header">
-                                        <div className="header-item">Student Name</div>
-                                        <div className="header-item">Point</div>
-                                    </div>       
-                                </div>
-                                
-                                <div className="popup_buttons">
-                                    <Button className="popup_button" >
-                                          Ok
-                                    </Button>
-                                    <Button className="popup_button cancel_button" onClick={() => setIsSurveyPopupVisible(false)}>
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible) && (
+            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible || isSurveyPopupVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
-                    aria-hidden={!isPopupVisible && !isPopup2Visible}
+                    aria-hidden={!isPopupVisible && !isPopup2Visible && !isSurveyPopupVisible}
                 >
                     {isPopupVisible && (
                         <div id="joy-rating-dialog" className="dialog">
@@ -269,6 +246,13 @@ const handleSurvey = async () => {
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
                             <TeamVelocityInput closeDialogs={closeDialogs}/>
+                            <button onClick={closeDialogs}>Close</button>
+                        </div>
+                    )}
+                    {isSurveyPopupVisible &&  (
+                        <div id="joy-rating-dialog" className="dialog">
+                            <h2>Joy Rating Input</h2>
+                            <Survey10point closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
