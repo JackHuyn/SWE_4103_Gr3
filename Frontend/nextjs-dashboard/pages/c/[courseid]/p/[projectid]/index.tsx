@@ -9,12 +9,8 @@ import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/groups.css';
-<<<<<<< HEAD
-import { groups } from 'console';
-=======
 import '@/app/ui/stylesheets/coursePage.css';
 import { group } from 'console';
->>>>>>> role_scrum_master
 
 
 /**
