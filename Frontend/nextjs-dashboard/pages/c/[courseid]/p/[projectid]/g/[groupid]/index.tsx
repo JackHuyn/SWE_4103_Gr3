@@ -80,7 +80,7 @@ export default function Metrics() {
 const survey = () =>{
     setIsSurveyPopupVisible(true);
 };
-const handleRemoveProject = async () => {
+const handleSurvey = async () => {
     if (newProjectName) {
         const localId  = Cookies.get('localId')
         if (!localId){
