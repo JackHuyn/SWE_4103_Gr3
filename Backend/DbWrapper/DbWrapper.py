@@ -235,7 +235,7 @@ class DbWrapper:
         template["group_id"] = group_id
         template["joy_rating"] = joy_rating
         template["comment"] = comment
-        template["timestamp"] = firestore.SERVER_TIMESTAMP
+        template["timestamp"] = firestore.firestore.SERVER_TIMESTAMP
         self.db.collection(JOY).document(f"{student_id}_{group_id}_{timestamp}").set(template)
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
             return True
@@ -328,7 +328,7 @@ class DbWrapper:
         try:
             doc.update({"joy_rating": joy_rating})
             doc.update({"comment": comment})
-            doc.update({"timestamp": firestore.SERVER_TIMESTAMP})
+            doc.update({"timestamp": firestore.firestore.SERVER_TIMESTAMP})
         except:
             return False
         if  (self.calculateJoyAverage(group_id, datetime.datetime.today())):
@@ -437,7 +437,7 @@ class DbWrapper:
     # Project Access Functions
     def getRecentStudentJoyRatings(self, group_id:str) -> dict:
         group_id = group_id.lower()
-        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        docs = self.db.collection(JOY).where(filter=FieldFilter("group_id", "==", group_id)).order_by("timestamp", direction=firestore.firestore.Query.DESCENDING).stream()
         user_ids = []
         docList = []
         for doc in docs:
