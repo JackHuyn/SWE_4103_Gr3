@@ -725,6 +725,52 @@ def remove_groups():
         )
         return response    
 #----------------------------------
+#Author: Sarun Weerakul
+#This route manage students in groups
+@app.route('/manage-groups', methods=['POST'])
+@cross_origin()
+def manage_groups():
+    try:
+        data = request.get_json()
+        manage_list = data.get('manage_list', [])
+        scrum_masters = data.get('master_list', [])
+        success = False
+        for student,group in manage_list:
+            if dbWrapper.addStudentToGroup(group,student):
+                success = True
+            else:
+                success = False
+                break
+        for master,group in scrum_masters:
+            masters = []
+            masters.append(master)
+            if dbWrapper.addScrumMasterToGroup(group,masters):
+                success = True
+            else:
+                success = False
+                break
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Students added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add students'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])

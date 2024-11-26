@@ -8,7 +8,7 @@ import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/groups.css';
-import { group } from 'console';
+import { groups } from 'console';
 
 
 /**
@@ -30,8 +30,9 @@ export default function ProjectDetails(){
   const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [isRemoveGroupVisible, setIsRemoveGroupVisible] = useState(false);
   const [isManageGroupVisible, setIsManageGroupVisible] = useState(false);
-  const [selectedGroups1, setSelectedGroups1] = useState([]);
-  const [selectedGroups2, setSelectedGroups2] = useState([]);
+  const [selectedGroups1, setSelectedGroups1] = useState([]);//for remove group
+  const [selectedGroups2, setSelectedGroups2] = useState([]);//for manage student-group
+  const [selectedGroups3, setSelectedGroups3] = useState([]);//for set scrum master
   const [removedGroups, setRemovedGroups] = useState([]);
   const [groupData, setgroupData] = useState([]);
   const [studentList, setStudentList] = useState([]);
@@ -174,9 +175,20 @@ const handleRemoveGroups = async () => {
 const manageGroups = () =>{
   setIsManageGroupVisible(true);
 };
-//Function: handle checkbox change
+//Function: handle student-group checkbox change
 const handleCheckboxChange2 = (studentId, groupId) => {
   setSelectedGroups2((prevSelected) => {
+    const newPair = JSON.stringify([studentId, groupId]);
+    if (prevSelected.some(pair => JSON.stringify(pair) === newPair)) {
+        return prevSelected.filter(pair => JSON.stringify(pair) !== newPair);
+    } else {
+          return [...prevSelected, [studentId, groupId]];
+      }
+  });
+};
+//Function: handle scrum master checkbox change
+const handleCheckboxChange3 = (studentId, groupId) => {
+  setSelectedGroups3((prevSelected) => {
     const newPair = JSON.stringify([studentId, groupId]);
     if (prevSelected.some(pair => JSON.stringify(pair) === newPair)) {
         return prevSelected.filter(pair => JSON.stringify(pair) !== newPair);
@@ -191,32 +203,27 @@ const handleManageGroups = async () => {
   if (!localId){
       window.location.href = "/auth/login"
   }
-  const studentToAdd = groupDetails?.students?.filter(student => selectedGroups2.some(
-                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
-                        ));
-  const thisGroup = groupDetails?.groups?.filter(group => selectedGroups2.includes(group.group_id));
-  setRemovedGroups(groupsToRemove); // Store removed groups in the state
-  setSelectedGroups1([]); // Clear the selected groups after removal
-  const removedList = {
-      remove_list: groupsToRemove
+  const manageList = {
+      manage_list: selectedGroups2,
+      master_list: selectedGroups3
   };
   try { 
-      const response = await fetch('http://localhost:3001/remove-groups' , {
+      const response = await fetch('http://localhost:3001/manage-groups' , {
           method: 'POST',
           headers: {'Content-Type': 'application/json',},
-          body: JSON.stringify(removedList),
+          body: JSON.stringify(manageList),
       });
       const result = await response.json();
       if (response.ok) {
           window.location.reload();
-          alert('removed successfully!');
+          alert('managed successfully!');
           window.location.reload();
       } else {
-          alert(`Error removing groups: ${result.reason}`);
+          alert(`Error managing groups: ${result.reason}`);
       }
   } catch (error) {
   console.error('Error sending request:', error);
-  alert('Error removing group. Please try again later.');
+  alert('Error managing group. Please try again later.');
   }
 };
 //-------------------------------------------------
@@ -240,7 +247,6 @@ const handleManageGroups = async () => {
                   <a onClick={addGroup}>Add Group</a>
                   <a onClick={removeGroups}>Remove Group</a>
                   <a onClick={manageGroups}>Group Mambers</a>
-                  <a >Set Scrum Masters//</a>
                 </div>
               </div>
             )}
@@ -335,6 +341,7 @@ const handleManageGroups = async () => {
                   </div>
                   {groupDetails?.groups?.map((group, index2) => (
                     <div className="checkbox-column" key={index2}>
+                      {/*Manage Student in Group*/}
                       <input
                         type="checkbox"
                         onChange={() => handleCheckboxChange2(student.uid, group.group_id)}
@@ -342,7 +349,15 @@ const handleManageGroups = async () => {
                           pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
                         )}
                       />
-                    </div>
+                      {/*Set Scrum Master*/}
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange3(student.uid, group.group_id)}
+                        checked={selectedGroups3.some(
+                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
+                        )}
+                      />
+                    </div>    
                   ))}
                 </div>
               ))}
