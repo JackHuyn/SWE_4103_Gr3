@@ -9,6 +9,7 @@ import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import HandleLogout from '@/app/ui/logout';
 import { group } from 'console';
@@ -23,6 +24,7 @@ export default function Metrics() {
     const [userRole, setUserRole] = useState('')
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
     const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
+    const [isSurveyPopupVisible, setIsSurveyPopupVisible] = useState(false);
 
 
     function openAddGithubRepoDialog(){
@@ -71,7 +73,44 @@ export default function Metrics() {
         }
       }, [groupId]);
 
-        
+//------------------ Remove Project -------------------
+const survey = () =>{
+    setIsSurveyPopupVisible(true);
+};
+const handleRemoveProject = async () => {
+    if (newProjectName) {
+        const localId  = Cookies.get('localId')
+        if (!localId){
+            window.location.href = "/auth/login"
+        }
+        const projectData = {
+            course_id: courseid,
+            project_name: newProjectName
+        };
+        try {
+            const response = await fetch('http://localhost:3001/remove-project' , {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(projectData),  // Send JSON data in request body
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('Project removed successfully!');
+                window.location.reload();
+                setNewProjectName('');
+                setIsProjectPopup2Visible(false);
+            } else {
+                alert(`Error removing project: ${result.reason}`);
+            }
+        } catch (error) {
+            console.error('Error sending request:', error);
+            alert('Error removing project. Please try again later.');
+        }
+    } else {
+        alert('Please fill in all the fields.');
+    }
+};
+//-----------------------------------------------------
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
@@ -140,7 +179,6 @@ export default function Metrics() {
         else{
             alert('please enter a repository')
         }
-
     }
 
     return (
@@ -173,7 +211,7 @@ export default function Metrics() {
 
                     
                     {/* Add checks once surveys are ready  */}
-                    <button className="metrics-button">Survey//soon</button>
+                    <Button className="add-button" onClick={survey}> Survey </Button>
             
             </div>
 
@@ -227,6 +265,29 @@ export default function Metrics() {
                             </div>
                           
                     )}
+                    {/*Handle survey*/}
+                    {isSurveyPopupVisible && (
+                        <div className="popup">
+                            <div className="popup_content">
+                                <h2>Survey</h2>
+            <div className="checkbox-list">
+              <div className="checkbox-header">
+                <div className="header-item">Group Name</div>
+                <div className="header-item">To Remove</div>
+              </div>
+              
+            </div>
+            <div className="popup_buttons">
+              <Button className="popup_button" >
+                  Ok
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsSurveyPopupVisible(false)}>
+                  Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
                 </div>
             )}
         </div>
