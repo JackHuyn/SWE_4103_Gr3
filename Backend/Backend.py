@@ -57,6 +57,7 @@ def signup_user():
     password = request.args.get("password", default = "", type = str)
     account_type = request.args.get("accountType", default = -1, type = int)
     instructor_key = request.args.get("instructorKey", default = "", type = str)
+    display_name = f"{fname} {lname}"
     try:
         if(account_type == 1 and not firebase_auth.validate_instructor_key(instructor_key)):
             raise fb_auth.InvalidInstructorKeyException
@@ -64,7 +65,7 @@ def signup_user():
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
 
-        dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid)
+        dbWrapper.addUser(account_type,email,fname,lname, signup_resp.uid, display_name)
         
         
         print(signup_resp)
