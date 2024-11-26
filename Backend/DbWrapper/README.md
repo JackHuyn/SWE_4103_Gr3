@@ -4,12 +4,6 @@ Wrapper with basic functions to use Firestore.
 
 To use this, instantiate the class in your code and use the functions as described.
 
-## Model Of the Database
-
-The Firebase DB is document-based NoSQL Database, which means that it is non-relational. However, to better visualize how data is currently stored, an ERD will be used. Each function will describe what data is explicitly needed.
-
-![](./StartERD.png)
-
 ## Instantiating
 
 `DbWrapper(db)`
@@ -76,12 +70,13 @@ Note:
 - section - Should be something like "FR01A"
 - term - Should be something like "FA2024"
 
-`addUser(accType, email, first_name, last_name, uid, github_personal_access_token: optional)` - Given data points, create a user entry in the database. Returns True if successful.
+`addUser(accType, email, first_name, last_name, uid, display_name, github_personal_access_token: optional)` - Given data points, create a user entry in the database. Returns True if successful.
 
 Note:
 - accType - 0 is student, 1 is a prof
 - uid - Derived from Authentication
 - github_personal_access_token - Optional for now. May become mandatory in future sprints. (Default is empty string)
+- display_name - User's choice. This is what other users will see.
 
 `addGithubTokenToUser(uid, github_personal_access_token)` - Given an uid and a GitHib token, add the token to the corresponding user entry. Returns True if successful.
 
@@ -124,11 +119,28 @@ Note:
 - sprint_start and sprint_end must be Python datetime objects.
 - The auto-IDs are assigned sequentially based on how many entries the group has. The document ID (as well as any reference to velocity_id) is derived from {group_id}_Sprint{sprint_num}. sprint_num is also stored in the newly created entry.
 
-`updateVelocityData(velocity_id, sprint_start: optiona, sprint_end: optional, planned_points: optional, completed_points: optional)` - Change what you need in a given velocity entry. All fields are optional. Returns True if successful.
+`updateDisplayName(uid, display_name)` - Given an uid and a new display name, update the user's display name
+
+Note:
+- display_name - User's choice. This is what other users will see.
+
+`updateVelocityData(velocity_id, sprint_start: optional, sprint_end: optional, planned_points: optional, completed_points: optional)` - Change what you need in a given velocity entry. All fields are optional. Returns True if successful.
 
 Note:
 - sprint_start and sprint_end must be Python datetime objects.
 - velocity_id is derived from {group_id}_Sprint{sprint_num}
+
+`removeStudentFromCourse(student_id, course_id)` - Given a student ID and a course ID, remove the student from the course.
+
+Note:
+- The student will also be removed from any groups and as scrum master.
+
+`removeStudentFromGroup(student_id, group_id)` - Given a student ID and a group ID, remove the student from the group.
+
+Note:
+- The student will also be removed as scrum master
+
+`removeScrumMaster(student_id, group_id)` - Given a student ID and a group ID, remove the student from the scrum master list.
 
 `removeCourse(course_id)` - Given a course ID, deletes the course entry from the database. Returns True if successful.
 
@@ -142,3 +154,7 @@ Note:
 - Velocity ID is derived from {group_id}_Sprint{sprint_num}
 
 `findUser(email)` - Given an email, returns a user entry in the database. Returns None if entry is not found.
+
+`showSurveys(group_id)` - Given a group ID, toggle surveys to show
+
+`hideSurveys(group_id)` - Given a group ID, toggle surveys to hide
