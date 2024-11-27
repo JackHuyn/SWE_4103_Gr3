@@ -188,17 +188,6 @@ export default function Metrics() {
         setSelectedGraphType(event.target.value);
     };
 
-    const handleLogout = async () => {
-        const localId = Cookies.get('localId')
-        if (localId) {
-          Cookies.remove('localId');
-          Cookies.remove('idToken');
-          window.location.href = "/auth/login";
-        } else {
-          alert("You are already logged out.");
-        }
-      }
-
 
     async function submitGithubRepo(){
 
@@ -242,7 +231,7 @@ export default function Metrics() {
                     <Link href="/">
                         <button id="home">Home</button>
                     </Link>
-                    <button id="logout" onClick={handleLogout}>
+                    <button id="logout" onClick={HandleLogout}>
                         Log Out
                     </button>
                 </div>

@@ -94,16 +94,6 @@ export default function Courses() {
         setIsPopup2Visible(true); // Show the popup2
     };
 
-    const handleLogout = async () => {
-        const localId = Cookies.get('localId')
-        if (localId) {
-            Cookies.remove('localId');
-            Cookies.remove('idToken');
-            window.location.href = "/auth/login";
-        } else {
-            alert("You are already logged out.");
-        }
-    }
 
 
     // Handle adding a new course with name, description, and term
@@ -264,7 +254,7 @@ export default function Courses() {
                         </Link>
 
                         {/* Logout Button on the Right */}
-                        <button id="logout" onClick={handleLogout}>
+                        <button id="logout" onClick={HandleLogout}>
                             Log Out
                         </button>
                     </div>

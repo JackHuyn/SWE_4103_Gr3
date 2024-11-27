@@ -176,16 +176,6 @@ const handleRemoveGroups = async () => {
   }
 };
 
-const handleLogout = async () => {
-  const localId = Cookies.get('localId')
-  if (localId) {
-    Cookies.remove('localId');
-    Cookies.remove('idToken');
-    window.location.href = "/auth/login";
-  } else {
-    alert("You are already logged out.");
-  }
-}
 
 const handleChangeNumber = (event) => {
   const value = event.target.value;
@@ -206,7 +196,7 @@ const handleChangeNumber = (event) => {
           </Link>
 
           {/* Logout Button on the Right */}
-          <button id="logout" onClick={handleLogout}>
+          <button id="logout" onClick={HandleLogout}>
             Log Out
           </button>
         </div>

@@ -235,16 +235,7 @@ const addStudent = () => {
     setIsStudentPopup1Visible(true);
 };
 
-const handleLogout = async () => {
-  const localId = Cookies.get('localId')
-  if (localId) {
-    Cookies.remove('localId');
-    Cookies.remove('idToken');
-    window.location.href = "/auth/login";
-  } else {
-    alert("You are already logged out.");
-  }
-}
+
 //Function: handle add student
 const handleAddStudent = async () => {  
     if (newStudentFName && newStudentLName && newStudentEmail) {
@@ -346,7 +337,7 @@ if (projectData) {
           </Link>
 
           {/* Logout Button on the Right */}
-          <button id="logout" onClick={handleLogout}>
+          <button id="logout" onClick={HandleLogout}>
             Log Out
           </button>
         </div>
@@ -362,7 +353,7 @@ if (projectData) {
           {/* Projects Section */}
 
           <div className="projects-section">
-          <button id="logout" onClick={HandleLogout}>Log Out</button>
+
             <div className="section-header">
               <h2>Projects</h2>
               {userRole === '1' && (
