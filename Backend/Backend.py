@@ -172,8 +172,6 @@ def getGroupStudents():
             mimetype='application/json'
         )
 
-    
-
     except:
          response = app.response_class(
             response = json.dumps({'approved': False, 'message':'Sever error'}),
@@ -1380,7 +1378,7 @@ def add_group():
             success = dbWrapper.addGroup(
                 project_id,
                 #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
-                ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
+                []  # Hard coding students for now
             )
         
         else:
