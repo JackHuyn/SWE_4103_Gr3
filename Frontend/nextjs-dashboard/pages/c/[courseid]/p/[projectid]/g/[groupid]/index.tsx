@@ -166,7 +166,8 @@ export default function Metrics() {
                     {userRole === '0' && (
                     <>
                            <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
-                           <button className="metrics-button" onClick={survey}>Survey</button>
+                           <button className="metrics-button" onClick={survey}>10 points Survey</button>
+                           <button className="metrics-button" onClick={survey}>CEAB Survey</button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
