@@ -8,7 +8,6 @@ import HandleLogout from '@/app/ui/logout';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
-import '@/app/ui/stylesheets/groups.css';
 import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';

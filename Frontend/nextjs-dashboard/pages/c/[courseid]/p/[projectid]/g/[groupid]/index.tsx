@@ -39,7 +39,9 @@ export default function Metrics() {
 
     // Close dialog only if click is on backdrop
     function handleBackdropClick(event) {
+        console.log('hello there :/ ')
         if (event.target.id === 'metrics-dialog-backdrop') {
+            console.log('it is here for sure ')
             closeDialogs();
         }
     }
@@ -249,14 +251,14 @@ export default function Metrics() {
                     {/* Check if student  */}
                     {userRole === '0' && (
                     <>
-                           <button className="metrics-button" onClick={() => setIsJoyRatingDialogVisible(true)}>
+                           <button className="metrics-button" onClick={openJoyRatingDialog}>
                             Joy Rating Input
                            </button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
                                 <>
-                                <button className="metrics-button" onClick={() => setIsTeamVelocityDialogVisible(true)}>
+                                <button className="metrics-button" onClick={openTeamVelocityDialog}>
                                 Team Velocity Input
                                 </button>
                                 <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
@@ -309,20 +311,22 @@ export default function Metrics() {
             {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
-                    onClick={(e) => e.target.id === 'metrics-dialog-backdrop' && setIsJoyRatingDialogVisible(false)}
+                    onClick={handleBackdropClick}
+                    aria-hidden={!isJoyRatingDialogVisible && !isTeamVelocityDialogVisible && !isGithubDialogVisible}
+                    
                 >
                     {isJoyRatingDialogVisible && (
                         <div id="joy-rating-dialog" className="dialog">
                             <h2>Joy Rating Input</h2>
-                            <JoyRatingInput closeDialogs={() => setIsJoyRatingDialogVisible(false)} />
-                            <button onClick={() => setIsJoyRatingDialogVisible(false)}>Close</button>
+                            <JoyRatingInput closeDialogs={closeDialogs} />
+                            <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
                     {isTeamVelocityDialogVisible && (
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
-                            <TeamVelocityInput closeDialogs={() => setIsTeamVelocityDialogVisible(false)} />
-                            <button onClick={() => setIsTeamVelocityDialogVisible(false)}>Close</button>
+                            <TeamVelocityInput closeDialogs={closeDialogs} />
+                            <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
                     {isGithubDialogVisible &&  (

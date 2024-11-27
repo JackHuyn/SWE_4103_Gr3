@@ -20,9 +20,10 @@
     gap: 15px;
 }
 
+
 #team-velocity-dialog h1 {
     font-size: 1.8rem;
-    font-weight: normal;
+    font-weight: bold;
     margin: 0;
     color: #e0e0e0;
 }
@@ -53,11 +54,11 @@
 }
 
 #submit-team-velocity-button {
-    padding: 10px;
+    padding: 12px;
     width: 100%;
     border: none;
-    border-radius: 8px;
-    background-color: #007bff;
+    border-radius: 12px;
+    background-color: #0066cc;
     color: white;
     font-size: 0.95rem;
     cursor: pointer;
@@ -67,19 +68,6 @@
 #submit-team-velocity-button:hover {
     background-color: #0056b3;
     transform: scale(1.04);
-}
-
-/* Team Velocity Dialog */
-#team-velocity-dialog label {
-    display: block;
-    margin-bottom: 5px;
-    color: #b0b0b0;
-    font-size: 0.9rem;
-    text-align: left;
-}
-
-#team-velocity-dialog input {
-    margin-bottom: 10px;
 }
 
 #team-velocity-dialog button {
