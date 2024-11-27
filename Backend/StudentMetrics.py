@@ -87,7 +87,7 @@ class StudentMetrics:
             raise ValueError("Number of students and points must be equal.")
         try:
             for student, point in zip(student_ids, points):
-                if studen != current_student_id:
+                if student != current_student_id:
                     self.add_student_10point_assessment(group_id, student, point)
             return True
         except:

@@ -1,12 +1,15 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
-//import { Button } from './button';
+import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
 import FileUpload from '@/app/ui/upload-form'
+import HandleLogout from '@/app/ui/logout';
+import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
+
 
 
 
@@ -16,14 +19,19 @@ export default function CourseDetails() {
   const [courseDetails, setCourseDetails] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [studentList, setStudentList] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [removedStudents, setRemovedStudents] = useState([]);
   const [projectData, setProjectData] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [newStudentFName, setNewStudentFName] = useState('');
   const [newStudentLName, setNewStudentLName] = useState('');
   const [newStudentEmail, setNewStudentEmail] = useState('');
   const localId = Cookies.get('localId');
-  const [isProjectPopupVisible, setIsProjectPopupVisible] = useState(false);
-  const [isStudentPopupVisible, setIsStudentPopupVisible] = useState(false);
+  const [isProjectPopup1Visible, setIsProjectPopup1Visible] = useState(false); //add project
+  const [isProjectPopup2Visible, setIsProjectPopup2Visible] = useState(false); //remove project
+  const [isStudentPopup1Visible, setIsStudentPopup1Visible] = useState(false); //add a student
+  const [isStudentPopup2Visible, setIsStudentPopup2Visible] = useState(false); //add students
+  const [isStudentPopup3Visible, setIsStudentPopup3Visible] = useState(false); //remove students
   const [newProjectName, setNewProjectName] = useState('');
   const [isPopupVisible, setIsPopupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents
@@ -125,7 +133,7 @@ export default function CourseDetails() {
 
 
   const addProject = () => {
-    setIsProjectPopupVisible(true); // Show the popup
+    setIsProjectPopup1Visible(true); // Show the popup
   };
 
   // Handle adding a new course with name, description, and term
@@ -178,72 +186,141 @@ export default function CourseDetails() {
         alert('Please provide a project name.');
     }
 };
-
-
+//-----------------------------------------------------
+//------------------ Remove Project -------------------
+const removeProject = () =>{
+    setIsProjectPopup2Visible(true);
+};
+const handleRemoveProject = async () => {
+    if (newProjectName) {
+        const localId  = Cookies.get('localId')
+        if (!localId){
+            window.location.href = "/auth/login"
+        }
+        const projectData = {
+            course_id: courseid,
+            project_name: newProjectName
+        };
+        try {
+            const response = await fetch('http://localhost:3001/remove-project' , {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(projectData),  // Send JSON data in request body
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('Project removed successfully!');
+                window.location.reload();
+                setNewProjectName('');
+                setIsProjectPopup2Visible(false);
+            } else {
+                alert(`Error removing project: ${result.reason}`);
+            }
+        } catch (error) {
+            console.error('Error sending request:', error);
+            alert('Error removing project. Please try again later.');
+        }
+    } else {
+        alert('Please fill in all the fields.');
+    }
+};
+//-----------------------------------------------------
+//------------------- Add a Student -------------------
 //Function: set visibiliy of addStudent popup
 const addStudent = () => {
-  setIsStudentPopupVisible(true);
+    setIsStudentPopup1Visible(true);
 };
 //Function: handle add student
 const handleAddStudent = async () => {  
-  if (newStudentFName && newStudentLName && newStudentEmail) {
-      const localId  = Cookies.get('localId')
-      if (!localId){
-          window.location.href = "/auth/login"
-      }
-      const studentData = {
-          course_id: courseid,
-          student_fname: newStudentFName,
-          student_lname: newStudentLName,
-          student_email: newStudentEmail
-      };
-      try {  
-          //Need to have checks to ensure that the instructor is valid 
-          const response = await fetch('http://localhost:3001/add-a-student' , {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(studentData),  // Send JSON data in request body
-          });
-          const result = await response.json();
-          if (response.ok) {
-              window.location.reload();
-              alert('student added successfully!');
-              window.location.reload();
-          } else {
-              alert(`Error adding student: ${result.reason}`);
-          }
-      } catch (error) {
-          console.error('Error sending request:', error);
-          alert('Error adding student. Please try again later.');
-      }
-  } else {
-      alert('Please provide all information.');
-  }
-};
-
-/**useEffect(() => {
-  if (isProjectPopupVisible && inputRef.current) {
-      inputRef.current.focus(); // Focus the input field when the popup is shown
-  }
-}, [isProjectPopupVisible]);**/
-
-/**useEffect(() => {
-const handleEscapeKey = (event) => {
-    if (event.key === 'Escape' && isProjectPopupVisible) {
-        setIsProjectPopupVisible(false); // Close the popup when Escape is pressed
+    if (newStudentFName && newStudentLName && newStudentEmail) {
+        const localId  = Cookies.get('localId')
+        if (!localId){
+            window.location.href = "/auth/login"
+        }
+        const studentData = {
+            course_id: courseid,
+            student_fname: newStudentFName,
+            student_lname: newStudentLName,
+            student_email: newStudentEmail
+        };
+        try { 
+            const response = await fetch('http://localhost:3001/add-a-student' , {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',},
+                body: JSON.stringify(studentData),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                window.location.reload();
+                alert('student added successfully!');
+                window.location.reload();
+            } else {
+                alert(`Error adding student: ${result.reason}`);
+            }
+        } catch (error) {
+            console.error('Error sending request:', error);
+            alert('Error adding student. Please try again later.');
+        }
+    } else {
+        alert('Please provide all information.');
     }
 };
-
-// Add event listener for keydown
-document.addEventListener('keydown', handleEscapeKey);
-
-// Cleanup function to remove event listener when component unmounts
-return () => {
-    document.removeEventListener('keydown', handleEscapeKey);
+//-----------------------------------------------------
+//-------------------- Add Students -------------------
+//Function: set visibiliy of uploadStudent popup
+const uploadStudents = () =>{
+    setIsStudentPopup2Visible(true);
 };
-}, [isProjectPopupVisible]);**/
+//-----------------------------------------------------
+//------------------ Remove Students ------------------
+//Function: set visibiliy of removeStudents popup
+const removeStudents = () =>{
+    setIsStudentPopup3Visible(true);
+};
+//Function: handle checkbox change
+const handleCheckboxChange = (studentId) => {
+    setSelectedStudents((prevSelected) => {
+        if (prevSelected.includes(studentId)) {
+            return prevSelected.filter((id) => id !== studentId);
+        } else {
+            return [...prevSelected, studentId];
+        }
+    });
+};
+//Function: handle remove students
+const handleRemoveStudents = async () => {
+    const localId  = Cookies.get('localId')
+    if (!localId){
+        window.location.href = "/auth/login"
+    }
+    const studentsToRemove = studentData?.students?.filter(student => selectedStudents.includes(student.uid));
+    setRemovedStudents(studentsToRemove); // Store removed students in the state
+    setSelectedStudents([]); // Clear the selected students after removal
+    const removedList = {
+        course_id: courseid,
+        remove_list: studentsToRemove
+    };
+    try { 
+        const response = await fetch('http://localhost:3001/remove-students-course' , {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json',},
+            body: JSON.stringify(removedList),
+        });
+        const result = await response.json();
+        if (response.ok) {
+            window.location.reload();
+            alert('removed successfully!');
+            window.location.reload();
+        } else {
+            alert(`Error removing students: ${result.reason}`);
+        }
+    } catch (error) {
+    console.error('Error sending request:', error);
+    alert('Error removing student. Please try again later.');
+    }
+};
+//-----------------------------------------------------
+
 if (projectData) {
     return (
       <div className="page-wrapper">
@@ -259,10 +336,14 @@ if (projectData) {
           {/* Projects Section */}
 
           <div className="projects-section">
+          <button id="logout" onClick={HandleLogout}>Log Out</button>
             <div className="section-header">
               <h2>Projects</h2>
               {userRole === '1' && (
-                <button className="add-button" onClick={addProject}>+ </button>
+                <div className="addandremove">
+                  <Button className="add-button" onClick={addProject}> + </Button>
+                  <Button className="remove-button" onClick = {removeProject}> - </Button>    
+                </div>
               )}
             </div>
             <div className="projects-grid">
@@ -286,7 +367,14 @@ if (projectData) {
             <div className="section-header">
               <h2>Students</h2>
               {userRole === '1' && (
-                <button className="add-button" onClick={addStudent}>+</button>
+                <div className="options-container">
+                  <button className="options-button">⋮</button>
+                  <div className="options-menu">
+                    <a onClick={addStudent}>Add a Student</a>
+                    <a onClick={uploadStudents}>Upload list</a>
+                    <a onClick={removeStudents}>Remove Students</a>
+                  </div>
+                </div>
               )}
             </div>
             <div className="students-list">
@@ -301,32 +389,9 @@ if (projectData) {
             <p className="view-all">View all</p>
           </div>
         </div>
-
-        {isPopupVisible && (
-          <div className="popup">
-            <div className="popup_content">
-              <h2>Upload CSV</h2>
-              <input type="file" accept=".csv" onChange={handleFileChange} />
-              <div className="popup_buttons">
-                <button className="popup_button upload" onClick={handleUpload}>
-                  Upload
-                </button>
-                <button className="popup_button cancel_button" onClick={() => setIsPopupVisible(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Reuse FileUpload Component */}
-        
-        {localId && courseid && userRole=='1' &&(
-          <FileUpload localId={localId} courseId={courseid as string} />
-        )}
-
-    
-      {isProjectPopupVisible && (
+   
+      {/*Handle add project*/}
+      {isProjectPopup1Visible && (
           <div className="popup">
               <div className="popup_content">
                   <h2>Add New Project</h2>
@@ -338,18 +403,41 @@ if (projectData) {
                       placeholder="Project Name"/>
 
                   <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleAddProject}>
+                      <Button className="popup_button" onClick={handleAddProject}>
                           Add Project
-                      </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup1Visible(false)}>
                           Cancel
-                      </button>
+                      </Button>
                   </div>
               </div>
           </div>
         )}
-
-      {isStudentPopupVisible && (
+      {/*Handle remove project*/}
+      {isProjectPopup2Visible && (
+          <div className="popup">
+              <div className="popup_content">
+                  <h2>Enter Course ID</h2>
+                  <input
+                      ref={inputRef}
+                      type="text"
+                      value={newProjectName}
+                      onChange={(e) => setNewProjectName(e.target.value)}
+                      placeholder="Project Name"
+                  />
+                  <div className="popup_buttons">
+                      <Button className="popup_button" onClick={handleRemoveProject}>
+                          Remove
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
+                          Cancel
+                      </Button>
+                  </div>
+              </div>
+          </div>
+      )}          
+      {/*Handle add student*/}
+      {isStudentPopup1Visible && (
           <div className="popup">
               <div className="popup_content">
                   <h2>Add New Student</h2>
@@ -373,17 +461,65 @@ if (projectData) {
                       placeholder="Email"/>
 
                   <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleAddStudent}>
+                      <Button className="popup_button" onClick={handleAddStudent}>
                           Add Student
-                      </button>
-                      <button className="popup_button_cancel_button" onClick={() => setIsStudentPopupVisible(false)}>
+                      </Button>
+                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup1Visible(false)}>
                           Cancel
-                      </button>
+                      </Button>
                   </div>
               </div>
           </div>
         )}
-
+      {/*Handle upload students*/}
+      {isStudentPopup2Visible && (
+        <div className="popup">
+          <div className="popup_content">
+            <FileUpload localId={localId} courseId={courseid as string} />
+            <div className="popup_buttons">
+                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
+                          Cancel
+                      </Button>
+                  </div>
+          </div>
+        </div>
+      )}
+      {/*Handle remove student*/}
+      {isStudentPopup3Visible && (
+        <div className="popup">
+          <div className="popup_content">
+            <h1>Select Student to Remove</h1>
+            <div className="checkbox-list">
+              <div className="checkbox-header">
+                <div className="header-item">Student Name</div>
+                <div className="header-item">To Remove</div>
+              </div>
+              {studentData?.students?.map((student, index) => (
+                <div className="checkbox-item" key={index}>
+                  <div className="checkbox-name">
+                    {student.first_name+" "+student.last_name}
+                  </div>
+                  <div className="checkbox-column">
+                    <input
+                      type="checkbox"
+                      onChange={() => handleCheckboxChange(student.uid)}
+                      checked={selectedStudents.includes(student.uid)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="popup_buttons">
+              <Button className="popup_button" onClick={handleRemoveStudents}>
+                  Remove
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
+                  Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}          
       </div>
 
       

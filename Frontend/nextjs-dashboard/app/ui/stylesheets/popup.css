@@ -25,10 +25,22 @@
     gap: 20px;
 }
 
+.popup_content h1 {
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 10px;
+}
+
 .popup_content h2 {
     font-size: 2rem;
     color: white;
     margin-bottom: 20px;
+}
+
+.popup_content h3 {
+    font-size: 1rem;
+    color: white;
+    margin-bottom: 10px;
 }
 
 .popup_content input {
@@ -79,3 +91,37 @@
 .cancel_button:hover {
     background-color: #c82333;
 }
+/*------------ Check List ------------*/
+.checkbox-list {
+    display: flex;
+    max-height: 300px;
+    overflow: auto;
+    padding: 8px;
+    border-radius: 4px;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.checkbox-item, .checkbox-header {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: white;
+    width: 100%;
+}
+
+.checkbox-name, .header-name {
+    flex: 1;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.header-item, .checkbox-column {
+    text-align: center;
+    padding: 5px 10px;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 50%;
+}
+/*-------------------------------------*/

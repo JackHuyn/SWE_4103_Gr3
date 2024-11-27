@@ -7,7 +7,7 @@ import {NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest){
 
     
-    if (request.nextUrl.pathname.startsWith('/courses') || request.nextUrl.pathname.startsWith('/projects')) {
+    if (request.nextUrl.pathname.startsWith('/c')) {
 
         //get the cookies
         const tokenId = request.cookies.get("idToken")?.value

@@ -1,12 +1,9 @@
 
-
-Note from Will:
-
 #### For the backend:
 - Install python
-- Use `pip install flask` or `pip3 install flask` to install flask. Do the same for `flask_cors` (if needed) and `firebase_admin`
-- Use `pip install pygithub` or `pip3 install pygithub` to install the github dependency. 
-- Navigate to the `Backend` folder and run `python ./Backend.py` or `python3 ./Backend.py`
+- Navigate to the `Backend` folder
+- Use `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
+- Run `python ./Backend.py` or `python3 ./Backend.py`
 
 #### For the frontend:
 - Install Node.js
