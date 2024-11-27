@@ -389,7 +389,6 @@ if (projectData) {
                   <button className="options-button">⋮</button>
                   <div className="options-menu">
                     <a onClick={addStudent}>Add a Student</a>
-                    <a onClick={uploadStudents}>Upload list</a>
                     <a onClick={removeStudents}>Remove Students</a>
                   </div>
                 </div>

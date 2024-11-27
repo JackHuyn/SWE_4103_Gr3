@@ -393,7 +393,7 @@ def upload():
                     print(student_id + ': Add\tFail')
             else:
                 student_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, email) #password is email by default
-                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, force_password_reset=True):
+                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, display_name = f"{fname} {lname}",  force_password_reset=True):
                     student_id = student_resp.uid
                     print(student_id + ': Create\tDone')
                     if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -685,9 +685,9 @@ def add_a_student():
     try:
         data = request.get_json()
         course_id = data.get('course_id','')
-        student_fname = data.get('student_fname','')
-        student_lname = data.get('student_lname','')
-        student_email = data.get('student_email','')
+        fname = data.get('student_fname','')
+        lname = data.get('student_lname','')
+        email = data.get('student_email','')
         success = False
         if not (course_id or student_fname or student_lname or student_email):
             raise ValueError("Missing required fields")
@@ -700,8 +700,8 @@ def add_a_student():
             else:
                 print(student_id + ': Add\tFail')
         else:
-            student_resp = firebase_auth.sign_up_with_email_and_password(student_fname,student_lname,student_email,student_email) #password is email by default
-            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid, force_password_reset=True):
+            student_resp = firebase_auth.sign_up_with_email_and_password(fname,lname,email,email) #password is email by default
+            if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, display_name = f"{fname} {lname}", force_password_reset=True):
                 student_id = student_resp.uid
                 print(student_id + ': Create\tDone')
                 if dbWrapper.addStudentToCourse(student_id, course_id):
