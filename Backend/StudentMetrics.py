@@ -100,6 +100,7 @@ class StudentMetrics:
     def get_student_scaling_factor(self, group_id, student_id):
         return self.db.getStudentScalingFactor(self, group_id, student_id)
 
+
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
         git = github.GitHubManager(auth, repo_address)
