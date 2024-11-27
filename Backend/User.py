@@ -1,4 +1,5 @@
 from github import Auth
+import GitHub as GitHubAccess
 
 
 class InvalidGitHubAuthException(Exception):
@@ -31,10 +32,13 @@ class User:
             self._force_password_reset = user_data["force_password_reset"]
 
         self._github_auth = None
+        self._github_login = ""
         try:
             self._github_auth = Auth.Token(self._github_oauth_token)
+            self._github_login = GitHubAccess.getGitHubLogin(self._github_auth)
+            # print('GITHUB Login: ' + self._github_login)
         except Exception as e:
-            print(e)
+            print('Error: ', e)
         
 
     # Properties from login response
@@ -102,8 +106,10 @@ class User:
         """User's account type property"""
         return self._account_type
 
-
-
+    @property
+    def github_login(self):
+        """User's personal github login/username property"""
+        return self._github_login
 
     @property
     def github_auth(self):

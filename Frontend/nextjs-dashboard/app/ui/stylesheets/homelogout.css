@@ -1,0 +1,60 @@
+@import url('./colors.css');
+@import url('./default.css');
+@import url('./fonts.css');
+
+#home {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--secondaryColor);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jura', sans-serif;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#home:hover {
+    background-color: rgb(197, 125, 225);
+    transform: scale(1.05); /* Smooth scaling on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+}
+
+/* Add active state for a pressed button effect */
+#home:active {
+    background-color: #8e52b9; 
+    transform: scale(0.95); /* Slight shrink effect */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* Less pronounced shadow */
+}
+
+#logout {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d; /* Bright red color for attention */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Jura', sans-serif;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#logout:hover {
+    background-color: #e63946;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#logout:active {
+    background-color: #c32f33;
+    transform: scale(0.98);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+} 

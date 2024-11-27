@@ -1,4 +1,4 @@
-import '@/app/ui/stylesheets/joyRatingInput.css'
+import '@/app/ui/stylesheets/joyRatingInput.css';
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
