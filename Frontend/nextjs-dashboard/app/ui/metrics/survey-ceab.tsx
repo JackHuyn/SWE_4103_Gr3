@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/popup.css';
 
-export default function Survey10point() {
+export default function SurveyCEAB() {
     const local_id = Cookies.get('localId')
     const [groupId, setGroupId] = useState(null);
     const [studentList, setStudentList] = useState([]);

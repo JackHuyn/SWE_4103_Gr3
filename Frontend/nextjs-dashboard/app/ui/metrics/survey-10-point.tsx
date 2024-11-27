@@ -50,12 +50,11 @@ export default function Survey10point() {
             const payload = {
                 group_id: groupId,
                 student_id: local_id,
-                all_librarys: studentList,
                 all_points: points
 
             };
 
-            const response = await fetch('http://localhost:3001/save-survey-points', {
+            const response = await fetch('http://localhost:3001/survey-points', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

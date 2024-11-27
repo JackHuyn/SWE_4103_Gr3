@@ -856,6 +856,57 @@ def manage_groups():
         )
         return response    
 #----------------------------------
+#Author: Sarun Weerakul
+#This route handle 10 point survey
+@app.route('/survey-points', methods=['POST'])
+@cross_origin()
+def add_10_point_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        student_id = data.get('student_id','')
+        points = data.get('all_points',[])
+        success = False
+        if not (group_id or student_id or points):
+            raise ValueError("Missing required fields")
+        ids_list = []
+        points_list = []
+        for point in points:
+            ids_list.append(point['studentId'])
+            points_list.append(point['points'])
+        success = metrics.ten_point_assessment_handler(group_id, student_id, ids_list, points_list)
+        for id, point in zip(ids_list, points_list):
+            metrics.add_student_10point_assessment(group_id, id, point)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': '10 points survey added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add 10 points survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])
