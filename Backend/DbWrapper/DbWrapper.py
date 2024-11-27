@@ -13,6 +13,7 @@ PROJECTS = "projectdata"
 USERS = "userdata"
 JOY = "joydata"
 VELOCITY = "velocitydata"
+TRUCK_FACTOR = "truck_factor_data"
 
 class DbWrapper:
     def __init__(self, dbObject):
@@ -173,6 +174,10 @@ class DbWrapper:
                 inserted = True
         return True
     
+    def getGroupSize(self, group_id:str):
+        doc = self.db.collection(GROUPS).document(group_id).get()
+        return len(doc.to_dict()["student_ids"])
+
     def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
         doc = self.db.collection(GROUPS).document(group_id)
         try:
@@ -313,6 +318,34 @@ class DbWrapper:
             if completed_points != -1:
                 doc.update({'completed_points': completed_points})
         except:
+            return False
+        return True
+    
+    def getTruckFactorRatings(self, group_id:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(filter=FieldFilter("group_id", "==", group_id)).stream()
+        ratings = []
+        for doc in docs:
+            ratings.append(doc.to_dict())
+        return ratings
+    
+    def getUsersRecentTruckFactor(self, group_id:str, uid:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("uid", "==", uid)
+            ).stream()
+        for doc in docs:
+            return doc
+        return None
+
+    def submitTruckFactorRating(self, group_id:str, uid:str, truck_factor:int) -> bool:
+        recent_truck_factor = self.getUsersRecentTruckFactor(group_id, uid)
+        try:
+            if recent_truck_factor == None:
+                pass
+            else:
+                # recent_truck_factor.set
+                pass
+        except Exception as e:
             return False
         return True
 

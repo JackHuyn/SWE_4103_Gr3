@@ -75,3 +75,17 @@ class StudentMetrics:
         git = github.GitHubManager(auth, repo_address)
         print('git setup')
         return git.get_contributions()
+
+
+    def get_avg_truck_factor(self, group_id:str):
+        ratings = self.db.getTruckFactorRatings(group_id)
+        sum = 0
+        for rating in ratings:
+            try:
+                sum += rating['truck_factor']
+            except Exception as e:
+                pass
+        return sum / len(ratings)
+
+    def submit_truck_factor(self, group_id:str, uid:str, truck_factor:int) -> bool:
+        return self.db.submitTruckFactorRating(group_id, uid, truck_factor)
