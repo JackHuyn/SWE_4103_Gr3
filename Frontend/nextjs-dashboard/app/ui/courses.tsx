@@ -94,6 +94,33 @@ export default function Courses() {
         setIsPopup2Visible(true); // Show the popup2
     };
 
+    const callArchive = async () => 
+        {
+            try 
+            {
+                const response = await fetch('http://localhost:3001/archive', 
+                    {
+                    method: 'GET', 
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify(courseList.course_id)
+                })
+                data = response.json() 
+                if (data.archive_status)
+                {
+                    console.log(data.archive_status)
+                }
+                else
+                {
+                    console.log("Archive is not possible")
+                }
+            }
+            
+            catch (error) 
+            {
+                console.error('Error sending request:', error);
+                alert('Error archiving course. Please try again later.');
+            }
+        }
 
 
     // Handle adding a new course with name, description, and term
@@ -319,6 +346,8 @@ export default function Courses() {
                                         <p className="course-detail">Description: {course.course_description}</p>
                                         <p className="course-detail">Section: {course.section}</p>
                                         <p className="course-detail">Term: {course.term}</p>
+                                        <Button className="archive" onClick={callArchive()}> Archive </Button>
+                                        
                                         {/*</CardBody>*/}
 
                                     </div>
