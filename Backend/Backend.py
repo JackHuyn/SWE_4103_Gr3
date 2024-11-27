@@ -866,6 +866,49 @@ def remove_groups():
         return response    
 #----------------------------------
 
+# Leora Mascarenhas 
+@app.route('/archive', methods= ["GET"])
+@cross_origin()
+def archive():
+    course_id = request.args.get("courseId", default = "-1", type = str)
+    archive_status = dbWrapper.archiveCourse(course_id)
+    if archive_status:
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'archive_status': archive_status}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+    else:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'archive_status': archive_status}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+    return response
+ 
+# ----------------------
+# Leora Mascarenhas 
+
+@app.route('/unarchive', methods= ["GET"])
+@cross_origin()
+def unarchive():
+    course_id = request.args.get("courseId", default = "-1", type = str)
+    activate_status = dbWrapper.activateCourse(course_id)
+    if activate_status:
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'activate_status': activate_status}),
+            status = 200,
+            mimetype='applicaion/json'
+        )
+    else:
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'activate_status': activate_status}),
+            status = 401,
+            mimetype='applicaion/json'
+        )
+    return response
+
+#----------------------------------
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])
 @cross_origin()
