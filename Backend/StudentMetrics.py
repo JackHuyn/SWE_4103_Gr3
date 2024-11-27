@@ -99,7 +99,13 @@ class StudentMetrics:
     
     def get_student_scaling_factor(self, group_id, student_id):
         return self.db.getStudentScalingFactor(self, group_id, student_id)
+    
+    def get_student_CEAB_answers(self, group_id:str, student_id:str=""):
+        return self.db.getStudentCEABAnswers(group_id, student_id)
 
+    
+    def add_student_CEAB_assessement(self,group_id: str, student_id: str, grades: list[dict] ):
+        return self.addStudentCEABAssessementEntry(group_id, student_id, grades)
 
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
