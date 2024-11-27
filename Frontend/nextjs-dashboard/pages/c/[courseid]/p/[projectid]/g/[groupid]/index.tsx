@@ -81,41 +81,6 @@ export default function Metrics() {
         }
       }, [groupId]);
 
-//------------------ Survey -------------------
-const handleSurvey = async () => {
-    if (newProjectName) {
-        const localId  = Cookies.get('localId')
-        if (!localId){
-            window.location.href = "/auth/login"
-        }
-        const projectData = {
-            course_id: courseid,
-            project_name: newProjectName
-        };
-        try {
-            const response = await fetch('http://localhost:3001/remove-project' , {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json',},
-                body: JSON.stringify(projectData),  // Send JSON data in request body
-            });
-            const result = await response.json();
-            if (response.ok) {
-                alert('Project removed successfully!');
-                window.location.reload();
-                setNewProjectName('');
-                setIsProjectPopup2Visible(false);
-            } else {
-                alert(`Error removing project: ${result.reason}`);
-            }
-        } catch (error) {
-            console.error('Error sending request:', error);
-            alert('Error removing project. Please try again later.');
-        }
-    } else {
-        alert('Please fill in all the fields.');
-    }
-};
-//---------------------------------------------
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
