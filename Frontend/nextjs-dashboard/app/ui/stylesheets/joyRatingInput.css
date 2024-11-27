@@ -30,6 +30,8 @@
 #joy-stars {
     display: flex;
     gap: 8px;
+    align-items: center;
+    justify-content: center;
 }
 
 #joy-stars .star_button {
@@ -46,8 +48,8 @@
 }
 
 #joy-comment-textarea {
-    width: 100%;
-    padding: 10px;
+    width: 98%;
+    padding: 1%;
     border: 1px solid #4b4b4b;
     border-radius: 8px;
     background-color: #3a3a3a;

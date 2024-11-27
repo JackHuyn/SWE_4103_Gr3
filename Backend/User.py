@@ -27,6 +27,10 @@ class User:
         self._github_oauth_token = user_data['github_personal_access_token']
         self._account_type = user_data['account_type']
 
+        self._force_password_reset = False
+        if "force_password_reset" in user_data:
+            self._force_password_reset = user_data["force_password_reset"]
+
         self._github_auth = None
         self._github_login = ""
         try:
@@ -80,6 +84,14 @@ class User:
         """User's UID property"""
         return self._uid
     
+    @property
+    def force_password_reset(self):
+        """Flag that determines whether or not to force a user to reset their password"""
+        return self._force_password_reset
+    @force_password_reset.setter
+    def force_password_reset(self, value:bool):
+        self._force_password_reset = value
+
     @property
     def github_oauth_token(self):
         """User's GitHub oauth token property"""
