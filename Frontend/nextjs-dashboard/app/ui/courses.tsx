@@ -94,25 +94,29 @@ export default function Courses() {
         setIsPopup2Visible(true); // Show the popup2
     };
 
-    const callArchive = async () => 
+    const callArchive = async (courseid) => 
         {
             try 
             {
-                const response = await fetch('http://localhost:3001/archive', 
-                    {
-                    method: 'GET', 
+                console.log('Archiving on frontend : ', courseid)
+                const response = await fetch('http://localhost:3001/archive?courseId=' + courseid)
+                    /**{
+                    method: 'POST', 
                     headers: { 'Content-Type': 'application/json'},
                     body: JSON.stringify(courseList.course_id)
-                })
-                data = response.json() 
+                })**/
+                const data = await response.json() 
                 if (data.archive_status)
                 {
                     console.log(data.archive_status)
+                    
                 }
                 else
                 {
                     console.log("Archive is not possible")
                 }
+
+                window.location.reload();
             }
             
             catch (error) 
@@ -323,14 +327,13 @@ export default function Courses() {
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
-
-                                <Link
-                                    href={{
+                                <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
+                                    <Link
+                                        href={{
                                         pathname: '/c/[slug]',
                                         query: { slug: course.course_id }
                                     }
                                     } className="link">
-                                    <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
                                         <h3 className="course-title">{course.course_id}</h3>
 
 
@@ -346,12 +349,15 @@ export default function Courses() {
                                         <p className="course-detail">Description: {course.course_description}</p>
                                         <p className="course-detail">Section: {course.section}</p>
                                         <p className="course-detail">Term: {course.term}</p>
-                                        <Button className="archive" onClick={callArchive()}> Archive </Button>
+                                        
                                         
                                         {/*</CardBody>*/}
 
+                                        </Link>
+                                        <Button className="archive" onClick={() => callArchive(course.course_id)}> Archive </Button>
+
                                     </div>
-                                </Link>
+                                
                             ))}
                         </div>
                     )}

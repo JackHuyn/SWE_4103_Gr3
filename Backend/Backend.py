@@ -867,24 +867,37 @@ def remove_groups():
 #----------------------------------
 
 # Leora Mascarenhas 
-@app.route('/archive', methods= ["GET"])
+@app.route('/archive', methods= ["GET","POST"])
 @cross_origin()
 def archive():
-    course_id = request.args.get("courseId", default = "-1", type = str)
-    archive_status = dbWrapper.archiveCourse(course_id)
-    if archive_status:
+
+    try:
+        print('inside archive')
+        course_id =  request.args.get("courseId", default = "-1", type = str)
+        print('archiving: '  + course_id)
+        archive_status = dbWrapper.archiveCourse(course_id)
+        if archive_status:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'archive_status': archive_status}),
+                status = 200,
+                mimetype='applicaion/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'archive_status': archive_status}),
+                status = 401,
+                mimetype='applicaion/json'
+            )
+        return response
+    except: 
+        #print('are we inside - courseid')
         response = app.response_class(
-            response=json.dumps({'approved': True, 'archive_status': archive_status}),
-            status = 200,
-            mimetype='applicaion/json'
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
         )
-    else:
-        response = app.response_class(
-            response=json.dumps({'approved': False, 'archive_status': archive_status}),
-            status = 401,
-            mimetype='applicaion/json'
-        )
-    return response
+        return response 
+        
  
 # ----------------------
 # Leora Mascarenhas 
@@ -907,6 +920,12 @@ def unarchive():
             mimetype='applicaion/json'
         )
     return response
+
+#This helper function ensures the passed in user data courses are active i.e not archived
+#user_data_courses should be a list of dictionaries (See getInstructorCourses / getStudentCourses)
+def user_data_course_active(user_data_courses):
+    active_user_data_courses = [d for d in user_data_courses if d.get("status") == 0]
+    return active_user_data_courses
 
 #----------------------------------
 # Jack Huynh _ Show courses 
@@ -934,6 +953,9 @@ def show_courses():
         else:
             # Fetch student courses
             user_data_courses = dbWrapper.getStudentCourses(local_id)
+
+        
+        user_data_courses = user_data_course_active(user_data_courses)
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
