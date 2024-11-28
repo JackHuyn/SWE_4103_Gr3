@@ -7,6 +7,7 @@ import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/homelogout.css';
+import MoonLight from '@/app/ui/logo_module';
 
 
 import { Button } from './button';
@@ -335,9 +336,12 @@ export default function Courses() {
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
 
                     <div className="button-bar">
+                    
                         {/* Home Button on the Left */}
+                        
                         <Link href="/">
-                            <button id="home">Home</button>
+                            {/* <button id="home">Home</button> */}
+                            <MoonLight></MoonLight>
                         </Link>
 
                         {/* Logout Button on the Right */}
@@ -371,7 +375,7 @@ export default function Courses() {
                                 <Button className="removeCourse" onClick={removeCourse}>
                                     -
                                 </Button>
-                                <Button className="addCourse" onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }}>
+                                <Button className="archive_courses" onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }}>
     View Archived Courses
 </Button>
 

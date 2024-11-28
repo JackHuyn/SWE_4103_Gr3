@@ -1,14 +1,15 @@
 .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: absolute;
+    /* align-items: left; */
+    /* justify-content: left; */
     gap: 10px;
-    margin-bottom: 20px; /* Adds space below the logo */
+    margin-bottom: 0px; /* Adds space below the logo */
     transition: transform 0.8s ease;
+    background-color: rgba(16, 16, 16, 0.052);
 }
 
 .logo:hover {
-    transform: scale(1.1); /* Slightly increase the size of the logo when hovered */
+    transform: scaleY(1.1); /* Slightly increase the size of the logo when hovered */
 }
 
 .logo img {

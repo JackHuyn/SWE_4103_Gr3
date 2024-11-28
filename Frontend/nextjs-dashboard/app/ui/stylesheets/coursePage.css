@@ -95,6 +95,31 @@ h1 {
     background-color: #2b2b2b;
 }
 
+.archive_courses {
+    border: none;
+    background-color: rgb(231, 255, 113);
+    color: white;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.archive_courses:hover {
+    background-color: var;
+    transform: scale(1.05);
+}
+
+.archive_courses:active{
+    background-color: rgb(231, 255, 113);
+}
+
+
 
 
 .courses {
