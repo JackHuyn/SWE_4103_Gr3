@@ -12,23 +12,18 @@ GITHUB_BASE_URL = 'https://api.github.com'
 
 def getOAuthTokenFromCode(client_id, client_secret, code):
     rest_api_url = "https://github.com/login/oauth/access_token"
-    print('test')
     r = requests.post(rest_api_url,
                 params={
                     "client_id": client_id,
                     "client_secret": client_secret,
                     "code": code
                     })
-    print('test2')
-    print(r)
-    print(r.text)
 
     args = r.text.split('&')
     for arg in args:
         if(arg.startswith('access_token')):
             return arg.split('=')[1]
-    # print("R: ", r.json())
-    # return r.json()
+    
     return {}
 
 def getGitHubLogin(auth):
@@ -82,11 +77,11 @@ class GitHubManager:
         contributions = []
         for s in stats:
             con = {}
-            print("-", s.author)
+            # print("-", s.author)
             con['author'] = s.author.login
             con['contributions'] = []
             for week in s.weeks:
-                print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
+                # print(week.w, "\t", week.a, "\t", week.d, "\t", week.c)
                 con['contributions'].append({'week': str(week.w), 'additions': week.a, 'deletions': week.d, 'commits': week.c})
             contributions.append(con)
         return contributions
