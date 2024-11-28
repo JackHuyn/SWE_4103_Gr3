@@ -16,10 +16,12 @@ class TestDbWrapperVelocityManagement(unittest.TestCase):
     def test_addVelocityData(self):
         self.db.collection().document().set = MagicMock()
         
+        # set sprint time, and get result by calling function
         sprint_start = datetime(2024, 11, 1)
         sprint_end = datetime(2024, 11, 10)
         result = self.db_wrapper.addVelocityData("group1", sprint_start, sprint_end, planned_points=30, completed_points=25)
         
+        # ensure the mock is called once and check the result
         self.db.collection().document().set.assert_called_once()
         self.assertTrue(result)
 
