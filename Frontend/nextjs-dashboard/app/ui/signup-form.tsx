@@ -5,8 +5,9 @@ import {
   } from '@heroicons/react/24/outline';
 import '@/app/ui/stylesheets/signup.css'
 import { FormEvent } from 'react'
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
+import Link from 'next/link';
+
 
 
 let account_type = 0
@@ -166,15 +167,24 @@ export default function SignupForm()
         document.getElementById('instructor_key_dialog').style.display = 'block'
     }
 
+    
+
     return (
-        <div>
-            <div className="login_form">
+        <div className="page_wrapper">
+            <Link href="\">
+    <div className="logo2">
+        <img width="48" height="48" src="https://img.icons8.com/?size=100&id=11377&format=png&color=ffffff" alt="moon-satellite" className='logo-image'/>
+    </div></Link>
+            <h1>Sign Up.</h1>
+            
+            <div className="signup_form">
+            
                 <form onSubmit={handleSubmit}>
                     <div>
-                        <h1>Sign Up</h1>
+                        
                         <span id="login_error_span">Err</span>
-                        <div className="login_row">
-                            <div className="login_row_item left">
+                        <div className="signup_row">
+                            <div className="signup_row_item left">
                                 <label htmlFor="fname" className='input_label'>first name</label>
                                 <input
                                     id="fname"
@@ -185,7 +195,7 @@ export default function SignupForm()
                                     required
                                 />
                             </div>
-                            <div className="login_row_item right">
+                            <div className="signup_row_item right">
                                 <label htmlFor="fname" className='input_label'>last name</label>
                                 <input
                                     id="lname"
@@ -197,8 +207,8 @@ export default function SignupForm()
                                 />
                             </div>
                         </div>
-                        <div className="login_row">
-                            <div className="login_row_item left">
+                        <div className="signup_row">
+                            <div className="signup_row_item left">
                                 <label htmlFor="email" className='input_label'>email</label>
                                 <input
                                     id="email"
@@ -209,7 +219,7 @@ export default function SignupForm()
                                     required
                                 />
                             </div>
-                            <div className="login_row_item right">
+                            <div className="signup_row_item right">
                                 <label htmlFor="account_type" className='input_label'>I am a</label>
                                 {/* <input
                                     id="account_type"
@@ -222,8 +232,8 @@ export default function SignupForm()
                                 </div>
                             </div>
                         </div>
-                        <div className="login_row">
-                            <div className="login_row_item left">
+                        <div className="signup_row">
+                            <div className="signup_row_item left">
                                 <label htmlFor="passwordA" className='input_label'>password</label>
                                 <input
                                     id="passwordA"
@@ -235,7 +245,7 @@ export default function SignupForm()
                                     minLength={6}
                                 />
                             </div>
-                            <div className="login_row_item right">
+                            <div className="signup_row_item right">
                                 <label htmlFor="passwordB" className='input_label'>confirm password</label>
                                 <input
                                     id="passwordB"
@@ -260,7 +270,7 @@ export default function SignupForm()
                 <input id="instructor_key_input" name="instructor_key_input" type="text" />
                 <button onClick={submitInstructorKeyDialog}>Submit</button>
             </div>
-            <button id="auth_redirect_button" onClick={redirectToLogin}>Sign In</button>
+            {/* <button id="auth_redirect_button" onClick={redirectToLogin}>Sign In</button> */}
         </div>
     );
 }

@@ -97,29 +97,78 @@ h1 {
 
 .archive_courses {
     border: none;
-    background-color: ivory;
+    background-color: #4a90e2; /* Modern blue color */
     color: white;
-    font-size: 1.5rem;
+    font-size: 1rem;
     display: flex;
-    justify-content: center;
     align-items: center;
-    border-radius: 10px;
-    width: 50px;
+    justify-content: center;
+    border-radius: 8px;
+    width: 180px;
     height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-family: "Jura", sans-serif;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.archive_courses:hover {
+    background-color: #357abd; /* Darker blue for hover */
+    transform: scale(1.05);
+}
+
+.archive_courses:active {
+    background-color: #2b5d92; /* Even darker blue for active state */
+    transform: scale(0.98);
+}
+
+/* Archived Courses Popup Styles */
+.popup_content h2 {
+    font-family: "Jura", sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.archived-course-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    margin: 10px 0;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    color: #e0e0e0;
+}
+
+.archived-course-item p {
+    margin: 0;
+    font-family: "Jura", sans-serif;
+    font-size: 1rem;
+}
+
+.unarchive-button {
+    background-color: #4a90e2;
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.archive_courses:hover {
-    background-color: var;
+.unarchive-button:hover {
+    background-color: #357abd;
     transform: scale(1.05);
 }
 
-.archive_courses:active{
-    background-color: rgb(231, 255, 113);
+.unarchive-button:active {
+    background-color: #2b5d92;
+    transform: scale(0.98);
 }
-
-
 
 
 .courses {
@@ -134,13 +183,22 @@ h1 {
     backdrop-filter: blur(8px);
     border-radius: 15px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s, box-shadow 0.3s;
 }
+
+.courses:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 16px rgba(36, 36, 36, 0.3);
+}
+
+
 
 .course {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-width: 250px;
+    max-width: 600px;
     background-color: #3b3b3b;
     border-radius: 15px;
     padding: 20px;
@@ -223,28 +281,18 @@ h1 {
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.archive:hover {
-    background-color: gray;  /* Hover color same as other buttons */
-    transform: scale(1.05);
+.archive:hover{
+
+    background-color: #484848;
+    transform:scale(1.1);
+    
+
 }
 
-.archive:active {
-    background-color: #2b2b2b;  /* Active color */
+#archive_course_id{
+    margin-right:50px;
 }
 
-.archived-course-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #2b2b2b;
-    border-radius: 8px;
-    color: white;
-}
-
-.archived-course-item p {
-    margin: 0;
-}
 
 .popup {
     position: fixed;
@@ -287,3 +335,56 @@ h1 {
 .cancel_button:hover {
     background-color: #c0392b;
 }
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-button {
+    background-color: var(--secondaryColor);
+    color: rgb(235, 235, 235);
+    padding: 10px 20px;
+    font-family: "Jura";
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-button:hover {
+    background-color: var(--secondaryColorHover);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: rgb(57, 57, 57);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px 0;
+    left: 100%; /* Aligns the dropdown menu to the left */
+    transform: translateX(-100%); /* Ensures the dropdown opens to the left of the button */
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.dropdown-menu button:hover {
+    background-color: #303030;
+}
+

@@ -1,21 +1,35 @@
 .logo {
-    display: absolute;
-    /* align-items: left; */
-    /* justify-content: left; */
+    position: absolute; /* Use 'absolute' to control positioning relative to the container */
+    top: 10px; /* Adjust spacing from the top */
+    left: 10px; /* Align logo to the left */
+    display: flex; /* Ensure it behaves as a flexbox for children alignment */
+    align-items: center; /* Center-align items vertically */
+    justify-content: flex-start; /* Align content to the start (left) */
     gap: 10px;
-    margin-bottom: 0px; /* Adds space below the logo */
+    margin-bottom: 0px; /* Ensure no extra margin below */
     transition: transform 0.8s ease;
-    /* background-color: rgba(16, 16, 16, 0.052); */
-    background-color: rgba(220, 1, 1, 0.813);
-    left: 0px;
-    width:100%;
+}
+
+.logo2 {
+    display: flex; /* Ensure it behaves as a flexbox for children alignment */
+    align-items: center; /* Center-align items vertically */
+    justify-content: flex-start; /* Align content to the start (left) */
+    gap: 10px;
+    margin-bottom: 30px; /* Ensure no extra margin below */
+    transition: transform 0.8s ease;
 }
 
 .logo:hover {
-    transform: scaleY(1.1); /* Slightly increase the size of the logo when hovered */
+    transform: scale(1.1); /* Slightly increase size on hover */
 }
 
+.logo2:hover {
+    transform: scale(1.1); /* Slightly increase size on hover */
+}
+
+
+
 .logo img {
-    width: 48px; /* Set fixed size for the logo image */
+    width: 48px;
     height: 48px;
 }

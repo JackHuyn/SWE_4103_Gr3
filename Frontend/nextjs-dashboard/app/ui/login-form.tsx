@@ -4,60 +4,64 @@ import {
   KeyIcon,
   ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
+import '@/app/ui/stylesheets/logo.css'
 import '@/app/ui/stylesheets/login.css'
+
+
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
+import Link from 'next/link';
 
 
 function loginEmailUser(email, password) {
-    fetch("http://localhost:3001/auth/login-with-email-and-password?email=" + email + "&password=" + password,
-      {
-        method: 'GET',
+  fetch("http://localhost:3001/auth/login-with-email-and-password?email=" + email + "&password=" + password,
+    {
+      method: 'GET',
+    }
+  ).then(response => {
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          text: "Server not found!",
+          status: "danger"
+        };
       }
-    ).then(response => {
-      if (!response.ok) {
-        if (response.status === 404) {
-          return {
-            text: "Server not found!",
-            status: "danger"
-          };
-        }
-  
-        return response.text().then(text => {
-          return {
-            text: text,
-            status: "danger"
-          };
-        })
-      }
+
       return response.text().then(text => {
         return {
           text: text,
-          status: "success"
+          status: "danger"
         };
       })
-
-
-    }).then(resp => {
-      try {
-        let r = JSON.parse(resp.text)
-        console.log(r)
-        if(!r['approved'])
-          throw 'Invalid Email or Password'
-        const expires = new Date(Date.now() + 60 * 60 * 1000)
-        //console.log('Expiry date: ', expires.toDateString())
-        document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
-        document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
-        //console.log("Cookies: ", document.cookie)
-        window.location.href = "/"  
-      } catch(err) {
-        document.getElementById('login_error_span').style.display = 'block'
-        document.getElementById('login_error_span').innerText = err
-      }
-    }).catch((error) => {
-      document.getElementById('login_error_span').style.display = 'block'
-      document.getElementById('login_error_span').innerText = 'Server Error'
+    }
+    return response.text().then(text => {
+      return {
+        text: text,
+        status: "success"
+      };
     })
+
+
+  }).then(resp => {
+    try {
+      let r = JSON.parse(resp.text)
+      console.log(r)
+      if (!r['approved'])
+        throw 'Invalid Email or Password'
+      const expires = new Date(Date.now() + 60 * 60 * 1000)
+      //console.log('Expiry date: ', expires.toDateString())
+      document.cookie = "localId=" + r['localId'] + "; expires=" + expires.toDateString() + "; path=/"
+      document.cookie = "idToken=" + r['idToken'] + "; expires=" + expires.toDateString() + "; path=/"
+      //console.log("Cookies: ", document.cookie)
+      window.location.href = "/"
+    } catch (err) {
+      document.getElementById('login_error_span').style.display = 'block'
+      document.getElementById('login_error_span').innerText = err
+    }
+  }).catch((error) => {
+    document.getElementById('login_error_span').style.display = 'block'
+    document.getElementById('login_error_span').innerText = 'Server Error'
+  })
 }
 
 export default function LoginForm() {
@@ -76,12 +80,19 @@ export default function LoginForm() {
     window.location.href = "/auth/signup"
   }
 
+  
+
   return (
     <div className="page_wrapper">
+      <div className="col_page">
+      <Link href="\">
+    <div className="logo2">
+        <img width="48" height="48" src="https://img.icons8.com/?size=100&id=11377&format=png&color=ffffff" alt="moon-satellite" className='logo-image'/>
+    </div></Link>
       <div className="login_form">
         <form onSubmit={handleSubmit}>
           <div>
-              <h1>Sign In.</h1>
+            <h1>Sign In.</h1>
             <span id="login_error_span">Invalid Email or Password</span>
             <div className="login_row">
               <div className="login_row_item left">
@@ -94,18 +105,18 @@ export default function LoginForm() {
                   required
                 />
               </div>
-              
+
               <div className="login_row_item right">
                 <p>password: </p>
-                  <input
-                    id="password"
-                    type="password"
-                    name="password"
-                    placeholder="●●●●●●●"
-                    required
-                    minLength={6}
-                  />
-                  
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="●●●●●●●"
+                  required
+                  minLength={6}
+                />
+
               </div>
               <a href="/auth/forgot-password">Forgot Password?</a>
               <Button type="submit" id="login_button">Sign in</Button>
@@ -115,8 +126,8 @@ export default function LoginForm() {
 
       </div>
       <button id="auth_redirect_button" onClick={redirectToSignUp}>Sign Up</button>
-    </div>
-    
+    </div></div>
+
 
   );
 }

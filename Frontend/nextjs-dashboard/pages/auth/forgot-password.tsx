@@ -1,5 +1,7 @@
 import '@/app/ui/stylesheets/password-reset.css'
 import '@/app/ui/stylesheets/logo.css'
+import Link from 'next/link';
+
 
 import Cookies from 'js-cookie';
 
@@ -56,9 +58,10 @@ export default function PasswordReset() {
 
     return (
         <div className="page_wrapper">
-    <div className="logo">
+    <Link href="\">
+    <div className="logo2">
         <img width="48" height="48" src="https://img.icons8.com/?size=100&id=11377&format=png&color=ffffff" alt="moon-satellite" className='logo-image'/>
-    </div>
+    </div></Link>
 
     <div className="reset_form">
         <form onSubmit={submitPasswordChangeRequest} id="password-reset-form">
