@@ -35,12 +35,19 @@ jobs:
           mkdir -p logFile
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pylint ruff
 
       # Remove Python cache files
       - name: Remove Python cache files
         run: |
           find . -name "__pycache__" -type d -exec rm -r {} +
           find . -name "*.pyc" -exec rm -f {} +
+
+      # Lint with Ruff
+      - name: Lint with Ruff
+        run: |
+          ruff check --output-format=github --exit-zero
+        continue-on-error: true
 
   testing:
     name: CI
