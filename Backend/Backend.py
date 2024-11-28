@@ -954,9 +954,20 @@ def get_group_size():
 def get_avg_truck_factor():
     group_id = request.args.get("groupId", default = "", type = str)
     try:
-        pass
+        avg_truck_factor = metrics.get_avg_truck_factor(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'avgTruckFactor': avg_truck_factor}),
+            status=200,
+            mimetype='application/json'
+        )
     except Exception as e:
         print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/metrics/submit-truck-factor', methods=['POST'])
 @cross_origin()
@@ -964,12 +975,24 @@ def submit_truck_factor():
     group_id = request.args.get("groupId", default = "", type = str)
     uid = request.args.get("uid", default = "", type = str)
     truck_factor = request.args.get("truckFactor", default = -1, type = int)
+    comment = request.args.get("comment", default = "", type = str)
     try:
         if(truck_factor <= 0):
             raise Exception
-        valid = metrics.submit_truck_factor()
+        valid = metrics.submit_truck_factor(group_id, uid, truck_factor, comment)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
     except Exception as e:
         print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/auth/get-github-app-client-id', methods=['GET'])
 @cross_origin()

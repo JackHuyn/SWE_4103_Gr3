@@ -373,14 +373,20 @@ class DbWrapper:
             return doc
         return None
 
-    def submitTruckFactorRating(self, group_id:str, uid:str, truck_factor:int) -> bool:
+    def submitTruckFactorRating(self, group_id:str, uid:str, truck_factor:int, comment="") -> bool:
         recent_truck_factor = self.getUsersRecentTruckFactor(group_id, uid)
         try:
             if recent_truck_factor == None:
-                pass
+                self.db.collection(TRUCK_FACTOR).add(
+                    {
+                        "group_id": group_id,
+                        "uid": uid,
+                        "truck_factor": truck_factor,
+                        "comment": comment
+                    }
+                )
             else:
-                # recent_truck_factor.set
-                pass
+                recent_truck_factor.reference.set({'truck_factor': truck_factor}, merge=True)
         except Exception as e:
             return False
         return True

@@ -4,6 +4,7 @@ import JoyAvgChart from '@/app/ui/metrics/joy-avg-chart';
 import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
+import TruckFactorInput from '@/app/ui/metrics/truck-factor-input';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
 import { useRouter } from 'next/router';
@@ -15,6 +16,7 @@ export default function Metrics() {
     const [groupId, setGroupId] = useState(null);
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const [isPopup2Visible, setIsPopup2Visible] = useState(false);
+    const [isTruckFactorInputVisible, setIsTruckFactorInputVisible] = useState(false)
     const [isGitHubDialogVisible, setIsGitHubDialogVisible] = useState(false);
 
     function openJoyRatingDialog() {
@@ -25,9 +27,14 @@ export default function Metrics() {
         setIsPopup2Visible(true);
     }
 
+    function openTruckFactorInput() {
+        setIsTruckFactorInputVisible(true)
+    }
+
     function closeDialogs() {
         setIsPopupVisible(false);
         setIsPopup2Visible(false);
+        setIsTruckFactorInputVisible(false)
     }
 
     // Close dialog only if click is on backdrop
@@ -50,14 +57,6 @@ export default function Metrics() {
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
-
-        // // Validate session
-        // const sessionResponse = await fetch(`http://127.0.0.1:3001/auth/validate-session?localId=${localId}&idToken=${idToken}`);
-        // if (sessionResponse.status === 401) {
-        // // Redirect if unauthorized
-        // window.location.href = "/auth/login";
-        // return;
-        // }
     }
 
     return (
@@ -69,6 +68,7 @@ export default function Metrics() {
             <div className="metrics-buttons">
                 <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
                 <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
+                <button className="metrics-button" onClick={openTruckFactorInput}>Open Truck Factor Dialog</button>
             </div>
 
             <div className="metrics-content">
@@ -78,7 +78,7 @@ export default function Metrics() {
                 <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
-            {(isPopupVisible || isPopup2Visible) && (
+            {(isPopupVisible || isPopup2Visible || isTruckFactorInputVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
@@ -96,6 +96,11 @@ export default function Metrics() {
                             <h2>Team Velocity Input</h2>
                             <TeamVelocityInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
+                        </div>
+                    )}
+                    {isTruckFactorInputVisible && (
+                        <div className="dialog">
+                            <TruckFactorInput closeDialogs={closeDialogs}/>
                         </div>
                     )}
                 </div>

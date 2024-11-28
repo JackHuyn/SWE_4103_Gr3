@@ -86,6 +86,9 @@ class StudentMetrics:
             except Exception as e:
                 pass
         return sum / len(ratings)
+    
+    def get_users_recent_truck_factor(self, group_id:str, uid:str):
+        return self.db.getUsersRecentTruckFactor(group_id, uid)
 
     def submit_truck_factor(self, group_id:str, uid:str, truck_factor:int) -> bool:
         return self.db.submitTruckFactorRating(group_id, uid, truck_factor)
