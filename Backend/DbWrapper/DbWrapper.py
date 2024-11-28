@@ -123,7 +123,7 @@ class DbWrapper:
             print("Error getting CEAB assessment:", err)
             return False
 
-    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, github_personal_access_token:str="")->bool:
+    def addUser(self, accType:int, email:str, first_name:str, last_name:str, uid:str, display_name:str, github_personal_access_token:str="", force_password_reset:bool=False)->bool:
         x = [i for i in self.db.collection(USERS).where(filter=FieldFilter("uid", "==", uid)).stream()]
         if len(x) > 0:
             return False

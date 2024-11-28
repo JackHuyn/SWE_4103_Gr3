@@ -687,9 +687,9 @@ def add_a_student():
         lname = data.get('student_lname','')
         email = data.get('student_email','')
         success = False
-        if not (course_id or student_fname or student_lname or student_email):
+        if not (course_id or fname or lname or email):
             raise ValueError("Missing required fields")
-        student_dict = dbWrapper.findUser(student_email)
+        student_dict = dbWrapper.findUser(email)
         if student_dict != None:
             student_id = student_dict['uid']
             if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -990,6 +990,10 @@ def add_ceab_survey():
                 point = student['points']
                 result[id] = point[f'Q{i}']
             results_list.append(result)
+        print("XXXXXXXXXXXXX")
+        print(group_id)
+        print(student_id)
+        print(results_list)
         success = metrics.add_student_CEAB_assessement(group_id, student_id, results_list)
         if success:
             response = app.response_class(

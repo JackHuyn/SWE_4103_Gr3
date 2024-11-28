@@ -20,6 +20,7 @@ import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/courseDetails.css';
 import MoonLight from '@/app/ui/logo_module';
 import { group } from 'console';
+import Link from 'next/link';
 
 export default function Metrics() {
     const router = useRouter();
@@ -309,7 +310,6 @@ const showSurvey = async () => {
                     {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
             </div>
             
-            <button id="logout" onClick={HandleLogout}>Log Out</button>
             {isRoleLoaded && (
   
                 <div className="metrics-controls">

@@ -11,6 +11,7 @@ import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';
 import MoonLight from '@/app/ui/logo_module';
+import HandleLogout from '@/app/ui/logout';
 
 
 /**
@@ -227,7 +228,7 @@ const handleManageGroups = async () => {
   console.error('Error sending request:', error);
   alert('Error managing group. Please try again later.');
   }
-
+}
 
 const handleChangeNumber = (event) => {
   const value = event.target.value;
