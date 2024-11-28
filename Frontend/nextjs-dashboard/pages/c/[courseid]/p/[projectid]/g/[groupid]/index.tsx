@@ -100,7 +100,7 @@ export default function Metrics() {
                     console.log(userRole);
             } else {
                 
-                console.error('WHY THE FKCUK IS IT NOT WROKING', data);
+                console.error(data);
             }
         } catch (error) {
             console.error('Error fetching username:', error);

@@ -68,6 +68,7 @@ h1 {
     
 }
 
+
 .signup_form:hover {
     transform: scale(1.02); /* Slight scaling effect on hover */
     background-color: #171717;
