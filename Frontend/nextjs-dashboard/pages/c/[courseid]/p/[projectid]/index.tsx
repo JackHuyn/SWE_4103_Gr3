@@ -11,6 +11,7 @@ import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';
+import MoonLight from '@/app/ui/logo_module';
 
 
 /**
@@ -191,7 +192,8 @@ const handleChangeNumber = (event) => {
       <div className="button-bar">
           {/* Home Button on the Left */}
           <Link href="/">
-            <button id="home">Home</button>
+            {/* <button id="home">Home</button> */}
+            <MoonLight></MoonLight>
           </Link>
 
           {/* Logout Button on the Right */}
@@ -204,7 +206,7 @@ const handleChangeNumber = (event) => {
         {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
         {/*<p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>*/}
       </div>
-      <div className="content-grid">
+      <div className="content-grid-group">
         {/* Groups Section */}
         <div className="projects-section full-width-section">
           <div className="section-header">

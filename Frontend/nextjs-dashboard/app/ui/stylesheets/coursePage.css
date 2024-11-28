@@ -95,11 +95,85 @@ h1 {
     background-color: #2b2b2b;
 }
 
+.archive_courses {
+    border: none;
+    background-color: #4a90e2; /* Modern blue color */
+    color: white;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    width: 180px;
+    height: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-family: "Jura", sans-serif;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.archive_courses:hover {
+    background-color: #357abd; /* Darker blue for hover */
+    transform: scale(1.05);
+}
+
+.archive_courses:active {
+    background-color: #2b5d92; /* Even darker blue for active state */
+    transform: scale(0.98);
+}
+
+/* Archived Courses Popup Styles */
+.popup_content h2 {
+    font-family: "Jura", sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.archived-course-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    margin: 10px 0;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    color: #e0e0e0;
+}
+
+.archived-course-item p {
+    margin: 0;
+    font-family: "Jura", sans-serif;
+    font-size: 1rem;
+}
+
+.unarchive-button {
+    background-color: #4a90e2;
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.unarchive-button:hover {
+    background-color: #357abd;
+    transform: scale(1.05);
+}
+
+.unarchive-button:active {
+    background-color: #2b5d92;
+    transform: scale(0.98);
+}
 
 
 .courses {
     display: grid;
-    width: 70%;
+    width: 90%;
     height: auto;
     gap: 20px;
     margin: 3% auto;
@@ -109,13 +183,22 @@ h1 {
     backdrop-filter: blur(8px);
     border-radius: 15px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s, box-shadow 0.3s;
 }
+
+.courses:hover {
+    transform: scale(1.01);
+    box-shadow: 0 8px 16px rgba(36, 36, 36, 0.3);
+}
+
+
 
 .course {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-width: 250px;
+    max-width: 600px;
     background-color: #3b3b3b;
     border-radius: 15px;
     padding: 20px;
@@ -147,7 +230,7 @@ h1 {
     justify-content: space-between;
     font-size: 1rem;
     color: #b0b0b0;
-    margin:5px;
+    margin:8%;
 }
 
 .course-detail span:first-child {
@@ -173,3 +256,135 @@ h1 {
     resize: none;
     border-radius: 8px;
 }
+
+.titleline {
+    display: flex;
+    justify-content: center;  /* Ensures space between course title and button */
+    align-items: center;  /* Aligns the button with the title */
+}
+
+
+.archive {
+    position: absolute;
+    right: 5%;
+    border: none;
+    background-color: rgba(128, 128, 128, 0);  /* Use the same color variable */
+    color: white;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.archive:hover{
+
+    background-color: #484848;
+    transform:scale(1.1);
+    
+
+}
+
+#archive_course_id{
+    margin-right:50px;
+}
+
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup_content {
+    background-color: #3b3b3b;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+}
+
+.popup_button {
+    background-color: var(--secondaryColor);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.popup_button:hover {
+    background-color: var(--secondaryColorHover);
+}
+
+.cancel_button {
+    background-color: #e74c3c;
+}
+
+.cancel_button:hover {
+    background-color: #c0392b;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-button {
+    background-color: var(--secondaryColor);
+    color: rgb(235, 235, 235);
+    padding: 10px 20px;
+    font-family: "Jura";
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-button:hover {
+    background-color: var(--secondaryColorHover);
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: rgb(57, 57, 57);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px 0;
+    left: 100%; /* Aligns the dropdown menu to the left */
+    transform: translateX(-100%); /* Ensures the dropdown opens to the left of the button */
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.dropdown-menu button:hover {
+    background-color: #303030;
+}
+
