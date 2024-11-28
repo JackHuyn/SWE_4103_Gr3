@@ -1,0 +1,75 @@
+@import url('./colors.css');
+@import url('./default.css');
+
+
+#truck-factor-dialog {
+    padding: 5% !important;
+}
+
+/* Comment Section */
+#truck-factor-comment-textarea {
+    width: 98%;
+    height: 120px; /* Taller for easier typing */
+    padding: 1%;
+    border: 1px solid #4b4b4b;
+    border-radius: 12px;
+    background-color: #3a3a3a;
+    color: white;
+    font-size: 1rem; /* Slightly larger font */
+    outline: none;
+    transition: border-color 0.3s;
+    margin-top: 10px; /* Added spacing */
+}
+
+#truck-factor-comment-textarea:focus {
+    border-color: #007bff;
+}
+
+#truck-factor-dialog input{
+    margin-top: 2%;
+    margin-right: 2%;
+    width: 55%;
+    height: 25px;
+    background-color: var(--inputBackgroundDark);
+    color: var(--fontColorLight);
+    border: none;
+    border-radius: 5px;
+}
+
+#truck-factor-dialog span {
+    width: 43%;
+}
+
+
+#truck-factor-dialog h3 {
+    margin-bottom: 0 !important;
+}
+
+#truck div{
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Submit Button */
+#submit-truck-factor-button {
+    padding: 12px; /* Increased padding */
+    width: 100%;
+    border: none;
+    border-radius: 12px; /* Softer edges */
+    background-color: #0066cc; /* Subtle color adjustment */
+    color: white;
+    font-size: 1rem; /* Larger text */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#submit-truck-factor-button:hover {
+    background-color: #004d99; /* Slightly darker hover */
+    transform: scale(1.05); /* Subtle hover scaling */
+}
+
+/* Additional Dialog-Specific Styles */
+#truck-factor-dialog textarea {
+    resize: none;
+    height: 100px;
+}

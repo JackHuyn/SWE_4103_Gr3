@@ -34,6 +34,9 @@ class StudentMetrics:
                 rating['student_id'] = str(userdata['first_name']) + ' ' + str(userdata['last_name'])[0] + '.'
         return raw_ratings
     
+    def get_individual_current_day_joy_rating(self, group_id:str, uid:str):
+        return self.db.getIndividualCurrentDayJoyRating(group_id, uid)
+    
     def add_student_joy_rating(self, group_id, uid, joy_rating, comment):
         print(joy_rating)
         return self.db.addJoyRating(uid, group_id, joy_rating, comment)
@@ -88,7 +91,7 @@ class StudentMetrics:
         return sum / len(ratings)
     
     def get_users_recent_truck_factor(self, group_id:str, uid:str):
-        return self.db.getUsersRecentTruckFactor(group_id, uid)
+        return self.db.getUsersRecentTruckFactor(group_id, uid).to_dict()
 
-    def submit_truck_factor(self, group_id:str, uid:str, truck_factor:int) -> bool:
-        return self.db.submitTruckFactorRating(group_id, uid, truck_factor)
+    def submit_truck_factor(self, group_id:str, uid:str, truck_factor:int, comment:str) -> bool:
+        return self.db.submitTruckFactorRating(group_id, uid, truck_factor, comment)

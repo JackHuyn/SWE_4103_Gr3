@@ -386,7 +386,7 @@ class DbWrapper:
                     }
                 )
             else:
-                recent_truck_factor.reference.set({'truck_factor': truck_factor}, merge=True)
+                recent_truck_factor.reference.set({'truck_factor': truck_factor, 'comment': comment}, merge=True)
         except Exception as e:
             return False
         return True
@@ -491,6 +491,29 @@ class DbWrapper:
             docList.append(d)
             user_ids.append(d['student_id'])
         return docList
+    
+    def getIndividualCurrentDayJoyRating(self, group_id:str, uid:str) -> dict | None:
+        group_id = group_id.lower()
+        date = datetime.datetime.today()
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).where(
+                        filter=FieldFilter("student_id", "==", uid)
+                    ).get()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            print('\n', d, '\n')
+            return d
+        return None
     
     def getGithubRepoAddress(self, group_id:str):
         group_id = group_id.lower()

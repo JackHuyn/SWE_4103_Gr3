@@ -78,6 +78,53 @@ export default function JoyRatingInput({closeDialogs})
             const group_id = router.query.groupid;
             setGroupId(group_id);
             console.log("Group ID:", group_id);
+
+            fetch("http://127.0.0.1:3001/metrics/get-individual-daily-joy-rating?groupId="+group_id+"&localId="+local_id,
+                {
+                    method: 'GET'
+                }
+            ).then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return {
+                            text: "Server not found!",
+                            status: "danger"
+                        };
+                    }
+          
+                    return response.text().then(text => {
+                        return {
+                            text: text,
+                            status: "danger"
+                        };
+                    })
+                }
+                return response.text().then(text => {
+                    return {
+                        text: text,
+                        status: "success"
+                    };
+                })
+            }).then(resp => {
+                console.log("result:", resp);
+                try {
+                    let r = JSON.parse(resp.text)
+                    if(!r['approved'])
+                        throw 'idek bro'
+                    console.log(r)
+
+                    const joy_rating = r['joyData']
+                    
+                    setStars(joy_rating['joy_rating'])
+                    document.getElementById('joy-comment-textarea').innerText = joy_rating['comment']
+                    
+                } catch(err) {
+                    console.log(err)
+                }
+            }).catch((error) => {
+                console.log(error)
+            })
+
         }
     }, [router.isReady, router.query]);
 
