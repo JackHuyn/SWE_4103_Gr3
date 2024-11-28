@@ -88,6 +88,34 @@ export default function Metrics() {
         }
       }, [groupId]);
 
+//Function: handle show survey
+const showSurvey = async () => {
+    const groupData = {              
+      group_id: groupId
+    };
+    try {              
+      const response = await fetch('http://localhost:3001/show-survey' , {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(groupData),  // Send JSON data in request body
+      });
+      const result = await response.json();
+      if (response.ok) {
+        window.location.reload();
+        alert('show survey successfully!');
+        window.location.reload();
+      } else {
+        alert(`Error showing survey: ${result.reason}`);
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      alert('Error showing survey. Please try again later.');
+    }    
+  };
+//-------------------------------------------------
+
     async function checkSessionAndFetchData() {
         const localId = Cookies.get('localId');
         const idToken = Cookies.get('idToken');
@@ -164,11 +192,10 @@ export default function Metrics() {
             <div className="metrics-header">
                 {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
             </div>
-
+            
             <button id="logout" onClick={HandleLogout}>Log Out</button>
             {isRoleLoaded && (
             <div className="metrics-buttons">
-
                     {/* Check if student  */}
                     {userRole === '0' && (
                     <>
@@ -179,6 +206,7 @@ export default function Metrics() {
                            {isScrumMaster && 
                             (
                                 <>
+                                <button className="metrics-button" onClick={showSurvey} >Activte Survey</button>
                                 <button className="metrics-button" onClick={openTeamVelocityDialog}>Open Team Velocity Dialog</button>
                                 <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
                                 </>

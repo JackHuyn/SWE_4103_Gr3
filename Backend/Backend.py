@@ -907,6 +907,98 @@ def add_10_point_survey():
         )
         return response
 #----------------------------------
+#Author: Sarun Weerakul
+#This route handle CEAB survey
+@app.route('/survey-ceab', methods=['POST'])
+@cross_origin()
+def add_ceab_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        student_id = data.get('student_id','')
+        points = data.get('points',[])
+        success = False
+        if not (group_id or student_id or points):
+            raise ValueError("Missing required fields")
+        results_list = []
+        for i in range(1,11):
+            result ={}
+            for student in points:
+                id = student['studentId']
+                point = student['points']
+                result[id] = point[f'Q{i}']
+            results_list.append(result)
+        success = metrics.add_student_CEAB_assessement(group_id, student_id, results_list)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': '10 points survey added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add 10 points survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
+#Author: Sarun Weerakul
+#This route handle show survey
+@app.route('/show-survey', methods=['POST'])
+@cross_origin()
+def show_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        success = False
+        success = dbWrapper.showSurveys(group_id)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'show surveys successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to show survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
 
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])

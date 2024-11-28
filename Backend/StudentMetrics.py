@@ -105,7 +105,7 @@ class StudentMetrics:
 
     
     def add_student_CEAB_assessement(self,group_id: str, student_id: str, grades: list[dict] ):
-        return self.addStudentCEABAssessementEntry(group_id, student_id, grades)
+        return self.db.addStudentCEABAssessementEntry(group_id, student_id, grades)
 
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
