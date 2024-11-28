@@ -310,7 +310,7 @@ export default function Courses() {
 
             const result = await response.json();
             if (response.ok) {
-                alert('Course unarchived successfully!');
+                console.log('Course unarchived successfully!');
                 setIsArchivePopupVisible(false);  // Close the popup after unarchiving
                 window.location.reload();  // Refresh the page to show the updated course list
             } else {
@@ -364,15 +364,15 @@ export default function Courses() {
 
                         {/* Right Section: Add and Remove Buttons */}
                         {userRole === '1' && (
-                        <div className="dropdown">
-                            <button className="dropdown-button">⋮</button>
-                            <div className="dropdown-menu">
-                                <button onClick={() => setIsPopupVisible(true)} className="addCourse">Add Course</button>
-                                <button onClick={() => setIsPopup2Visible(true)} className="removeCourse">Remove Course</button>
-                                <button onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }} className="archive_courses">View Archived</button>
+                            <div className="dropdown">
+                                <button className="dropdown-button">⋮</button>
+                                <div className="dropdown-menu">
+                                    <button onClick={() => setIsPopupVisible(true)} className="addCourse">Add Course</button>
+                                    <button onClick={() => setIsPopup2Visible(true)} className="removeCourse">Remove Course</button>
+                                    <button onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }} className="archive_courses">View Archived</button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
 
                     </div>
@@ -390,7 +390,16 @@ export default function Courses() {
                                         } className="link">
                                         <div className="titleline">
                                             <h3 className="course-title">{course.course_id}</h3>
-                                            {userRole=='1' && (<Button className="archive" onClick={() => callArchive(course.course_id)}>⋮</Button>)}
+                                            {userRole == '1' && <Button
+                                                className="archive"
+                                                onClick={(e) => {
+                                                    e.preventDefault(); // Prevent default link behavior
+                                                    e.stopPropagation(); // Prevent navigation to course page
+                                                    callArchive(course.course_id);
+                                                }}
+                                            >
+                                                -
+                                            </Button>}
                                         </div>
 
 

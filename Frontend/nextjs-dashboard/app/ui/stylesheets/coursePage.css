@@ -268,7 +268,7 @@ h1 {
     position: absolute;
     right: 5%;
     border: none;
-    background-color: rgba(128, 128, 128, 0);  /* Use the same color variable */
+    background-color: rgba(128, 128, 128, 0.501);  /* Use the same color variable */
     color: white;
     font-size: 1.2rem;
     display: flex;
@@ -283,7 +283,7 @@ h1 {
 
 .archive:hover{
 
-    background-color: #484848;
+    background-color: #f93b3b;
     transform:scale(1.1);
     
 
