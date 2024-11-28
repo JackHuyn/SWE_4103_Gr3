@@ -315,6 +315,9 @@ export default function Courses() {
                                 <Button className="removeCourse" onClick={removeCourse}>
                                     -
                                 </Button>
+                                <Button className="addCourse" onClick={addCourse}>
+                                    Archives
+                                </Button>
 
                             </div>
                         )}
