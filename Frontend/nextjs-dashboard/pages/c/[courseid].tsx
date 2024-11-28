@@ -10,6 +10,7 @@ import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/homelogout.css';
+import MoonLight from '@/app/ui/logo_module';
 
 
 
@@ -333,7 +334,7 @@ if (projectData) {
         <div className="button-bar">
           {/* Home Button on the Left */}
           <Link href="/">
-            <button id="home">Home</button>
+                            <MoonLight></MoonLight>
           </Link>
 
           {/* Logout Button on the Right */}

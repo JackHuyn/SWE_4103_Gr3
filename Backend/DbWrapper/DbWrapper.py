@@ -25,6 +25,15 @@ class DbWrapper:
         except:
             return False
         return True
+    def getArchivedCoursesForUser(self, local_id:str):
+        try:
+            # Query the database to get archived courses specifically for the user (local_id)
+            archived_courses = self.db.collection(COURSES).where("status", "==", 1).where("instructor_ids", "array_contains", local_id).stream()
+            archived_course_list = [course.to_dict() for course in archived_courses]
+            return archived_course_list
+        except Exception as e:
+            print(f"Error fetching archived courses for user {local_id}: {e}")
+            return []
     def activateCourse(self, course_id:str)->bool:
         course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
@@ -169,7 +178,7 @@ class DbWrapper:
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
         try:
-            template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+            template["group_name"] = f'{projData["project_name"]} Group {group_n}'
         except TypeError:
             return False
         template["project_id"] = project_id
@@ -189,7 +198,7 @@ class DbWrapper:
                 group_n -= 1
                 group_id = f"{project_id}_gr{group_n}"
                 template["group_id"] = group_id
-                template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+                template["group_name"] = f'{projData["project_name"]} Group {group_n}'
             else:
                 self.db.collection(GROUPS).document(group_id).set(template)
                 inserted = True

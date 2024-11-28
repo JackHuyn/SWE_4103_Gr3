@@ -7,6 +7,7 @@ import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
 import '@/app/ui/stylesheets/homelogout.css';
+import MoonLight from '@/app/ui/logo_module';
 
 
 import { Button } from './button';
@@ -33,6 +34,9 @@ export default function Courses() {
     const [userRole, setUserRole] = useState('')
     const [loading, setLoading] = useState(true) // Loadign state
     const inputRef = useRef(null); // Create a ref for the input field
+    const [isArchivePopupVisible, setIsArchivePopupVisible] = useState(false); // Control visibility of archive popup
+    const [archivedCourses, setArchivedCourses] = useState([]); // Store archived courses
+
 
     // Fetch courses data when the component mounts
     useEffect(() => {
@@ -85,6 +89,7 @@ export default function Courses() {
     }, []);
 
 
+
     // Show popup for adding a course
     const addCourse = () => {
         setIsPopupVisible(true); // Show the popup
@@ -94,6 +99,32 @@ export default function Courses() {
         setIsPopup2Visible(true); // Show the popup2
     };
 
+    const callArchive = async (courseid) => {
+        try {
+            console.log('Archiving on frontend : ', courseid)
+            const response = await fetch('http://localhost:3001/archive?courseId=' + courseid)
+            /**{
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(courseList.course_id)
+        })**/
+            const data = await response.json()
+            if (data.archive_status) {
+                console.log(data.archive_status)
+
+            }
+            else {
+                console.log("Archive is not possible")
+            }
+
+            window.location.reload();
+        }
+
+        catch (error) {
+            console.error('Error sending request:', error);
+            alert('Error archiving course. Please try again later.');
+        }
+    }
 
 
     // Handle adding a new course with name, description, and term
@@ -242,15 +273,71 @@ export default function Courses() {
         );
     }
 
+    const fetchArchivedCourses = async () => {
+        const localId = Cookies.get('localId');
+
+        if (localId) {
+            try {
+                const response = await fetch(`http://localhost:3001/get-archived-courses?localId=${localId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch archived courses');
+                }
+                const result = await response.json();
+                setArchivedCourses(result.courses);
+            } catch (error) {
+                console.error('Error fetching archived courses:', error);
+            }
+        } else {
+            window.location.href = "/auth/login";
+        }
+    };
+
+
+
+    const handleUnarchiveCourse = async (courseId) => {
+        const localId = Cookies.get('localId');
+
+        if (!localId) {
+            window.location.href = "/auth/login";
+        }
+
+        try {
+            const response = await fetch('http://localhost:3001/unarchive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ courseId })  // Sending the courseId as JSON
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert('Course unarchived successfully!');
+                setIsArchivePopupVisible(false);  // Close the popup after unarchiving
+                window.location.reload();  // Refresh the page to show the updated course list
+            } else {
+                alert(`Error unarchiving course: ${result.reason}`);
+            }
+        } catch (error) {
+            console.error('Error sending unarchive request:', error);
+            alert('Error unarchiving course. Please try again later.');
+        }
+    };
+
+
+
+
+
     if (data) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
                 <div className="flex flex-col items-center justify-center bg-white rounded-lg p-10 shadow-md">
 
                     <div className="button-bar">
+
                         {/* Home Button on the Left */}
+
                         <Link href="/">
-                            <button id="home">Home</button>
+                            {/* <button id="home">Home</button> */}
+                            <MoonLight></MoonLight>
                         </Link>
 
                         {/* Logout Button on the Right */}
@@ -277,34 +364,34 @@ export default function Courses() {
 
                         {/* Right Section: Add and Remove Buttons */}
                         {userRole === '1' && (
-                            <div className="addandremove">
-                                <Button className="addCourse" onClick={addCourse}>
-                                    +
-                                </Button>
-                                <Button className="removeCourse" onClick={removeCourse}>
-                                    -
-                                </Button>
-
+                        <div className="dropdown">
+                            <button className="dropdown-button">⋮</button>
+                            <div className="dropdown-menu">
+                                <button onClick={() => setIsPopupVisible(true)} className="addCourse">Add Course</button>
+                                <button onClick={() => setIsPopup2Visible(true)} className="removeCourse">Remove Course</button>
+                                <button onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }} className="archive_courses">View Archived</button>
                             </div>
-                        )}
+                        </div>
+                    )}
 
 
                     </div>
-
 
                     {/* Conditionally render courses */}
                     {showCourses && (
                         <div className="courses">
                             {courseList.map((course, index) => (
-
-                                <Link
-                                    href={{
-                                        pathname: '/c/[slug]',
-                                        query: { slug: course.course_id }
-                                    }
-                                    } className="link">
-                                    <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
-                                        <h3 className="course-title">{course.course_id}</h3>
+                                <div key={course.course_id || index} className="course mb-4 p-4 bg-gray-100 rounded shadow">
+                                    <Link
+                                        href={{
+                                            pathname: '/c/[slug]',
+                                            query: { slug: course.course_id }
+                                        }
+                                        } className="link">
+                                        <div className="titleline">
+                                            <h3 className="course-title">{course.course_id}</h3>
+                                            {userRole=='1' && (<Button className="archive" onClick={() => callArchive(course.course_id)}>⋮</Button>)}
+                                        </div>
 
 
                                         {/* 
@@ -319,10 +406,14 @@ export default function Courses() {
                                         <p className="course-detail">Description: {course.course_description}</p>
                                         <p className="course-detail">Section: {course.section}</p>
                                         <p className="course-detail">Term: {course.term}</p>
+
+
                                         {/*</CardBody>*/}
 
-                                    </div>
-                                </Link>
+                                    </Link>
+
+                                </div>
+
                             ))}
                         </div>
                     )}
@@ -372,6 +463,38 @@ export default function Courses() {
                     </div>
                 )}
 
+                {isArchivePopupVisible && (
+                    <div className="popup">
+                        <div className="popup_content">
+                            <h2>Archived Courses</h2>
+                            {archivedCourses.length === 0 ? (
+                                <p>No archived courses available.</p>
+                            ) : (
+                                <div>
+                                    {archivedCourses.map((course) => (
+                                        <div key={course.course_id} className="archived-course-item">
+                                            <p id="archive_course_id">{course.course_name} - {course.course_id}</p>
+                                            <button
+                                                className="unarchive-button"
+                                                onClick={() => handleUnarchiveCourse(course.course_id)}
+                                            >
+                                                Unarchive
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <button
+                                className="popup_button cancel_button"
+                                onClick={() => setIsArchivePopupVisible(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+
 
                 {/* Popup Window for Removing Course */}
                 {isPopup2Visible && (
@@ -389,10 +512,10 @@ export default function Courses() {
 
                             <div className="popup_buttons">
                                 <Button className="popup_button" onClick={handleRemoveCourse}>
-                                    yep
+                                    Remove
                                 </Button>
                                 <Button className="popup_button cancel_button" onClick={() => setIsPopup2Visible(false)}>
-                                    nah
+                                    Cancel
                                 </Button>
                             </div>
                         </div>

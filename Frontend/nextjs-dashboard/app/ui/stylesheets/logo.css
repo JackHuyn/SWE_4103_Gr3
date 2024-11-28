@@ -1,0 +1,35 @@
+.logo {
+    position: absolute; /* Use 'absolute' to control positioning relative to the container */
+    top: 10px; /* Adjust spacing from the top */
+    left: 10px; /* Align logo to the left */
+    display: flex; /* Ensure it behaves as a flexbox for children alignment */
+    align-items: center; /* Center-align items vertically */
+    justify-content: flex-start; /* Align content to the start (left) */
+    gap: 10px;
+    margin-bottom: 0px; /* Ensure no extra margin below */
+    transition: transform 0.8s ease;
+}
+
+.logo2 {
+    display: flex; /* Ensure it behaves as a flexbox for children alignment */
+    align-items: center; /* Center-align items vertically */
+    justify-content: flex-start; /* Align content to the start (left) */
+    gap: 10px;
+    margin-bottom: 30px; /* Ensure no extra margin below */
+    transition: transform 0.8s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1); /* Slightly increase size on hover */
+}
+
+.logo2:hover {
+    transform: scale(1.1); /* Slightly increase size on hover */
+}
+
+
+
+.logo img {
+    width: 48px;
+    height: 48px;
+}

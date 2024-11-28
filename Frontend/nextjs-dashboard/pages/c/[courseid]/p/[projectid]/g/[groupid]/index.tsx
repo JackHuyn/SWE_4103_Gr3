@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import HandleLogout from '@/app/ui/logout';
+import MoonLight from '@/app/ui/logo_module';
 import { group } from 'console';
 
 export default function Metrics() {
@@ -102,7 +103,7 @@ export default function Metrics() {
                     console.log(userRole);
             } else {
                 
-                console.error('WHY THE FKCUK IS IT NOT WROKING', data);
+                console.error(data);
             }
         } catch (error) {
             console.error('Error fetching username:', error);
@@ -238,7 +239,8 @@ export default function Metrics() {
             <div className="button-bar">
                 <div className="left-buttons">
                     <Link href="/">
-                        <button id="home">Home</button>
+                        {/* <button id="home">Home</button> */}
+                        <MoonLight></MoonLight>
                     </Link>
                     <button id="logout" onClick={HandleLogout}>
                         Log Out
