@@ -5,6 +5,7 @@ import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import Survey10point from '@/app/ui/metrics/survey-10-point';
+import SurveyCEAB from '@/app/ui/metrics/survey-ceab';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
@@ -29,6 +30,7 @@ export default function Metrics() {
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
     const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
     const [isSurveyPopupVisible, setIsSurveyPopupVisible] = useState(false);
+    const [isCEABPopupVisible, setIsCEABPopupVisible] = useState(false);
     const [studentList, setStudentList] = useState([]);
 
     function openAddGithubRepoDialog(){
@@ -43,6 +45,10 @@ export default function Metrics() {
         setIsSurveyPopupVisible(true);
     }
 
+    function ceab() {
+        setIsCEABPopupVisible(true);
+    }
+
     function openTeamVelocityDialog() {
         setIsPopup2Visible(true);
     }
@@ -52,6 +58,7 @@ export default function Metrics() {
         setIsPopup2Visible(false);
         setIsGithubDialogVisible(false);
         setIsSurveyPopupVisible(false);
+        setIsCEABPopupVisible(false);
     }
 
     // Close dialog only if click is on backdrop
@@ -167,7 +174,7 @@ export default function Metrics() {
                     <>
                            <button className="metrics-button" onClick={openJoyRatingDialog}>Open Joy Rating Dialog</button>
                            <button className="metrics-button" onClick={survey}>10 points Survey</button>
-                           <button className="metrics-button" onClick={survey}>CEAB Survey</button>
+                           <button className="metrics-button" onClick={ceab}>CEAB Survey</button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
@@ -195,11 +202,11 @@ export default function Metrics() {
                 <div className="chart-container"><TeamVelocityGraph group_id={groupId} /></div>
             </div>
 
-            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible || isSurveyPopupVisible) && (
+            {(isPopupVisible || isPopup2Visible || isGithubDialogVisible || isSurveyPopupVisible || isCEABPopupVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
-                    aria-hidden={!isPopupVisible && !isPopup2Visible && !isSurveyPopupVisible}
+                    aria-hidden={!isPopupVisible && !isPopup2Visible && !isSurveyPopupVisible && !isCEABPopupVisible}
                 >
                     {isPopupVisible && (
                         <div id="joy-rating-dialog" className="dialog">
@@ -217,8 +224,15 @@ export default function Metrics() {
                     )}
                     {isSurveyPopupVisible &&  (
                         <div id="joy-rating-dialog" className="dialog">
-                            <h2>Joy Rating Input</h2>
+                            <h2>10 point Survey</h2>
                             <Survey10point closeDialogs={closeDialogs}/>
+                            <button onClick={closeDialogs}>Close</button>
+                        </div>
+                    )}
+                    {isCEABPopupVisible &&  (
+                        <div id="joy-rating-dialog" className="dialog">
+                            <h2>CEAB Survey</h2>
+                            <SurveyCEAB closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}

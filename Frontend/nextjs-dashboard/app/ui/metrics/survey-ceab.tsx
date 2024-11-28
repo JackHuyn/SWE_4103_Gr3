@@ -82,12 +82,16 @@ export default function SurveyCEAB() {
     return(
         <div className="popup">
             <div className="popup_content">
-                <h2>Survey</h2>
-                <h3>10-point distribution: total points = {totalPoints}</h3>
+                <h2>CEAB Survey</h2>
+                <h3>PartA: Contribution </h3>
                     <div className="checkbox-list">
                         <div className="checkbox-header">
-                            <div className="header-item">Student Name</div>
-                            <div className="header-item">Point</div>
+                            <div className="header-name">Topic</div>
+                            {studentList?.map((student, index) => (
+                                <div className="header-item" key={index}>
+                                    {student.first_name+" "+student.last_name}
+                                </div>
+                            ))}
                         </div>       
                     </div>
                     {studentList?.map((student, index) => (
