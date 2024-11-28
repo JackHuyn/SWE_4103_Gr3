@@ -14,14 +14,23 @@
 
 .login_form {
 
-    color: var(--fontColorLight);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%; 
-    height:100vh;
+    width: 100%;
+    max-width: 500px; /* Limits the form width */
+    background-color: rgba(43, 43, 43, 0.7);
     padding: 20px;
+    border-radius: 8px;
+    border: 1px solid;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+    border-color: var(--secondaryColor);
+    transition: background-color 0.3s, transform 1s, border-color 0.3s;
 
+}
+
+.login_form:hover {
+    background-color: #232323;
+    transform: scale(1.02);
+    border-color: white;
 }
 
 .login_form form {
@@ -33,8 +42,8 @@
 }
 
 .login_form h1{
-    font-size:50px;
-
+    font-size:2rem;
+    font-family:"Jura";
 }
 
 .login_row {

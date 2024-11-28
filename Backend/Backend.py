@@ -902,24 +902,73 @@ def archive():
 # ----------------------
 # Leora Mascarenhas 
 
-@app.route('/unarchive', methods= ["GET"])
+@app.route('/unarchive', methods=["POST"])
 @cross_origin()
 def unarchive():
-    course_id = request.args.get("courseId", default = "-1", type = str)
-    activate_status = dbWrapper.activateCourse(course_id)
-    if activate_status:
+    try:
+        course_id = request.json.get("courseId", "")  # Assuming JSON body instead of query params
+        if not course_id:
+            return jsonify({'approved': False, 'reason': 'Missing courseId'}), 400
+        
+        activate_status = dbWrapper.activateCourse(course_id)
+        
+        if activate_status:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'activate_status': activate_status}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'activate_status': activate_status}),
+                status=401,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(f"Error: {e}")
         response = app.response_class(
-            response=json.dumps({'approved': True, 'activate_status': activate_status}),
-            status = 200,
-            mimetype='applicaion/json'
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
         )
-    else:
+        return response
+
+
+# ---------------------
+# Namneet
+
+@app.route('/get-archived-courses', methods=["GET"])
+@cross_origin()
+def get_archived_courses():
+    try:
+        # Retrieve the localId from the request
+        local_id = request.args.get("localId", default="", type=str)
+
+        if not local_id:
+            return jsonify({'approved': False, 'reason': 'Missing localId'}), 400
+
+        # Fetch archived courses for the specific user (based on localId)
+        archived_courses = dbWrapper.getArchivedCoursesForUser(local_id)
+        
+        # Return the archived courses if any, otherwise return an empty array
         response = app.response_class(
-            response=json.dumps({'approved': False, 'activate_status': activate_status}),
-            status = 401,
-            mimetype='applicaion/json'
+            response=json.dumps({'approved': True, 'courses': archived_courses if archived_courses else []}),
+            status=200,
+            mimetype='application/json'
         )
-    return response
+        return response
+    except Exception as e:
+        print(f"Error fetching archived courses: {e}")
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+
+
+
 
 #This helper function ensures the passed in user data courses are active i.e not archived
 #user_data_courses should be a list of dictionaries (See getInstructorCourses / getStudentCourses)

@@ -33,6 +33,9 @@ export default function Courses() {
     const [userRole, setUserRole] = useState('')
     const [loading, setLoading] = useState(true) // Loadign state
     const inputRef = useRef(null); // Create a ref for the input field
+    const [isArchivePopupVisible, setIsArchivePopupVisible] = useState(false); // Control visibility of archive popup
+    const [archivedCourses, setArchivedCourses] = useState([]); // Store archived courses
+
 
     // Fetch courses data when the component mounts
     useEffect(() => {
@@ -273,6 +276,59 @@ export default function Courses() {
         );
     }
 
+    const fetchArchivedCourses = async () => {
+        const localId = Cookies.get('localId');
+        
+        if (localId) {
+            try {
+                const response = await fetch(`http://localhost:3001/get-archived-courses?localId=${localId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch archived courses');
+                }
+                const result = await response.json();
+                setArchivedCourses(result.courses);
+            } catch (error) {
+                console.error('Error fetching archived courses:', error);
+            }
+        } else {
+            window.location.href = "/auth/login";
+        }
+    };
+    
+    
+    
+    const handleUnarchiveCourse = async (courseId) => {
+        const localId = Cookies.get('localId');
+        
+        if (!localId) {
+            window.location.href = "/auth/login";
+        }
+    
+        try {
+            const response = await fetch('http://localhost:3001/unarchive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ courseId })  // Sending the courseId as JSON
+            });
+    
+            const result = await response.json();
+            if (response.ok) {
+                alert('Course unarchived successfully!');
+                setIsArchivePopupVisible(false);  // Close the popup after unarchiving
+                window.location.reload();  // Refresh the page to show the updated course list
+            } else {
+                alert(`Error unarchiving course: ${result.reason}`);
+            }
+        } catch (error) {
+            console.error('Error sending unarchive request:', error);
+            alert('Error unarchiving course. Please try again later.');
+        }
+    };
+
+    
+    
+    
+
     if (data) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6 bg-gray-50">
@@ -315,9 +371,10 @@ export default function Courses() {
                                 <Button className="removeCourse" onClick={removeCourse}>
                                     -
                                 </Button>
-                                <Button className="addCourse" onClick={addCourse}>
-                                    Archives
-                                </Button>
+                                <Button className="addCourse" onClick={() => { setIsArchivePopupVisible(true); fetchArchivedCourses(); }}>
+    View Archived Courses
+</Button>
+
 
                             </div>
                         )}
@@ -337,7 +394,10 @@ export default function Courses() {
                                         query: { slug: course.course_id }
                                     }
                                     } className="link">
-                                        <h3 className="course-title">{course.course_id}</h3>
+                                        <div className="titleline">
+                                            <h3 className="course-title">{course.course_id}</h3>
+                                            <Button className="archive" onClick={() => callArchive(course.course_id)}>⋮</Button>
+                                        </div>
 
 
                                         {/* 
@@ -357,7 +417,6 @@ export default function Courses() {
                                         {/*</CardBody>*/}
 
                                         </Link>
-                                        <Button className="archive" onClick={() => callArchive(course.course_id)}> Archive </Button>
 
                                     </div>
                                 
@@ -409,6 +468,35 @@ export default function Courses() {
                         </div>
                     </div>
                 )}
+
+                {isArchivePopupVisible && (
+                    <div className="popup">
+                        <div className="popup_content">
+                            <h2>Archived Courses</h2>
+                            {archivedCourses.length === 0 ? (
+                                <p>No archived courses available.</p>
+                            ) : (
+                                <div>
+                                    {archivedCourses.map((course) => (
+                                        <div key={course.course_id} className="archived-course-item">
+                                            <p>{course.course_name} - {course.course_id}</p>
+                                            <Button
+                                                className="popup_button"
+                                                onClick={() => handleUnarchiveCourse(course.course_id)}
+                                            >
+                                                Unarchive
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <Button className="popup_button cancel_button" onClick={() => setIsArchivePopupVisible(false)}>
+                                Close
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
 
 
                 {/* Popup Window for Removing Course */}

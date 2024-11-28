@@ -204,7 +204,7 @@ const handleChangeNumber = (event) => {
         {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
         {/*<p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>*/}
       </div>
-      <div className="content-grid">
+      <div className="content-grid-group">
         {/* Groups Section */}
         <div className="projects-section full-width-section">
           <div className="section-header">

@@ -1,0 +1,17 @@
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px; /* Adds space below the logo */
+    transition: transform 0.8s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1); /* Slightly increase the size of the logo when hovered */
+}
+
+.logo img {
+    width: 48px; /* Set fixed size for the logo image */
+    height: 48px;
+}
