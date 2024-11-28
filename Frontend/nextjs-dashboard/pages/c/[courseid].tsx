@@ -176,7 +176,7 @@ export default function CourseDetails() {
 
         if (response.ok) {
           window.location.reload();
-          alert('project added successfully!');
+          //alert('project added successfully!');
           window.location.reload();
 
         } else {
@@ -214,7 +214,7 @@ const handleRemoveProject = async () => {
             });
             const result = await response.json();
             if (response.ok) {
-                alert('Project removed successfully!');
+                //alert('Project removed successfully!');
                 window.location.reload();
                 setNewProjectName('');
                 setIsProjectPopup2Visible(false);
@@ -259,7 +259,7 @@ const handleAddStudent = async () => {
             const result = await response.json();
             if (response.ok) {
                 window.location.reload();
-                alert('student added successfully!');
+                //alert('student added successfully!');
                 window.location.reload();
             } else {
                 alert(`Error adding student: ${result.reason}`);
@@ -316,7 +316,7 @@ const handleRemoveStudents = async () => {
         const result = await response.json();
         if (response.ok) {
             window.location.reload();
-            alert('removed successfully!');
+            //alert('removed successfully!');
             window.location.reload();
         } else {
             alert(`Error removing students: ${result.reason}`);

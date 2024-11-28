@@ -193,27 +193,21 @@ def check_scrum_master_role():
 
     group_id = request.args.get("groupId",default="-1",type=str)
     local_id = request.args.get("localId",default="-1",type=str)
-    group_data = getGroupData(group_id)
-    scrum_master_list = group_data['scrum_master']
     is_scrum_master = False
-
-    if(scrum_master_list == local_id):
-        is_scrum_master = True
-            
+    try:
+        group_data = getGroupData(group_id)
+        scrum_master_list = group_data['scrum_master']
+        
+        if(scrum_master_list == local_id):
+            is_scrum_master = True
+    except Exception as e:
+        pass
     
-    if(is_scrum_master):
-        response = app.response_class(
-            response=json.dumps({'approved': True}),
-            status=200,
-            mimetype='application/json'
-        )
-
-    else:
-        response = app.response_class(
-            response=json.dumps({'approved': False}),
-            status=200,
-            mimetype='application/json'
-        )
+    response = app.response_class(
+        response=json.dumps({'approved': is_scrum_master}),
+        status=200,
+        mimetype='application/json'
+    )
 
     return response
     
@@ -1083,6 +1077,30 @@ def get_student_joy_ratings(): # Avg Joy Ratings per Day
     group_id = request.args.get("groupId", default = "", type = str)
     try:
         joy_data = metrics.get_recent_student_joy_ratings(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-individual-joy-ratings', methods=['GET'])
+@cross_origin()
+def get_individual_joy_ratings():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("localId", default = "", type = str)
+    try:
+        joy_data = metrics.get_recent_individual_joy_ratings(group_id, uid)
+        if joy_data == None:
+            print('EMPTY JOY HISTORY')
+            raise Exception
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
