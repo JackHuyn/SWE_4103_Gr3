@@ -4,6 +4,8 @@ import JoyAvgChart from '@/app/ui/metrics/joy-avg-chart';
 import JoyStudentRatingGraph from '@/app/ui/metrics/joy-student-rating-graph';
 import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
+import TruckFactorInput from '@/app/ui/metrics/truck-factor-input';
+import TruckFactorStatBarItem from '@/app/ui/metrics/truck-factor-stat-bar';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import '@/app/ui/stylesheets/joyRatingInput.css'
 
@@ -22,6 +24,7 @@ import { group } from 'console';
 export default function Metrics() {
     const router = useRouter();
     const [groupId, setGroupId] = useState(null);
+    const [isTruckFactorInputVisible, setIsTruckFactorInputVisible] = useState(false)
     const [isJoyRatingDialogVisible, setIsJoyRatingDialogVisible] = useState(false)
     const [isTeamVelocityDialogVisible, setIsTeamVelocityDialogVisible] = useState(false);
     const [selectedGraphType, setSelectedGraphType] = useState('team'); // State for dropdown selection
@@ -179,11 +182,15 @@ export default function Metrics() {
     function openTeamVelocityDialog() {
         setIsTeamVelocityDialogVisible(true);
     }
+    function openTruckFactorInput() {
+        setIsTruckFactorInputVisible(true)
+    }
 
     function closeDialogs() {
         setIsJoyRatingDialogVisible(false);
         setIsTeamVelocityDialogVisible(false);
-        setIsGithubDialogVisible(false);
+        setIsTruckFactorInputVisible(false)
+        setIsGithubDialogVisible(false)
     }
 
     // Dropdown change handler
@@ -244,7 +251,7 @@ export default function Metrics() {
 
             <div className="group-id">
                     {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
-                </div>
+            </div>
 
             {isRoleLoaded && (
                 <div className="metrics-controls">
@@ -256,6 +263,9 @@ export default function Metrics() {
                            <button className="metrics-button" onClick={openJoyRatingDialog}>
                             Joy Rating Input
                            </button>
+                           <button className="metrics-button" onClick={openTruckFactorInput}>
+                            Open Truck Factor Dialog
+                            </button>
                            {/* Check if scrum master  */}
                            {isScrumMaster && 
                             (
@@ -287,6 +297,11 @@ export default function Metrics() {
             <div className="metrics-content">
                 {selectedGraphType === 'team' ? (
                     <>
+                        <div id="stats-bar" className="chart-container">
+                            <div className='stats-bar-item'>
+                                <TruckFactorStatBarItem />
+                            </div>
+                        </div>
                         <div className="chart-container">
                             <ContributionsGraph group_id={groupId} />
                         </div>
@@ -310,11 +325,11 @@ export default function Metrics() {
                 )}
             </div>
 
-            {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible) && (
+            {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible || isTruckFactorInputVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
-                    aria-hidden={!isJoyRatingDialogVisible && !isTeamVelocityDialogVisible && !isGithubDialogVisible}
+                    aria-hidden={!isJoyRatingDialogVisible && !isTeamVelocityDialogVisible && !isGithubDialogVisible && !isTruckFactorInputVisible}
                     
                 >
                     {isJoyRatingDialogVisible && (
@@ -329,6 +344,11 @@ export default function Metrics() {
                             <h2>Team Velocity Input</h2>
                             <TeamVelocityInput closeDialogs={closeDialogs} />
                             <button onClick={closeDialogs}>Close</button>
+                        </div>
+                    )}
+                    {isTruckFactorInputVisible && (
+                        <div id="truck-factor-dialog" className="dialog">
+                            <TruckFactorInput closeDialogs={closeDialogs}/>
                         </div>
                     )}
                     {isGithubDialogVisible &&  (

@@ -12,6 +12,7 @@ PROJECTS = "projectdata"
 USERS = "userdata"
 JOY = "joydata"
 VELOCITY = "velocitydata"
+TRUCK_FACTOR = "truck_factor_data"
 
 class DbWrapper:
     def __init__(self, dbObject):
@@ -203,6 +204,10 @@ class DbWrapper:
                 inserted = True
         return True
     
+    def getGroupSize(self, group_id:str):
+        doc = self.db.collection(GROUPS).document(group_id).get()
+        return len(doc.to_dict()["student_ids"])
+
     def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
         group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
@@ -360,6 +365,40 @@ class DbWrapper:
         except:
             return False
         return True
+    
+    def getTruckFactorRatings(self, group_id:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(filter=FieldFilter("group_id", "==", group_id)).stream()
+        ratings = []
+        for doc in docs:
+            ratings.append(doc.to_dict())
+        return ratings
+    
+    def getUsersRecentTruckFactor(self, group_id:str, uid:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("uid", "==", uid)
+            ).stream()
+        for doc in docs:
+            return doc
+        return None
+
+    def submitTruckFactorRating(self, group_id:str, uid:str, truck_factor:int, comment="") -> bool:
+        recent_truck_factor = self.getUsersRecentTruckFactor(group_id, uid)
+        try:
+            if recent_truck_factor == None:
+                self.db.collection(TRUCK_FACTOR).add(
+                    {
+                        "group_id": group_id,
+                        "uid": uid,
+                        "truck_factor": truck_factor,
+                        "comment": comment
+                    }
+                )
+            else:
+                recent_truck_factor.reference.set({'truck_factor': truck_factor, 'comment': comment}, merge=True)
+        except Exception as e:
+            return False
+        return True
 
     def removeStudentFromCourse(self, student_id:str, course_id:str)->bool:
         course_id = course_id.lower()
@@ -461,6 +500,29 @@ class DbWrapper:
             docList.append(d)
             user_ids.append(d['student_id'])
         return docList
+    
+    def getIndividualCurrentDayJoyRating(self, group_id:str, uid:str) -> dict | None:
+        group_id = group_id.lower()
+        date = datetime.datetime.today()
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).where(
+                        filter=FieldFilter("student_id", "==", uid)
+                    ).get()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            print('\n', d, '\n')
+            return d
+        return None
     
     def getGithubRepoAddress(self, group_id:str):
         group_id = group_id.lower()

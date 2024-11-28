@@ -10,6 +10,7 @@
     --fontLinkLightBlue: lightblue;
 
     --inputBackgroundGrey: #fff;
+    --inputBackgroundDark: #3a3a3a;
     --inputBackgroundGreyAutofill: #909090;
     --selectorItemSelected: #2440EE;
     --selectorItemNotSelected: var(--inputBackgroundGrey);

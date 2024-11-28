@@ -1097,6 +1097,29 @@ def get_student_joy_ratings(): # Avg Joy Ratings per Day
         )
     return response
 
+@app.route('/metrics/get-individual-daily-joy-rating', methods=['GET'])
+@cross_origin()
+def get_individual_daily_joy_rating():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("localId", default = "", type = str)
+    try:
+        joy_data = metrics.get_individual_current_day_joy_rating(group_id, uid)
+        if joy_data == None:
+            raise Exception
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
 @app.route('/metrics/submit-joy-rating', methods=['POST'])
 @cross_origin()
 def submit_student_joy_rating():
@@ -1202,6 +1225,91 @@ def sumbit_team_velocity():
         )
     return response
 
+@app.route('/group/get-group-size', methods=['GET'])
+@cross_origin()
+def get_group_size():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        group_size = dbWrapper.getGroupSize(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'group_size': group_size}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-avg-truck-factor', methods=['GET'])
+@cross_origin()
+def get_avg_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        avg_truck_factor = metrics.get_avg_truck_factor(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'avgTruckFactor': avg_truck_factor}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-individual-truck-factor', methods=['GET'])
+@cross_origin()
+def get_individual_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    local_id = request.args.get("localId", default = "", type = str)
+    try:
+        truck_factor = metrics.get_users_recent_truck_factor(group_id, local_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'truckFactor': truck_factor}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/submit-truck-factor', methods=['POST'])
+@cross_origin()
+def submit_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("uid", default = "", type = str)
+    truck_factor = request.args.get("truckFactor", default = -1, type = int)
+    comment = request.args.get("comment", default = "", type = str)
+    try:
+        if(truck_factor <= 0):
+            raise Exception
+        valid = metrics.submit_truck_factor(group_id, uid, truck_factor, comment)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/auth/get-github-app-client-id', methods=['GET'])
 @cross_origin()

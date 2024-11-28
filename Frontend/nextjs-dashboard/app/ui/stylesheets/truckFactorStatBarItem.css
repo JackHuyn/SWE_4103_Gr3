@@ -1,0 +1,14 @@
+#truck-factor-stat-bar-indicator {
+    position: relative;
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    border-radius: 10px;
+    height: 100%;
+    width: 10%;
+    min-width: 25px;
+    min-height: 25px;
+    margin-right: 0%;
+    top: 50%;
+    transform: translate(0, -25%);
+}
