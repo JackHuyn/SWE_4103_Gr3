@@ -92,6 +92,7 @@
 
 .cancel_button:hover {
     background-color: #c82333;
+    transform: scale(1.05);
 }
 /*------------ Check List ------------*/
 .checkbox-list {
@@ -121,7 +122,5 @@
     text-align: center;
     padding: 5px 10px;
     font-weight: bold;
-    white-space: nowrap;
-    width: 50%;
-}
+  }
 /*-------------------------------------*/

@@ -259,7 +259,69 @@ def validate_session():
     print(response.response)
     return response
 
-@app.route('/auth/logout', methods=['GET'])
+@app.route('/auth/password-reset', methods=['POST'])
+@cross_origin()
+def password_change():
+    local_id = request.args.get("localId", default = "", type = str)
+    current_password = request.args.get("currentPassword", default = "", type = str)
+    password = request.args.get("password", default = "", type = str)
+    try:
+        userdata = firebase_auth.active_sessions[local_id]
+        uid = userdata.uid
+        email = userdata.email
+
+        login_resp = firebase_auth.sign_in_with_email_and_password(email, current_password, False)
+        if not login_resp:
+            raise fb_auth.InvalidLogin
+        valid = firebase_auth.change_password(uid, password)
+        print(valid)
+        if not dbWrapper.updateForceResetPassword(uid, False):
+            raise Exception
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except (KeyError, fb_auth.InvalidLogin) as ke:
+        print(ke)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Invlid Login'}),
+            status=401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    # print(response)
+    return response
+
+@app.route('/auth/forgot-password', methods=['POST'])
+@cross_origin()
+def forgot_password():
+    email = request.args.get("email", default = '', type = str)
+    try:
+        if email == '':
+            raise Exception
+        valid = firebase_auth.forgot_password(email)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+
+@app.route('/auth/logout', methods=['POST'])
 @cross_origin()
 def logout_user():
     print('in logout')
@@ -329,7 +391,7 @@ def upload():
                     print(student_id + ': Add\tFail')
             else:
                 student_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, email) #password is email by default
-                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid):
+                if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, display_name = f"{fname} {lname}",  force_password_reset=True):
                     student_id = student_resp.uid
                     print(student_id + ': Create\tDone')
                     if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -621,9 +683,9 @@ def add_a_student():
     try:
         data = request.get_json()
         course_id = data.get('course_id','')
-        student_fname = data.get('student_fname','')
-        student_lname = data.get('student_lname','')
-        student_email = data.get('student_email','')
+        fname = data.get('student_fname','')
+        lname = data.get('student_lname','')
+        email = data.get('student_email','')
         success = False
         if not (course_id or student_fname or student_lname or student_email):
             raise ValueError("Missing required fields")
@@ -636,8 +698,8 @@ def add_a_student():
             else:
                 print(student_id + ': Add\tFail')
         else:
-            student_resp = firebase_auth.sign_up_with_email_and_password(student_fname,student_lname,student_email,student_email) #password is email by default
-            if dbWrapper.addUser(0,student_email,student_fname,student_lname,student_resp.uid):
+            student_resp = firebase_auth.sign_up_with_email_and_password(fname,lname,email,email) #password is email by default
+            if dbWrapper.addUser(0,email,fname,lname,student_resp.uid, display_name = f"{fname} {lname}", force_password_reset=True):
                 student_id = student_resp.uid
                 print(student_id + ': Create\tDone')
                 if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -1000,6 +1062,117 @@ def show_survey():
         return response
 #----------------------------------
 
+# Leora Mascarenhas 
+@app.route('/archive', methods= ["GET","POST"])
+@cross_origin()
+def archive():
+
+    try:
+        print('inside archive')
+        course_id =  request.args.get("courseId", default = "-1", type = str)
+        print('archiving: '  + course_id)
+        archive_status = dbWrapper.archiveCourse(course_id)
+        if archive_status:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'archive_status': archive_status}),
+                status = 200,
+                mimetype='applicaion/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'archive_status': archive_status}),
+                status = 401,
+                mimetype='applicaion/json'
+            )
+        return response
+    except: 
+        #print('are we inside - courseid')
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response 
+        
+ 
+# ----------------------
+# Leora Mascarenhas 
+
+@app.route('/unarchive', methods=["POST"])
+@cross_origin()
+def unarchive():
+    try:
+        course_id = request.json.get("courseId", "")  # Assuming JSON body instead of query params
+        if not course_id:
+            return jsonify({'approved': False, 'reason': 'Missing courseId'}), 400
+        
+        activate_status = dbWrapper.activateCourse(course_id)
+        
+        if activate_status:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'activate_status': activate_status}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'activate_status': activate_status}),
+                status=401,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(f"Error: {e}")
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+
+
+# ---------------------
+# Namneet
+
+@app.route('/get-archived-courses', methods=["GET"])
+@cross_origin()
+def get_archived_courses():
+    try:
+        # Retrieve the localId from the request
+        local_id = request.args.get("localId", default="", type=str)
+
+        if not local_id:
+            return jsonify({'approved': False, 'reason': 'Missing localId'}), 400
+
+        # Fetch archived courses for the specific user (based on localId)
+        archived_courses = dbWrapper.getArchivedCoursesForUser(local_id)
+        
+        # Return the archived courses if any, otherwise return an empty array
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'courses': archived_courses if archived_courses else []}),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(f"Error fetching archived courses: {e}")
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+
+
+
+
+#This helper function ensures the passed in user data courses are active i.e not archived
+#user_data_courses should be a list of dictionaries (See getInstructorCourses / getStudentCourses)
+def user_data_course_active(user_data_courses):
+    active_user_data_courses = [d for d in user_data_courses if d.get("status") == 0]
+    return active_user_data_courses
+
+#----------------------------------
 # Jack Huynh _ Show courses 
 @app.route('/auth/courses', methods= ["GET"])
 @cross_origin()
@@ -1025,6 +1198,9 @@ def show_courses():
         else:
             # Fetch student courses
             user_data_courses = dbWrapper.getStudentCourses(local_id)
+
+        
+        user_data_courses = user_data_course_active(user_data_courses)
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
@@ -1103,6 +1279,29 @@ def get_student_joy_ratings(): # Avg Joy Ratings per Day
     group_id = request.args.get("groupId", default = "", type = str)
     try:
         joy_data = metrics.get_recent_student_joy_ratings(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'joyData': joy_data}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-individual-daily-joy-rating', methods=['GET'])
+@cross_origin()
+def get_individual_daily_joy_rating():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("localId", default = "", type = str)
+    try:
+        joy_data = metrics.get_individual_current_day_joy_rating(group_id, uid)
+        if joy_data == None:
+            raise Exception
         response = app.response_class(
             response=json.dumps({'approved': True, 'joyData': joy_data}),
             status=200,
@@ -1222,6 +1421,91 @@ def sumbit_team_velocity():
         )
     return response
 
+@app.route('/group/get-group-size', methods=['GET'])
+@cross_origin()
+def get_group_size():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        group_size = dbWrapper.getGroupSize(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'group_size': group_size}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-avg-truck-factor', methods=['GET'])
+@cross_origin()
+def get_avg_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    try:
+        avg_truck_factor = metrics.get_avg_truck_factor(group_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'avgTruckFactor': avg_truck_factor}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/get-individual-truck-factor', methods=['GET'])
+@cross_origin()
+def get_individual_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    local_id = request.args.get("localId", default = "", type = str)
+    try:
+        truck_factor = metrics.get_users_recent_truck_factor(group_id, local_id)
+        response = app.response_class(
+            response=json.dumps({'approved': True, 'truckFactor': truck_factor}),
+            status=200,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
+
+@app.route('/metrics/submit-truck-factor', methods=['POST'])
+@cross_origin()
+def submit_truck_factor():
+    group_id = request.args.get("groupId", default = "", type = str)
+    uid = request.args.get("uid", default = "", type = str)
+    truck_factor = request.args.get("truckFactor", default = -1, type = int)
+    comment = request.args.get("comment", default = "", type = str)
+    try:
+        if(truck_factor <= 0):
+            raise Exception
+        valid = metrics.submit_truck_factor(group_id, uid, truck_factor, comment)
+        response = app.response_class(
+            response=json.dumps({'approved': valid}),
+            status=200 if valid else 401,
+            mimetype='application/json'
+        )
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False}),
+            status=401,
+            mimetype='application/json'
+        )
+    return response
 
 @app.route('/auth/get-github-app-client-id', methods=['GET'])
 @cross_origin()

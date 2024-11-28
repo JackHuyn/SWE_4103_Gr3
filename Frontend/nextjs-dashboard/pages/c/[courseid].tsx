@@ -9,6 +9,8 @@ import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
+import '@/app/ui/stylesheets/homelogout.css';
+import MoonLight from '@/app/ui/logo_module';
 
 
 
@@ -16,6 +18,8 @@ import '@/app/ui/stylesheets/popup.css';
 export default function CourseDetails() {
   const router = useRouter();
   const { courseid } = router.query;
+  const [isSingleStudentTab, setIsSingleStudentTab] = useState(true);
+
   const [courseDetails, setCourseDetails] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [studentList, setStudentList] = useState([]);
@@ -37,7 +41,8 @@ export default function CourseDetails() {
   const [csvFile, setCsvFile] = useState(null); // Store the csv file for addingstudents
   const [userRole, setUserRole] = useState('')
   const inputRef = useRef(null); // Create a ref for the input field
-  const [loading,setLoading] = useState(true) // Loading state
+  const [loading, setLoading] = useState(true) // Loading state
+  const [error, setError] = useState("");  
   //setUserRole('1')
 
 
@@ -55,65 +60,65 @@ export default function CourseDetails() {
 
         const data = await res.json();
         setCourseDetails(data);
-        
+
         setStudentList(data.courses.student_ids)
         console.log(data)
 
-          try {
-            //console.log('Course .tsx is displayed')
-            //if (!router.isReady) return;
-            //const localId = Cookies.get('localId')
-            
-            if(localId) {
+        try {
+          //console.log('Course .tsx is displayed')
+          //if (!router.isReady) return;
+          //const localId = Cookies.get('localId')
 
-                const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
+          if (localId) {
 
-                //check if instructor role ? If not show student display
-                if(!role_response.ok){
-                    setUserRole('0')
-                }
-                else {
-                    //fetching same for instructor
-                    setUserRole('1')
-                }
-                //project part
-                const res = await fetch('http://localhost:3001/auth/projects?localId=' + localId + '&courseId=' + courseid)
-                    if (!res.ok) {
+            const role_response = await fetch('http://localhost:3001/check-instructor?localId=' + localId)
 
-                        throw new Error('Failed to fetch data');
-                    }
-                    const result = await res.json();
-                    
-                    // Set the initial projects to the state if the response is approved
-                    if (result.approved && result.projects) {
-                        console.log('it has been approved')
-                        setProjectData(result);
-                        setProjectList(result.projects);
-                        setLoading(false);
-                    }
-                //student part
-                    const stu_f = await fetch('http://localhost:3001/auth/course/students_info?localId=' + localId + '&courseId=' + courseid)
-                    if (!stu_f.ok) {
-                        throw new Error('Failed to fetch data');
-                    }
-                    const stu_r = await stu_f.json();
-                    if (stu_r.approved && stu_r.students) {
-                        console.log('it has been approved')
-                        setStudentData(stu_r);
-                        setStudentList(stu_r.students);
-                        setLoading(false);
-                    }
+            //check if instructor role ? If not show student display
+            if (!role_response.ok) {
+              setUserRole('0')
             }
-            else{
-                window.location.href = "/auth/login"
+            else {
+              //fetching same for instructor
+              setUserRole('1')
             }
-            
+            //project part
+            const res = await fetch('http://localhost:3001/auth/projects?localId=' + localId + '&courseId=' + courseid)
+            if (!res.ok) {
+
+              throw new Error('Failed to fetch data');
+            }
+            const result = await res.json();
+
+            // Set the initial projects to the state if the response is approved
+            if (result.approved && result.projects) {
+              console.log('it has been approved')
+              setProjectData(result);
+              setProjectList(result.projects);
+              setLoading(false);
+            }
+            //student part
+            const stu_f = await fetch('http://localhost:3001/auth/course/students_info?localId=' + localId + '&courseId=' + courseid)
+            if (!stu_f.ok) {
+              throw new Error('Failed to fetch data');
+            }
+            const stu_r = await stu_f.json();
+            if (stu_r.approved && stu_r.students) {
+              console.log('it has been approved')
+              setStudentData(stu_r);
+              setStudentList(stu_r.students);
+              setLoading(false);
+            }
+          }
+          else {
+            window.location.href = "/auth/login"
+          }
+
         } catch (error) {
-            console.error('Error fetching projects:', error);
-            setError('Error loading projects. Please try again later.');
+          console.error('Error fetching projects:', error);
+          setError('Error loading projects. Please try again later.');
         }
-        finally{
-            setLoading(false);
+        finally {
+          setLoading(false);
         }
       };
 
@@ -129,7 +134,7 @@ export default function CourseDetails() {
     );
   }
 
-  
+
 
 
   const addProject = () => {
@@ -138,52 +143,52 @@ export default function CourseDetails() {
 
   // Handle adding a new course with name, description, and term
   const handleAddProject = async () => {
-    
+
     if (newProjectName) {
-        
-        //Ensure localId cookie is valid
-        const localId  = Cookies.get('localId')
 
-        if (!localId){
-            window.location.href = "/auth/login"
+      //Ensure localId cookie is valid
+      const localId = Cookies.get('localId')
+
+      if (!localId) {
+        window.location.href = "/auth/login"
+      }
+      const projectData = {
+        course_id: courseid,
+        project_id: courseid + "_" + newProjectName,
+        project_name: newProjectName
+
+
+      };
+
+      try {
+
+        //Need to have checks to ensure that the instructor is valid 
+        const response = await fetch('http://localhost:3001/add-project', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+
+          },
+          body: JSON.stringify(projectData),  // Send JSON data in request body
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          window.location.reload();
+          alert('project added successfully!');
+          window.location.reload();
+
+        } else {
+          alert(`Error adding project: ${result.reason}`);
         }
-        const projectData = {
-            course_id: courseid,
-            project_id: courseid + "_" + newProjectName,
-            project_name: newProjectName
-            
-            
-        };
-
-        try {
-            
-            //Need to have checks to ensure that the instructor is valid 
-            const response = await fetch('http://localhost:3001/add-project' , {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    
-                },
-                body: JSON.stringify(projectData),  // Send JSON data in request body
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                window.location.reload();
-                alert('project added successfully!');
-                window.location.reload();
-                
-            } else {
-                alert(`Error adding project: ${result.reason}`);
-            }
-        } catch (error) {
-            console.error('Error sending request:', error);
-            alert('Error adding project. Please try again later.');
-        }
+      } catch (error) {
+        console.error('Error sending request:', error);
+        alert('Error adding project. Please try again later.');
+      }
 
     } else {
-        alert('Please provide a project name.');
+      alert('Please provide a project name.');
     }
 };
 //-----------------------------------------------------
@@ -324,6 +329,17 @@ const handleRemoveStudents = async () => {
 if (projectData) {
     return (
       <div className="page-wrapper">
+        <div className="button-bar">
+          {/* Home Button on the Left */}
+          <Link href="/">
+            <MoonLight></MoonLight>
+          </Link>
+
+          {/* Logout Button on the Right */}
+          <button id="logout" onClick={HandleLogout}>
+            Log Out
+          </button>
+        </div>
         <div className="course-header">
           <h1>{courseid}</h1>
           {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
@@ -336,13 +352,13 @@ if (projectData) {
           {/* Projects Section */}
 
           <div className="projects-section">
-          <button id="logout" onClick={HandleLogout}>Log Out</button>
+          
             <div className="section-header">
               <h2>Projects</h2>
               {userRole === '1' && (
                 <div className="addandremove">
-                  <Button className="add-button" onClick={addProject}> + </Button>
-                  <Button className="remove-button" onClick = {removeProject}> - </Button>    
+                   <button className="add-button" onClick={addProject}> + </button>
+                   <button className="remove-button" onClick = {removeProject}> - </button>     
                 </div>
               )}
             </div>
@@ -350,17 +366,18 @@ if (projectData) {
               {projectData?.projects?.map((projects, index) => (
                 <Link href={{
                   pathname: '/c/[course_slug]/p/[project_slug]/',
-                  query: {course_slug: projects.course_id, project_slug: projects.project_id}}
-                  }> 
-                <div key={index} className="project-card">
-                  
-                  {projects.project_name}
-                  
-                </div>
+                  query: { course_slug: projects.course_id, project_slug: projects.project_id }
+                }
+                }>
+                  <div key={index} className="project-card">
+
+                    {projects.project_name}
+
+                  </div>
                 </Link>
               ))}
             </div>
-            <p className="view-all">View all</p>
+            <p className="view-all"></p>
           </div>
           {/* Students Section */}
           <div className="students-section">
@@ -371,7 +388,7 @@ if (projectData) {
                   <button className="options-button">⋮</button>
                   <div className="options-menu">
                     <a onClick={addStudent}>Add a Student</a>
-                    <a onClick={uploadStudents}>Upload list</a>
+ 
                     <a onClick={removeStudents}>Remove Students</a>
                   </div>
                 </div>
@@ -380,37 +397,37 @@ if (projectData) {
             <div className="students-list">
               {studentData?.students?.map((students, index) => (
                 <Link href={'/students_info/' + students.uid}>
-                <div key={index} className="student-card">
-                  {students.first_name+" "+students.last_name}
-                </div>
+                  <div key={index} className="student-card">
+                    {students.first_name + " " + students.last_name}
+                  </div>
                 </Link>
               ))}
             </div>
-            <p className="view-all">View all</p>
+            <p className="view-all"></p>
           </div>
         </div>
-   
-      {/*Handle add project*/}
-      {isProjectPopup1Visible && (
-          <div className="popup">
-              <div className="popup_content">
-                  <h2>Add New Project</h2>
-                  <input
-                      ref={inputRef} // Attach the ref to the input field
-                      type="text"
-                      value={newProjectName}
-                      onChange={(e) => setNewProjectName(e.target.value)}
-                      placeholder="Project Name"/>
 
-                  <div className="popup_buttons">
-                      <Button className="popup_button" onClick={handleAddProject}>
-                          Add Project
-                      </Button>
-                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup1Visible(false)}>
-                          Cancel
-                      </Button>
-                  </div>
+        {/*Handle add project*/}
+        {isProjectPopup1Visible && (
+          <div className="popup">
+            <div className="popup_content">
+              <h2>Add New Project</h2>
+              <input
+                ref={inputRef} // Attach the ref to the input field
+                type="text"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                placeholder="Project Name" />
+
+              <div className="popup_buttons">
+                <button className="popup_button" onClick={handleAddProject}>
+                  Add Project
+                </button>
+                <button className="popup_button cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
+                  Cancel
+                </button>
               </div>
+            </div>
           </div>
         )}
       {/*Handle remove project*/}
@@ -426,12 +443,12 @@ if (projectData) {
                       placeholder="Project Name"
                   />
                   <div className="popup_buttons">
-                      <Button className="popup_button" onClick={handleRemoveProject}>
+                  <button className="popup_button" onClick={handleRemoveProject}>
                           Remove
-                      </Button>
-                      <Button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
+                      </button>
+                      <button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
                           Cancel
-                      </Button>
+                      </button>
                   </div>
               </div>
           </div>
@@ -439,36 +456,68 @@ if (projectData) {
       {/*Handle add student*/}
       {isStudentPopup1Visible && (
           <div className="popup">
-              <div className="popup_content">
-                  <h2>Add New Student</h2>
-                  <input
-                      ref={inputRef}
+            <div className="popup_content">
+              <h2 className="popup_title">Manage Students</h2>
+              <div className="tab-container">
+                <button
+                  className={`tab ${isSingleStudentTab ? 'active-tab' : ''}`}
+                  onClick={() => setIsSingleStudentTab(true)}
+                >
+                  Add Single Student
+                </button>
+                <button
+                  className={`tab ${!isSingleStudentTab ? 'active-tab' : ''}`}
+                  onClick={() => setIsSingleStudentTab(false)}
+                >
+                  Upload CSV
+                </button>
+              </div>
+
+              <div className="popup_body">
+                {isSingleStudentTab ? (
+                  <>
+                    <input
+                      className="popup_input"
                       type="text"
                       value={newStudentFName}
                       onChange={(e) => setNewStudentFName(e.target.value)}
-                      placeholder="First Name"/>
-                  <input
-                      ref={inputRef}
+                      placeholder="First Name"
+                    />
+                    <input
+                      className="popup_input"
                       type="text"
                       value={newStudentLName}
                       onChange={(e) => setNewStudentLName(e.target.value)}
-                      placeholder="Last Name"/>
-                  <input
-                      ref={inputRef}
-                      type="text"
+                      placeholder="Last Name"
+                    />
+                    <input
+                      className="popup_input"
+                      type="email"
                       value={newStudentEmail}
                       onChange={(e) => setNewStudentEmail(e.target.value)}
                       placeholder="Email"/>
-
-                  <div className="popup_buttons">
-                      <Button className="popup_button" onClick={handleAddStudent}>
-                          Add Student
-                      </Button>
-                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup1Visible(false)}>
-                          Cancel
-                      </Button>
+                  </>
+                ) : (
+                  <div className="file-upload-wrapper">
+                    <FileUpload localId={localId} courseId={courseid as string} />
                   </div>
+                )}
               </div>
+
+              <div className="popup_buttons">
+                {isSingleStudentTab ? (
+                  <button className="popup_button" onClick={handleAddStudent}>
+                    Add Student
+                  </button>
+                ) : null}
+                <button
+                  className="popup_button cancel_button"
+                  onClick={() => setIsStudentPopup1Visible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
       {/*Handle upload students*/}
@@ -477,9 +526,9 @@ if (projectData) {
           <div className="popup_content">
             <FileUpload localId={localId} courseId={courseid as string} />
             <div className="popup_buttons">
-                      <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
+                      <button className="popup_button cancel_button" onClick={() => setIsStudentPopup2Visible(false)}>
                           Cancel
-                      </Button>
+                      </button>
                   </div>
           </div>
         </div>
@@ -510,28 +559,29 @@ if (projectData) {
               ))}
             </div>
             <div className="popup_buttons">
-              <Button className="popup_button" onClick={handleRemoveStudents}>
+            <button className="popup_button" onClick={handleRemoveStudents}>
                   Remove
-              </Button>
-              <Button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
+              </button>
+              <button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
                   Cancel
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       )}          
       </div>
 
-      
+
+
     );
   }
 
   else {
     return (
-        <div className="spinner-wrapper">
+      <div className="spinner-wrapper">
         <div className="spinner"></div>
-        </div>
+      </div>
     );
-      
-}
+
+  }
 }

@@ -2,30 +2,49 @@
 @import url('./default.css');
 @import url('./fonts.css');
 
+a {
+    text-decoration: none;
+    color: inherit;
+    /* Inherit color from parent */
+}
+
+a:visited {
+    color: inherit;
+    /* Ensure visited links inherit color */
+}
+
+
 .page-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px;
+    padding: 0;
+    margin: 0;
     min-height: 100vh;
-    background-color: #1a1a1a55;
+    background-color: #1a1a1a00;
     border-radius: 10px;
-    
 }
 
 .course-header {
     text-align: left;
     margin-bottom: 40px;
-    width:90%;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4%;
+    height: 10vh;
+    padding: 0 5%;
+    background-color: #2b2b2b;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .course-header h1 {
-    text-transform: uppercase;
     font-family: 'Jura', sans-serif;
-    font-size: 4rem;
-    color: white;
-    font-weight: lighter;
     margin: 0;
+    font-size: 2rem;
+    color: white;
 }
 
 .course-header p {
@@ -40,14 +59,29 @@
     grid-template-columns: 3fr 1fr;
     gap: 40px;
     width: 90%;
-    max-width: 1200px;
+    max-width: 3200px;
+    align-items: start;
+    /* Ensures grid items align to their content height */
 }
 
-.projects-section, .students-section {
+.content-grid-group {
+    display: grid;
+    grid-template-columns: 4fr;
+    gap: 40px;
+    width: 90%;
+    max-width: 3200px;
+    align-items: start;
+    /* Ensures grid items align to their content height */
+}
+
+.projects-section,
+.students-section {
     background-color: #2b2b2b;
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
 }
 
 .section-header {
@@ -116,17 +150,24 @@
 }
 
 .project-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 100px;
     background-color: #3b3b3b;
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 15px;
+    padding: 50px;
     text-align: center;
     color: white;
     cursor: pointer;
+    position: relative;
     transition: transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    gap: 15px;
 }
 
 .project-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -143,12 +184,19 @@
 }
 
 .student-card {
-    background-color: #3b3b3b;
-    border-radius: 10px;
-    padding: 10px;
+    background: rgba(59, 59, 59, 0.9);
+    border-radius: 12px;
+    padding: 15px;
     color: white;
     text-align: center;
     cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.student-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 
 .view-all {
@@ -210,3 +258,146 @@
     transform: scale(1.1);
 }
 /*-------------------------------------*/
+
+
+.file-upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #2b2b2b;
+    border-radius: 15px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.file-upload-form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.file-upload-label {
+    background-color: var(--secondaryColor);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.file-upload-label:hover {
+    background-color: var(--secondaryColorHover);
+    transform: scale(1.05);
+}
+
+.file-upload-input {
+    display: none;
+    /* Hide default file input */
+}
+
+.upload-button {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.upload-button:hover {
+    background-color: #e63946;
+    transform: scale(1.05);
+}
+
+.tab-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    color: white;
+    background-color: #3b3b3b;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.tab:hover {
+    background-color: #525252;
+}
+
+.active-tab {
+    background-color: var(--secondaryColor);
+    transform: scale(1.05);
+}
+
+.popup_body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    width: 100%;
+}
+
+.popup_input {
+    padding: 10px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #3b3b3b;
+    color: white;
+    outline: none;
+}
+
+.popup_input::placeholder {
+    color: #b0b0b0;
+}
+
+.file-upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.popup_buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+.popup_button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    background-color: var(--secondaryColor);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+.file-name {
+    font-size: 1rem;
+    color: #b0b0b0;
+    margin-left: 10px;
+    flex: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

@@ -6,8 +6,9 @@ import {NextResponse, type NextRequest } from "next/server";
 //Ensures that the connection is not stale by verifying the user session is valid using idToken
 export async function middleware(request: NextRequest){
 
-    
-    if (request.nextUrl.pathname.startsWith('/c')) {
+    // console.log('PATH NAME:  ', request.nextUrl.pathname)
+    if (!request.nextUrl.pathname.startsWith('/auth/') &&
+        !request.nextUrl.pathname.startsWith('/_next/')) {
 
         //get the cookies
         const tokenId = request.cookies.get("idToken")?.value

@@ -83,7 +83,7 @@ export default function TeamVelocityGraph({group_id})
     return (
         <div id="avg-joy-container">
             <h3>Team Velocity</h3>
-            <div style={{ width: '800px' }}><canvas id="team-velocity-graph"></canvas></div>
+            <div style={{ width: '100%' }}><canvas id="team-velocity-graph"></canvas></div>
         </div>
     );
 }

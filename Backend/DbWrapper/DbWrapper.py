@@ -14,6 +14,7 @@ JOY = "joydata"
 VELOCITY = "velocitydata"
 ASSESSMENT = "pointdistribution"
 CEAB = "ceabdata"
+TRUCK_FACTOR = "truck_factor_data"
 
 class DbWrapper:
     def __init__(self, dbObject):
@@ -26,6 +27,15 @@ class DbWrapper:
         except:
             return False
         return True
+    def getArchivedCoursesForUser(self, local_id:str):
+        try:
+            # Query the database to get archived courses specifically for the user (local_id)
+            archived_courses = self.db.collection(COURSES).where("status", "==", 1).where("instructor_ids", "array_contains", local_id).stream()
+            archived_course_list = [course.to_dict() for course in archived_courses]
+            return archived_course_list
+        except Exception as e:
+            print(f"Error fetching archived courses for user {local_id}: {e}")
+            return []
     def activateCourse(self, course_id:str)->bool:
         course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
@@ -264,7 +274,7 @@ class DbWrapper:
         projData = self.getProjectData(project_id)
         template["group_id"] = group_id
         try:
-            template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+            template["group_name"] = f'{projData["project_name"]} Group {group_n}'
         except TypeError:
             return False
         template["project_id"] = project_id
@@ -284,7 +294,7 @@ class DbWrapper:
                 group_n -= 1
                 group_id = f"{project_id}_gr{group_n}"
                 template["group_id"] = group_id
-                template["group_name"] = f"{projData["project_name"]} Group {group_n}"
+                template["group_name"] = f'{projData["project_name"]} Group {group_n}'
             else:
                 self.db.collection(GROUPS).document(group_id).set(template)
                 self.addTenPointPeerAssessment(project_id, group_id, student_ids)
@@ -292,6 +302,10 @@ class DbWrapper:
                 inserted = True
         return True
     
+    def getGroupSize(self, group_id:str):
+        doc = self.db.collection(GROUPS).document(group_id).get()
+        return len(doc.to_dict()["student_ids"])
+
     def addGithubRepoToGroup(self, group_id:str, github_repo_address:str)->bool:
         group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
@@ -458,6 +472,40 @@ class DbWrapper:
         except:
             return False
         return True
+    
+    def getTruckFactorRatings(self, group_id:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(filter=FieldFilter("group_id", "==", group_id)).stream()
+        ratings = []
+        for doc in docs:
+            ratings.append(doc.to_dict())
+        return ratings
+    
+    def getUsersRecentTruckFactor(self, group_id:str, uid:str):
+        docs = self.db.collection(TRUCK_FACTOR).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("uid", "==", uid)
+            ).stream()
+        for doc in docs:
+            return doc
+        return None
+
+    def submitTruckFactorRating(self, group_id:str, uid:str, truck_factor:int, comment="") -> bool:
+        recent_truck_factor = self.getUsersRecentTruckFactor(group_id, uid)
+        try:
+            if recent_truck_factor == None:
+                self.db.collection(TRUCK_FACTOR).add(
+                    {
+                        "group_id": group_id,
+                        "uid": uid,
+                        "truck_factor": truck_factor,
+                        "comment": comment
+                    }
+                )
+            else:
+                recent_truck_factor.reference.set({'truck_factor': truck_factor, 'comment': comment}, merge=True)
+        except Exception as e:
+            return False
+        return True
 
     def updateTenPointPeerAssessment(self, group_id):
         try:
@@ -584,6 +632,29 @@ class DbWrapper:
             docList.append(d)
             user_ids.append(d['student_id'])
         return docList
+    
+    def getIndividualCurrentDayJoyRating(self, group_id:str, uid:str) -> dict | None:
+        group_id = group_id.lower()
+        date = datetime.datetime.today()
+        date_start = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
+        date_end = datetime.datetime(date.year, date.month, date.day, 23, 59, 59)
+        timezone = pytz.timezone('Etc/GMT+4')  # Replace 'UTC' with your desired timezone
+        date_start_utc = timezone.localize(date_start)
+        date_end_utc = timezone.localize(date_end)
+
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                filter=FieldFilter("timestamp", ">=", date_start_utc)).where(
+                    filter=FieldFilter("timestamp", "<=", date_end_utc)).where(
+                        filter=FieldFilter("student_id", "==", uid)
+                    ).get()
+        for doc in joy_docs:
+            d = doc.to_dict()
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            print('\n', d, '\n')
+            return d
+        return None
     
     def getGithubRepoAddress(self, group_id:str):
         group_id = group_id.lower()

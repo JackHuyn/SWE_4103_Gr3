@@ -7,8 +7,10 @@ import Link from 'next/link';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
-import '@/app/ui/stylesheets/groups.css';
-import { groups } from 'console';
+import '@/app/ui/stylesheets/coursePage.css';
+import '@/app/ui/stylesheets/homelogout.css'
+import { group } from 'console';
+import MoonLight from '@/app/ui/logo_module';
 
 
 /**
@@ -225,17 +227,36 @@ const handleManageGroups = async () => {
   console.error('Error sending request:', error);
   alert('Error managing group. Please try again later.');
   }
+
+
+const handleChangeNumber = (event) => {
+  const value = event.target.value;
+
+  setNGroups(value)
+  
 };
 //-------------------------------------------------
 
   return (
     <div className="page-wrapper">
+      <div className="button-bar">
+          {/* Home Button on the Left */}
+          <Link href="/">
+            {/* <button id="home">Home</button> */}
+            <MoonLight></MoonLight>
+          </Link>
+
+          {/* Logout Button on the Right */}
+          <button id="logout" onClick={HandleLogout}>
+            Log Out
+          </button>
+        </div>
       <div className="course-header">
         {projectid && <h1 style={{textAlign:"center"}}>{projectid.split('_').slice(1).join('_')}</h1>}
         {/* <p>{JSON.stringify(courseDetails, null, 2)}</p> */}
         {/*<p>{courseDetails.courses.section} | {courseDetails.courses.term}</p>*/}
       </div>
-      <div className="content-grid">
+      <div className="content-grid-group">
         {/* Groups Section */}
         <div className="projects-section full-width-section">
           <div className="section-header">
