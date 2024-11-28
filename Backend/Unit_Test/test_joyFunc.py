@@ -5,9 +5,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unittest.mock import MagicMock, patch
 from datetime import datetime
 from DbWrapper.DbWrapper import DbWrapper  
-from firebase_admin import firestore  # Importing to reference firestore.SERVER_TIMESTAMP
+from firebase_admin import firestore 
 import datetime
-import pytz
 
 class TestDbWrapperJoyManagement(unittest.TestCase):
 
@@ -41,8 +40,6 @@ class TestDbWrapperJoyManagement(unittest.TestCase):
 
     @patch("firebase_admin.firestore.client")
     def test_updateJoyRating(self, mock_firestore_client):
-        timestamp = int(datetime.datetime.now().timestamp())
-        doc_id = f"student1_group123_{timestamp}"
         mock_doc = MagicMock()
         self.mock_db.collection.return_value.document.return_value = mock_doc
 

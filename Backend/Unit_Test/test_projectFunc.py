@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unittest.mock import MagicMock, patch
-from DbWrapper.DbWrapper import DbWrapper  # Adjust the import path if necessary
+from DbWrapper.DbWrapper import DbWrapper  
 
 class TestDbWrapperProjectManagement(unittest.TestCase):
 
