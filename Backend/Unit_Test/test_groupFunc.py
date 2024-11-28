@@ -30,11 +30,13 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         group_id = "proj123_gr1"  # Expected group ID
         self.mock_db.collection.return_value.document.return_value.set.assert_called_once_with({
             "group_id": group_id,
+            "group_name": "Project 1 Group 1",
             "project_id": "proj123",
             "student_ids": ["student1", "student2"],
             "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
             "github_repo_address": "https://github.com/repo",
-            "scrum_master": ["student1"]
+            "scrum_master": ["student1"],
+            "show_survey": 0
         })
         self.assertTrue(result)
 
@@ -55,11 +57,13 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         group_id = "proj123_gr2"  # Expected group ID for the second group
         self.mock_db.collection.return_value.document.return_value.set.assert_called_once_with({
             "group_id": group_id,
+            "group_name": "Project 1 Group 2",
             "project_id": "proj123",
             "student_ids": ["student1", "student2"],
             "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
             "github_repo_address": "https://github.com/repo",
-            "scrum_master": ["student1"]
+            "scrum_master": ["student1"],
+            "show_survey": 0
         })
         self.assertTrue(result)
 
@@ -124,10 +128,11 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         mock_doc = MagicMock()
         self.mock_db.collection.return_value.document.return_value = mock_doc
 
-        result = self.db_wrapper.addScrumMasterToGroup("group123", scrum_master=["student1"])
+        scrum_master = ["student1"]  # The scrum master to be added
+        result = self.db_wrapper.addScrumMasterToGroup("group123", scrum_master=scrum_master)
 
-        # Check that the scrum master is added to the group
-        mock_doc.update.assert_called_once_with({"scrum_master": ["student1"]})
+        # Check that the scrum master is added to the group using ArrayUnion
+        mock_doc.update.assert_called_once_with({"scrum_master": ArrayUnion(scrum_master)})
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
