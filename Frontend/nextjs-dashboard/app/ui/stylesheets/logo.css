@@ -5,7 +5,10 @@
     gap: 10px;
     margin-bottom: 0px; /* Adds space below the logo */
     transition: transform 0.8s ease;
-    background-color: rgba(16, 16, 16, 0.052);
+    /* background-color: rgba(16, 16, 16, 0.052); */
+    background-color: rgba(220, 1, 1, 0.813);
+    left: 0px;
+    width:100%;
 }
 
 .logo:hover {

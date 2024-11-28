@@ -334,8 +334,7 @@ if (projectData) {
         <div className="button-bar">
           {/* Home Button on the Left */}
           <Link href="/">
-            {/* <button id="home">Home</button> */}
-            <MoonLight></MoonLight>
+                            <MoonLight></MoonLight>
           </Link>
 
           {/* Logout Button on the Right */}
