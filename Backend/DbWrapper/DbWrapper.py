@@ -459,6 +459,19 @@ class DbWrapper:
             return False
         return True
 
+    def updateTenPointPeerAssessment(self, group_id):
+        try:
+            doc = self.db.collection(ASSESSMENT).document(group_id)
+            assess = self.db.collection(ASSESSMENT).document(group_id).get()
+            rawAssessments = assess.to_dict()["assessment_table"]
+            divisor = (len(rawAssessments) * 10) - 10
+            if divisor == 0: 
+                return False
+            for key, val in rawAssessments.items():
+                factor = val/divisor
+                doc.update({"scaling_factors": {key: factor}})
+        except Exception as updateFailed:
+            print(updateFailed)
     def removeStudentFromCourse(self, student_id:str, course_id:str)->bool:
         course_id = course_id.lower()
         doc = self.db.collection(COURSES).document(course_id)
