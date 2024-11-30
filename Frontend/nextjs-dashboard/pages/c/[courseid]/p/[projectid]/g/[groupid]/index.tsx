@@ -12,8 +12,6 @@ import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorizat
 import PersonalJoyChart from '@/app/ui/metrics/personal-joy-graph';
 import '@/app/ui/stylesheets/joyRatingInput.css'
 
-import Link from 'next/link';
-
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
 import { useRouter } from 'next/router';
@@ -50,10 +48,6 @@ export default function Metrics() {
         setIsGithubDialogVisible(true);
     }
 
-    function openJoyRatingDialog() {
-        setIsPopupVisible(true);
-    }
-
     function survey() {
         setIsSurveyPopupVisible(true);
     }
@@ -62,13 +56,8 @@ export default function Metrics() {
         setIsCEABPopupVisible(true);
     }
 
-    function openTeamVelocityDialog() {
-        setIsPopup2Visible(true);
-    }
 
     function closeDialogs() {
-        setIsPopupVisible(false);
-        setIsPopup2Visible(false);
         setIsGithubDialogVisible(false);
         setIsSurveyPopupVisible(false);
         setIsCEABPopupVisible(false);
@@ -432,11 +421,13 @@ const showSurvey = async () => {
                     {isSurveyPopupVisible &&  (
                         <div id="joy-rating-dialog" className="dialog">
                             <Survey10point closeDialogs={closeDialogs}/>
+                            <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
                     {isCEABPopupVisible &&  (
                         <div id="joy-rating-dialog" className="dialog">
                             <SurveyCEAB closeDialogs={closeDialogs}/>
+                            <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
                     {isTruckFactorInputVisible && (

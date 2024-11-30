@@ -198,6 +198,7 @@ def check_scrum_master_role():
         
         if(scrum_master_list == local_id):
             is_scrum_master = True
+        print(local_id+" is scrum master: "+str(is_scrum_master))
     except Exception as e:
         pass
     
@@ -797,8 +798,6 @@ def remove_students_course():
         success = False
         for student in remove_list:
             student_id = student['uid']
-            print(student_id)
-            print(course_id)
             success = dbWrapper.removeStudentFromCourse(student_id, course_id)
             projects = dbWrapper.getCourseProjects(course_id)
             for project in projects:
@@ -883,12 +882,15 @@ def manage_groups():
                 success = False
                 break
         for master,group in scrum_masters:
-            masters = []
-            masters.append(master)
-            if dbWrapper.addScrumMasterToGroup(group,masters):
+            print("add scrummaster")
+            print('group:' + group)
+            print('scrum master' + master)
+            if dbWrapper.addScrumMasterToGroup(group,master):
                 success = True
+                print("addScrumMasterToGroup("+group+","+master+") -> true")
             else:
                 success = False
+                print("addScrumMasterToGroup("+group+","+master+") -> false")
                 break
         if success:
             response = app.response_class(
@@ -984,10 +986,6 @@ def add_ceab_survey():
                 point = student['points']
                 result[id] = point[f'Q{i}']
             results_list.append(result)
-        print("XXXXXXXXXXXXX")
-        print(group_id)
-        print(student_id)
-        print(results_list)
         success = metrics.add_student_CEAB_assessement(group_id, student_id, results_list)
         if success:
             response = app.response_class(
