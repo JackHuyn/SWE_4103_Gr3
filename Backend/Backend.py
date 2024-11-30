@@ -195,9 +195,10 @@ def check_scrum_master_role():
     try:
         group_data = getGroupData(group_id)
         scrum_master_list = group_data['scrum_master']
-        
-        if(scrum_master_list == local_id):
-            is_scrum_master = True
+        for scrum in scrum_master_list:
+            if(scrum == local_id):
+                is_scrum_master = True
+                break
         print(local_id+" is scrum master: "+str(is_scrum_master))
     except Exception as e:
         pass

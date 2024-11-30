@@ -406,7 +406,7 @@ class DbWrapper:
         group_id = group_id.lower()
         doc = self.db.collection(GROUPS).document(group_id)
         try:
-            doc.update({"scrum_master": ArrayUnion(scrum_master)})
+            doc.update({"scrum_master": ArrayUnion([scrum_master])})
         except:
             return False
         return True

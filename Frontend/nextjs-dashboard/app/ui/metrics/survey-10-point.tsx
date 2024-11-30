@@ -70,6 +70,7 @@ export default function Survey10point() {
                 console.error('Failed to save data:', response.statusText);
                 alert('Failed to submit points.');
             }
+            window.location.reload();
         } catch (error) {
             console.error('Error sending data to backend:', error);
             alert('An error occurred while submitting points.');

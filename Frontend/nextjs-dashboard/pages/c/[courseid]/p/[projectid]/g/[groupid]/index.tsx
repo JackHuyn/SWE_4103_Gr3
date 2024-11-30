@@ -337,7 +337,7 @@ const showSurvey = async () => {
                            {isScrumMaster && 
                             (
                                 <>
-                                <button className="metrics-button" onClick={showSurvey}>Activte Survey</button>
+                                <button className="metrics-button" onClick={showSurvey}>Activate Survey</button>
                                 <button className="metrics-button" onClick={openTeamVelocityDialog}>Team Velocity Input</button>
                                 <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
                                 </>
@@ -421,13 +421,13 @@ const showSurvey = async () => {
                     {isSurveyPopupVisible &&  (
                         <div id="joy-rating-dialog" className="dialog">
                             <Survey10point closeDialogs={closeDialogs}/>
-                            <button onClick={closeDialogs}>Close</button>
+                            <button onClick={() => setIsSurveyPopupVisible(false)}>Close</button>
                         </div>
                     )}
                     {isCEABPopupVisible &&  (
                         <div id="joy-rating-dialog" className="dialog">
                             <SurveyCEAB closeDialogs={closeDialogs}/>
-                            <button onClick={closeDialogs}>Close</button>
+                            <button onClick={() => setIsCEABPopupVisible(false)}>Close</button>
                         </div>
                     )}
                     {isTruckFactorInputVisible && (
