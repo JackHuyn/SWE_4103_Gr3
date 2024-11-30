@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unittest.mock import MagicMock, patch
-from DbWrapper.DbWrapper import DbWrapper  # Adjust the import path if necessary
+from DbWrapper.DbWrapper import DbWrapper  
 
 class TestDbWrapperProjectManagement(unittest.TestCase):
 
@@ -92,25 +92,6 @@ class TestDbWrapperProjectManagement(unittest.TestCase):
             {"project_id": "proj123", "course_id": "course123", "project_name": "Project 1"},
             {"project_id": "proj456", "course_id": "course123", "project_name": "Project 2"}
         ])
-
-    # @patch("firebase_admin.firestore.client")
-    # def test_removeProject(self, mock_firestore_client):
-    #     # Simulate an existing project and associated groups
-    #     mock_project = MagicMock()
-    #     mock_group = MagicMock()
-    #     mock_group.to_dict.return_value = {"group_id": "group123"}
-        
-    #     self.mock_db.collection.return_value.where.return_value.stream.side_effect = [
-    #         [mock_project],  # For project existence check
-    #         [mock_group]     # For associated groups under the project
-    #     ]
-
-    #     result = self.db_wrapper.removeProject("proj123")
-        
-    #     # Check that the project and associated groups are deleted
-    #     self.mock_db.collection.return_value.document("proj123").delete.assert_called_once()
-    #     self.mock_db.collection.return_value.document("group123").delete.assert_called_once()
-    #     self.assertTrue(result)
 
 
     @patch("firebase_admin.firestore.client")

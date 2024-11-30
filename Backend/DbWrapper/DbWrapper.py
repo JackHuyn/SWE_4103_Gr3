@@ -656,6 +656,23 @@ class DbWrapper:
             return d
         return None
     
+    def getIndividualRecentJoyRatings(self, group_id:str, uid:str) -> dict | None:
+        group_id = group_id.lower()
+
+        joy_docs = self.db.collection(JOY).where(
+            filter=FieldFilter("group_id", "==", group_id)).where(
+                        filter=FieldFilter("student_id", "==", uid)
+                    ).order_by("timestamp", direction=firestore.firestore.Query.DESCENDING).limit(10).get()
+        docList = []
+        for doc in joy_docs:
+            d = doc.to_dict()
+            d['date'] = str(d['timestamp'])
+            d.pop('timestamp', None)
+            print('\n', d, '\n')
+            docList.append(d)
+        docList = sorted(docList, key=lambda x: x['date'])
+        return docList
+
     def getGithubRepoAddress(self, group_id:str):
         group_id = group_id.lower()
         docs = self.db.collection(GROUPS).document(group_id).get()

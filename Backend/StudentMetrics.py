@@ -34,6 +34,14 @@ class StudentMetrics:
                 rating['student_id'] = str(userdata['first_name']) + ' ' + str(userdata['last_name'])[0] + '.'
         return raw_ratings
     
+    def get_recent_individual_joy_ratings(self, group_id, uid): # Return Most Recent Joy Rating for each Student
+        raw_ratings = self.db.getIndividualRecentJoyRatings(group_id, uid)
+        for rating in raw_ratings:
+            userdata = self.db.getUserData(rating['student_id'])
+            if(userdata):
+                rating['student_id'] = str(userdata['first_name']) + ' ' + str(userdata['last_name'])[0] + '.'
+        return raw_ratings
+    
     def get_individual_current_day_joy_rating(self, group_id:str, uid:str):
         return self.db.getIndividualCurrentDayJoyRating(group_id, uid)
     

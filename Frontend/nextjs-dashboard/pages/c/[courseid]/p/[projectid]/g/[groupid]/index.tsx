@@ -9,6 +9,11 @@ import TruckFactorStatBarItem from '@/app/ui/metrics/truck-factor-stat-bar';
 import Survey10point from '@/app/ui/metrics/survey-10-point';
 import SurveyCEAB from '@/app/ui/metrics/survey-ceab';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
+import PersonalJoyChart from '@/app/ui/metrics/personal-joy-graph';
+import '@/app/ui/stylesheets/joyRatingInput.css'
+
+import Link from 'next/link';
+
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
 import { useRouter } from 'next/router';
@@ -21,6 +26,7 @@ import '@/app/ui/stylesheets/courseDetails.css';
 import MoonLight from '@/app/ui/logo_module';
 import { group } from 'console';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function Metrics() {
     const router = useRouter();
@@ -86,6 +92,13 @@ export default function Metrics() {
             
             console.log('Group ID:', group_id);
             fetchUsername(group_id);
+            // try{
+            //     // const graph_type = router.query.graphType
+            //     // console.log('GRAPH TYPE: ', graph_type)
+            //     // setSelectedGraphType(graph_type)
+            // } catch {
+
+            // }
         }
 
        
@@ -134,6 +147,8 @@ const showSurvey = async () => {
 
 
         
+    //     console.log('GRAPH TYPE: ', router.query.graphType)
+    // }, [selectedGraphType])   
       
 
     async function fetchUsername(group_id) {
@@ -215,20 +230,25 @@ const showSurvey = async () => {
 
 
         //check if Scrum Master: 
-        const scrum_master_response = await fetch('http://localhost:3001/check-scrum-master?groupId=' + groupId + '&localId=' + localId)
-
-        const data = await scrum_master_response.json()
+        const scrum_master_response = await fetch('http://localhost:3001/check-scrum-master?groupId=' + groupId + '&localId=' + localId).catch(
+            (error) => {console.log(error)})
         
-        if(data.approved){
-            console.log('User is a scrum master')
-            setIsScrumMaster(true)
-            
-        }
-
-        else{
-            console.log('User is not a scrum master')
+        try{
+            const data = await scrum_master_response.json()
+        
+            if(data.approved){
+                console.log('User is a scrum master')
+                setIsScrumMaster(true)
+            }
+    
+            else{
+                console.log('User is not a scrum master')
+                setIsScrumMaster(false)
+            }
+        } catch {
             setIsScrumMaster(false)
         }
+        
 
         setIsRoleLoaded(true)
     }
@@ -379,8 +399,10 @@ const showSurvey = async () => {
                 ) : (
                     <>
                         <div className="chart-container">
-                            
                             <ContributionsGraph group_id={groupId} username={username} />
+                        </div>
+                        <div className='chart-container'>
+                            <PersonalJoyChart group_id={groupId} />
                         </div>
                     </>
                 )}
