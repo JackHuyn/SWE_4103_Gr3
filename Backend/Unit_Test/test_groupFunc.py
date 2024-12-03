@@ -132,7 +132,7 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         result = self.db_wrapper.addScrumMasterToGroup("group123", scrum_master=scrum_master)
 
         # Check that the scrum master is added to the group using ArrayUnion
-        mock_doc.update.assert_called_once_with({"scrum_master": ArrayUnion(scrum_master)})
+        mock_doc.update.assert_called_once_with({"scrum_master": ArrayUnion([scrum_master])})
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
