@@ -19,17 +19,14 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         # Simulate no existing group with the same group_id
         self.db_wrapper.getProjectGroups = MagicMock(return_value=[])  # No existing groups
         self.db_wrapper.getProjectData = MagicMock(return_value={"project_name": "Project 1"})
-
         result = self.db_wrapper.addGroup(
             project_id="proj123",
             student_ids=["student1", "student2"],
             github_repo_address="https://github.com/repo",
             scrum_master=["student1"]
         )
-
         # Check that the group is added with the correct data
         group_id = "proj123_gr1"  # Expected group ID
-
         expected_calls = [
             call({
                 "group_id": group_id,
@@ -82,10 +79,8 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
                 "student_id": "student2"
             })
         ]
-
         # Check that set was called with the correct arguments
         self.mock_db.collection.return_value.document.return_value.set.assert_has_calls(expected_calls)
-
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
@@ -93,28 +88,70 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         # Simulate existing groups under the same project
         self.db_wrapper.getProjectGroups = MagicMock(return_value=[{"group_id": "proj123_gr1"}])
         self.db_wrapper.getProjectData = MagicMock(return_value={"project_name": "Project 1"})
-
         result = self.db_wrapper.addGroup(
             project_id="proj123",
             student_ids=["student1", "student2"],
             github_repo_address="https://github.com/repo",
             scrum_master=["student1"]
         )
-
         # Since the group ID already exists, it should create a new group ID
         group_id = "proj123_gr2"  # Expected group ID for the second group
-        self.mock_db.collection.return_value.document.return_value.set.assert_called_once_with({
-            "group_id": group_id,
-            "group_name": "Project 1 Group 2",
-            "project_id": "proj123",
-            "student_ids": ["student1", "student2"],
-            "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
-            "github_repo_address": "https://github.com/repo",
-            "scrum_master": ["student1"],
-            "show_survey": 0
-        })
+        expected_calls = [
+            call({
+                "group_id": group_id,
+                "group_name": "Project 1 Group 2",
+                "project_id": "proj123",
+                "student_ids": ["student1", "student2"],
+                "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
+                "github_repo_address": "https://github.com/repo",
+                "scrum_master": ["student1"],
+                "show_survey": 0
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "assessment_table": {"student1": "N/A", "student2": "N/A"},
+                "scaling_factors": {"student1": "N/A", "student2": "N/A"}
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "questionnaire": {
+                    "Q1": {"student1": "N/A", "student2": "N/A"},
+                    "Q2": {"student1": "N/A", "student2": "N/A"},
+                    "Q3": {"student1": "N/A", "student2": "N/A"},
+                    "Q4": {"student1": "N/A", "student2": "N/A"},
+                    "Q5": {"student1": "N/A", "student2": "N/A"},
+                    "Q6": {"student1": "N/A", "student2": "N/A"},
+                    "Q7": {"student1": "N/A", "student2": "N/A"},
+                    "Q8": {"student1": "N/A", "student2": "N/A"},
+                    "Q9": {"student1": "N/A", "student2": "N/A"},
+                    "Q10": {"student1": "N/A", "student2": "N/A"}
+                },
+                "student_id": "student2"
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "questionnaire": {
+                    "Q1": {"student1": "N/A", "student2": "N/A"},
+                    "Q2": {"student1": "N/A", "student2": "N/A"},
+                    "Q3": {"student1": "N/A", "student2": "N/A"},
+                    "Q4": {"student1": "N/A", "student2": "N/A"},
+                    "Q5": {"student1": "N/A", "student2": "N/A"},
+                    "Q6": {"student1": "N/A", "student2": "N/A"},
+                    "Q7": {"student1": "N/A", "student2": "N/A"},
+                    "Q8": {"student1": "N/A", "student2": "N/A"},
+                    "Q9": {"student1": "N/A", "student2": "N/A"},
+                    "Q10": {"student1": "N/A", "student2": "N/A"}
+                },
+                "student_id": "student2"
+            })
+        ]
+        # Check that set was called with the correct arguments
+        self.mock_db.collection.return_value.document.return_value.set.assert_has_calls(expected_calls)
         self.assertTrue(result)
-
+        
     @patch("firebase_admin.firestore.client")
     def test_getGroupData(self, mock_firestore_client):
         # Mock document to return specific group data
