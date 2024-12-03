@@ -151,7 +151,7 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         # Check that set was called with the correct arguments
         self.mock_db.collection.return_value.document.return_value.set.assert_has_calls(expected_calls)
         self.assertTrue(result)
-        
+
     @patch("firebase_admin.firestore.client")
     def test_getGroupData(self, mock_firestore_client):
         # Mock document to return specific group data
@@ -200,11 +200,15 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         # Simulate adding a student to a group
         mock_doc = MagicMock()
         self.mock_db.collection.return_value.document.return_value = mock_doc
-
         result = self.db_wrapper.addStudentToGroup("group123", "student1")
-
-        # Check that the student is added to the group
-        mock_doc.update.assert_called_once_with({"student_ids": ArrayUnion(["student1"])})
+        # Check that update was called with the correct arguments
+        expected_calls = [
+            call({'student_ids': ArrayUnion(["student1"])}),
+            call({'assessment_table.student1': 'N/A'}),
+            call({'scaling_factors.student1': 'N/A'})
+        ]
+        # Check that update was called with the expected arguments
+        mock_doc.update.assert_has_calls(expected_calls)
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
