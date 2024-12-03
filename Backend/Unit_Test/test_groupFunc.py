@@ -3,6 +3,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from unittest.mock import MagicMock, patch
+from unittest.mock import call
 from google.cloud.firestore_v1 import ArrayUnion
 from DbWrapper.DbWrapper import DbWrapper  
 import datetime
@@ -28,16 +29,63 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
 
         # Check that the group is added with the correct data
         group_id = "proj123_gr1"  # Expected group ID
-        self.mock_db.collection.return_value.document.return_value.set.assert_called_once_with({
-            "group_id": group_id,
-            "group_name": "Project 1 Group 1",
-            "project_id": "proj123",
-            "student_ids": ["student1", "student2"],
-            "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
-            "github_repo_address": "https://github.com/repo",
-            "scrum_master": ["student1"],
-            "show_survey": 0
-        })
+
+        expected_calls = [
+            call({
+                "group_id": group_id,
+                "group_name": "Project 1 Group 1",
+                "project_id": "proj123",
+                "student_ids": ["student1", "student2"],
+                "avg_joy": {datetime.datetime.today().strftime("%d/%m/%Y"): 'None'},
+                "github_repo_address": "https://github.com/repo",
+                "scrum_master": ["student1"],
+                "show_survey": 0
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "assessment_table": {"student1": "N/A", "student2": "N/A"},
+                "scaling_factors": {"student1": "N/A", "student2": "N/A"}
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "questionnaire": {
+                    "Q1": {"student1": "N/A", "student2": "N/A"},
+                    "Q2": {"student1": "N/A", "student2": "N/A"},
+                    "Q3": {"student1": "N/A", "student2": "N/A"},
+                    "Q4": {"student1": "N/A", "student2": "N/A"},
+                    "Q5": {"student1": "N/A", "student2": "N/A"},
+                    "Q6": {"student1": "N/A", "student2": "N/A"},
+                    "Q7": {"student1": "N/A", "student2": "N/A"},
+                    "Q8": {"student1": "N/A", "student2": "N/A"},
+                    "Q9": {"student1": "N/A", "student2": "N/A"},
+                    "Q10": {"student1": "N/A", "student2": "N/A"}
+                },
+                "student_id": "student2"
+            }),
+            call({
+                "group_id": group_id,
+                "project_id": "proj123",
+                "questionnaire": {
+                    "Q1": {"student1": "N/A", "student2": "N/A"},
+                    "Q2": {"student1": "N/A", "student2": "N/A"},
+                    "Q3": {"student1": "N/A", "student2": "N/A"},
+                    "Q4": {"student1": "N/A", "student2": "N/A"},
+                    "Q5": {"student1": "N/A", "student2": "N/A"},
+                    "Q6": {"student1": "N/A", "student2": "N/A"},
+                    "Q7": {"student1": "N/A", "student2": "N/A"},
+                    "Q8": {"student1": "N/A", "student2": "N/A"},
+                    "Q9": {"student1": "N/A", "student2": "N/A"},
+                    "Q10": {"student1": "N/A", "student2": "N/A"}
+                },
+                "student_id": "student2"
+            })
+        ]
+
+        # Check that set was called with the correct arguments
+        self.mock_db.collection.return_value.document.return_value.set.assert_has_calls(expected_calls)
+
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")
