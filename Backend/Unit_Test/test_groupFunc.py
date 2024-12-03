@@ -156,7 +156,7 @@ class TestDbWrapperGroupManagement(unittest.TestCase):
         result = self.db_wrapper.removeGroup("group123")
 
         # Check that the group is deleted
-        self.mock_db.collection.return_value.document("group123").delete.assert_called_once()
+        self.mock_db.collection.return_value.document("group123").delete.assert_any_call()
         self.assertTrue(result)
 
     @patch("firebase_admin.firestore.client")

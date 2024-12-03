@@ -296,9 +296,9 @@ class DbWrapper:
                 template["group_id"] = group_id
                 template["group_name"] = f'{projData["project_name"]} Group {group_n}'
             else:
-                p = self.db.collection(GROUPS).document(group_id).set(template)
-                q = self.addTenPointPeerAssessment(project_id, group_id, student_ids)
-                r = self.addCEABAssessmentTable(project_id, group_id, student_ids)
+                self.db.collection(GROUPS).document(group_id).set(template)
+                self.addTenPointPeerAssessment(project_id, group_id, student_ids)
+                self.addCEABAssessmentTable(project_id, group_id, student_ids)
                 inserted = True
         return True
     
