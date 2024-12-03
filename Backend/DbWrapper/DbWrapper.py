@@ -266,7 +266,7 @@ class DbWrapper:
             return False
         
 
-    def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]="")->bool:
+    def addGroup(self, project_id:str, student_ids:list[str]=[], github_repo_address:str="", scrum_master:list[str]=[])->bool:
         x = self.getProjectGroups(project_id)
         group_n = len(x) + 1
         template = {}
