@@ -11,9 +11,11 @@ import SurveyCEAB from '@/app/ui/metrics/survey-ceab';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import PersonalJoyChart from '@/app/ui/metrics/personal-joy-graph';
 import '@/app/ui/stylesheets/joyRatingInput.css'
+import Link from 'next/link';
 
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
+import '@/app/ui/stylesheets/homelogout.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { Button } from 'app/ui/button';

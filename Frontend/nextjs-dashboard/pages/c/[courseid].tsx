@@ -423,7 +423,7 @@ if (projectData) {
                 <button className="popup_button" onClick={handleAddProject}>
                   Add Project
                 </button>
-                <button className="popup_button cancel_button" onClick={() => setIsProjectPopupVisible(false)}>
+                <button className="popup_button cancel_button" onClick={() => setIsProjectPopup1Visible(false)}>
                   Cancel
                 </button>
               </div>
@@ -549,11 +549,12 @@ if (projectData) {
                     {student.first_name+" "+student.last_name}
                   </div>
                   <div className="checkbox-column">
+                    <div className="checkbox-wrapper">
                     <input
                       type="checkbox"
                       onChange={() => handleCheckboxChange(student.uid)}
                       checked={selectedStudents.includes(student.uid)}
-                    />
+                    /></div>
                   </div>
                 </div>
               ))}

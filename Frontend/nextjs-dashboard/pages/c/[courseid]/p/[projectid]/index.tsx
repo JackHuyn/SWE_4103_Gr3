@@ -39,6 +39,7 @@ export default function ProjectDetails(){
   const [removedGroups, setRemovedGroups] = useState([]);
   const [groupData, setgroupData] = useState([]);
   const [studentList, setStudentList] = useState([]);
+  const [nGroups, setNGroups] = useState("1");
   const [userRole, setUserRole] = useState('')  
   const [loading,setLoading] = useState(true) // Loading state
   const inputRef = useRef(null); // Create a ref for the input field
@@ -101,7 +102,8 @@ const handleAddGroup = async () => {
     window.location.href = "/auth/login"
   }
   const groupData = {              
-    project_id: projectid
+    project_id: projectid,
+    n_groups: nGroups
   };
   try {              
     //Need to have checks to ensure that the instructor is valid 
