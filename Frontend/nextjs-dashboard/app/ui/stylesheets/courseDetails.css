@@ -174,7 +174,13 @@ a:visited {
 .students-list {
     display: flex;
     flex-direction: column;
+    padding: 8px;
+    border-radius: 4px;
     gap: 10px;
+    max-height: 600px;
+    overflow-y: scroll;
+    padding-right: 16px;
+    box-sizing: content-box;
 }
 
 .student-card {

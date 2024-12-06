@@ -78,9 +78,46 @@ class StudentMetrics:
         # ]
         return self.db.getTeamVelocity(group_id)
     
-    def submit_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
+    def get_team_velocity(self, group_id):
+        return self.db.getTeamVelocity(group_id)
+
+    def add_team_velocity(self, group_id, start_date, end_date, planned_story_points, completed_story_points):
         return self.db.addVelocityData(group_id, start_date, end_date, planned_story_points, completed_story_points)
+
+    def modify_team_velocity(self, velocity_id, sprint_start, sprint_end, points):
+        return self.db.updateVelocityData(velocity_id, sprint_start, sprint_end, points)
     
+    def remove_team_velocity(self, velocity_id):
+        return self.db.removeVelocity(velocity_id)
+
+    def ten_point_assessment_handler(self, group_id, current_student_id ,student_ids: list[str], points: list[int]):
+        if len(student_ids) <= 1 or sum(points) > len(student_ids) * 10:
+            return False
+        
+        if len(student_ids) != len(points):
+            raise ValueError("Number of students and points must be equal.")
+        try:
+            for student, point in zip(student_ids, points):
+                if student != current_student_id:
+                    self.add_student_10point_assessment(group_id, student, point)
+            return True
+        except:
+            print("Error adding assessments")
+            return False
+    
+    def add_student_10point_assessment(self, group_id, student_id, points):
+        return self.db.addStudentTenPointPeerAssessmentEntry(group_id, student_id, points)
+    
+    def get_student_scaling_factor(self, group_id, student_id):
+        return self.db.getStudentScalingFactor(self, group_id, student_id)
+    
+    def get_student_CEAB_answers(self, group_id:str, student_id:str=""):
+        return self.db.getStudentCEABAnswers(group_id, student_id)
+
+    
+    def add_student_CEAB_assessement(self,group_id: str, student_id: str, grades: list[dict] ):
+        return self.db.addStudentCEABAssessementEntry(group_id, student_id, grades)
+
     def get_github_contribution_stats(self, auth, group_id):
         repo_address = self.db.getGithubRepoAddress(group_id)
         git = github.GitHubManager(auth, repo_address)

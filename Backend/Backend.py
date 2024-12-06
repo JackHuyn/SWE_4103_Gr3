@@ -65,7 +65,7 @@ def signup_user():
             raise Exception
         signup_resp = firebase_auth.sign_up_with_email_and_password(fname, lname, email, password)
 
-        dbWrapper.addUser(account_type,email,fname,lname, signup_resp.uid, display_name)
+        dbWrapper.addUser(account_type,email,fname,lname,signup_resp.uid,display_name)
         
         
         print(signup_resp)
@@ -162,17 +162,16 @@ def getGroupStudents():
 
     try:
         group_id = request.args.get("groupId", default="-1",type=str)
-        local_id = request.args.get("localId", default="-1",type=str)
         group_data = getGroupData(group_id)
-        list_of_students = group_data['student_ids']
-
+        list_of_ids = group_data['student_ids']
+        list_of_students = []
+        for student in list_of_ids:
+            list_of_students.append(dbWrapper.getUserData(student))
         response = app.response_class(
             response=json.dumps({'approved': True, 'student_list': list_of_students}),
             status=200,
             mimetype='application/json'
         )
-
-    
 
     except:
          response = app.response_class(
@@ -197,9 +196,11 @@ def check_scrum_master_role():
     try:
         group_data = getGroupData(group_id)
         scrum_master_list = group_data['scrum_master']
-        
-        if(scrum_master_list == local_id):
-            is_scrum_master = True
+        for scrum in scrum_master_list:
+            if(scrum == local_id):
+                is_scrum_master = True
+                break
+        print(local_id+" is scrum master: "+str(is_scrum_master))
     except Exception as e:
         pass
     
@@ -244,15 +245,15 @@ def check_instructor_role():
 @app.route('/auth/validate-session', methods=['GET'])
 @cross_origin()
 def validate_session():
-    local_id = request.args.get("localId", default = "", type = str)
-    id_token = request.args.get("idToken", default = "", type = str)
+    local_id = request.args.get("localId", default = -1, type = str)
+    id_token = request.args.get("idToken", default = -1, type = str)
     valid = firebase_auth.validate_token(local_id, id_token)
     response = app.response_class(
         response=json.dumps({'approved': valid}),
         status=200 if valid else 401,
         mimetype='application/json'
     )
-    # print(response.response)
+    print(response.response)
     return response
 
 @app.route('/auth/password-reset', methods=['POST'])
@@ -683,9 +684,9 @@ def add_a_student():
         lname = data.get('student_lname','')
         email = data.get('student_email','')
         success = False
-        if not (course_id or student_fname or student_lname or student_email):
+        if not (course_id or fname or lname or email):
             raise ValueError("Missing required fields")
-        student_dict = dbWrapper.findUser(student_email)
+        student_dict = dbWrapper.findUser(email)
         if student_dict != None:
             student_id = student_dict['uid']
             if dbWrapper.addStudentToCourse(student_id, course_id):
@@ -798,8 +799,15 @@ def remove_students_course():
         remove_list = data.get('remove_list', [])
         success = False
         for student in remove_list:
-            print(student['uid'])
-            success = True
+            student_id = student['uid']
+            success = dbWrapper.removeStudentFromCourse(student_id, course_id)
+            projects = dbWrapper.getCourseProjects(course_id)
+            for project in projects:
+                project_id = project['project_id']
+                groups = dbWrapper.getProjectGroups(project_id)
+                for group in groups:
+                    group_id = group['group_id']
+                    dbWrapper.removeStudentFromGroup(student_id, group_id)  
         if success:
             response = app.response_class(
                 response=json.dumps({'approved': True, 'message': 'Students removed successfully'}),
@@ -858,6 +866,198 @@ def remove_groups():
             mimetype='application/json'
         )
         return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route manage students in groups
+@app.route('/manage-groups', methods=['POST'])
+@cross_origin()
+def manage_groups():
+    try:
+        data = request.get_json()
+        manage_list = data.get('manage_list', [])
+        scrum_masters = data.get('master_list', [])
+        success = False
+        for student,group in manage_list:
+            if dbWrapper.addStudentToGroup(group,student):
+                success = True
+            else:
+                success = False
+                break
+        for master,group in scrum_masters:
+            print("add scrummaster")
+            print('group:' + group)
+            print('scrum master' + master)
+            if dbWrapper.addScrumMasterToGroup(group,master):
+                success = True
+                print("addScrumMasterToGroup("+group+","+master+") -> true")
+            else:
+                success = False
+                print("addScrumMasterToGroup("+group+","+master+") -> false")
+                break
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'Students added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add students'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response    
+#----------------------------------
+#Author: Sarun Weerakul
+#This route handle 10 point survey
+@app.route('/survey-points', methods=['POST'])
+@cross_origin()
+def add_10_point_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        student_id = data.get('student_id','')
+        points = data.get('all_points',[])
+        success = False
+        if not (group_id or student_id or points):
+            raise ValueError("Missing required fields")
+        ids_list = []
+        points_list = []
+        for point in points:
+            ids_list.append(point['studentId'])
+            points_list.append(point['points'])
+        success = metrics.ten_point_assessment_handler(group_id, student_id, ids_list, points_list)
+        for id, point in zip(ids_list, points_list):
+            metrics.add_student_10point_assessment(group_id, id, point)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': '10 points survey added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add 10 points survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
+#Author: Sarun Weerakul
+#This route handle CEAB survey
+@app.route('/survey-ceab', methods=['POST'])
+@cross_origin()
+def add_ceab_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        student_id = data.get('student_id','')
+        points = data.get('points',[])
+        success = False
+        if not (group_id or student_id or points):
+            raise ValueError("Missing required fields")
+        results_list = []
+        for i in range(1,11):
+            result ={}
+            for student in points:
+                id = student['studentId']
+                point = student['points']
+                result[id] = point[f'Q{i}']
+            results_list.append(result)
+        success = metrics.add_student_CEAB_assessement(group_id, student_id, results_list)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': '10 points survey added successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to add 10 points survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
+#----------------------------------
+#Author: Sarun Weerakul
+#This route handle show survey
+@app.route('/show-survey', methods=['POST'])
+@cross_origin()
+def show_survey():
+    try:
+        data = request.get_json()
+        group_id = data.get('group_id','')
+        success = False
+        success = dbWrapper.showSurveys(group_id)
+        if success:
+            response = app.response_class(
+                response=json.dumps({'approved': True, 'message': 'show surveys successfully'}),
+                status=200,
+                mimetype='application/json'
+            )
+        else:
+            response = app.response_class(
+                response=json.dumps({'approved': False, 'reason': 'Failed to show survey'}),
+                status=500,
+                mimetype='application/json'
+            )
+        return response
+    except ValueError as ve:
+        print(ve)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': str(ve)}),
+            status=400,
+            mimetype='application/json'
+        )
+        return response
+    except Exception as e:
+        print(e)
+        response = app.response_class(
+            response=json.dumps({'approved': False, 'reason': 'Server Error'}),
+            status=500,
+            mimetype='application/json'
+        )
+        return response
 #----------------------------------
 
 # Leora Mascarenhas 
@@ -1476,7 +1676,12 @@ def show_groups():
     try:  
         
         list_of_groups = dbWrapper.getProjectGroups(project_id)
-      
+        course_id = dbWrapper.getProjectData(project_id)['course_id']
+        list_of_students = dbWrapper.getCourseData(course_id)['student_ids']
+        students = []
+        for student in list_of_students:
+            toadd = dbWrapper.getUserData(student)
+            students.append(toadd)
 
         response = app.response_class(
             response=json.dumps({'approved': True, 'id': 'valid'}),
@@ -1485,13 +1690,14 @@ def show_groups():
         )
 
 
-        if list_of_groups:
+        if list_of_groups or list_of_students:
             
             print("converting")
             response = app.response_class(
                 response=json.dumps({
                     'approved': True,
-                    'groups': list_of_groups
+                    'groups': list_of_groups,
+                    'students': students
                 }),
                 status=200,
                 mimetype='application/json'
@@ -1621,7 +1827,7 @@ def add_group():
             success = dbWrapper.addGroup(
                 project_id,
                 #Hard coded students : test@unb.ca, anon@anon.com, will@unb.ca
-                ['x4jaePpUW0Vnz8zB8BNFWy2HXYB2', 'vTRZQxoDzWTtPYCOPr8LxIcJk702', 'G4rI7g4ChTbkkQwtXjZBxaI7fRj1']  # Hard coding students for now
+                []  # Hard coding students for now
             )
         
         else:

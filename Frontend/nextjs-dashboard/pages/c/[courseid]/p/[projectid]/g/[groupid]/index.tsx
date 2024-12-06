@@ -6,25 +6,31 @@ import TeamVelocityGraph from '@/app/ui/metrics/team-velocity-graph';
 import TeamVelocityInput from '@/app/ui/metrics/team-velocity-input';
 import TruckFactorInput from '@/app/ui/metrics/truck-factor-input';
 import TruckFactorStatBarItem from '@/app/ui/metrics/truck-factor-stat-bar';
+import Survey10point from '@/app/ui/metrics/survey-10-point';
+import SurveyCEAB from '@/app/ui/metrics/survey-ceab';
 import GitHubAppAuthorizationDialog from '@/app/ui/metrics/github-app-authorization-dialog'
 import PersonalJoyChart from '@/app/ui/metrics/personal-joy-graph';
 import '@/app/ui/stylesheets/joyRatingInput.css'
-
 import Link from 'next/link';
 
 import '@/app/ui/stylesheets/metrics.css';
 import '@/app/ui/stylesheets/coursePage.css';
-import '@/app/ui/stylesheets/homelogout.css'
+import '@/app/ui/stylesheets/homelogout.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
+import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import HandleLogout from '@/app/ui/logout';
+import '@/app/ui/stylesheets/popup.css';
+import '@/app/ui/stylesheets/courseDetails.css';
 import MoonLight from '@/app/ui/logo_module';
 import { group } from 'console';
+import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function Metrics() {
     const router = useRouter();
+    const localId = Cookies.get('localId');
     const [groupId, setGroupId] = useState(null);
     const [isTruckFactorInputVisible, setIsTruckFactorInputVisible] = useState(false)
     const [isJoyRatingDialogVisible, setIsJoyRatingDialogVisible] = useState(false)
@@ -36,11 +42,28 @@ export default function Metrics() {
     const [isScrumMaster, setIsScrumMaster] = useState(false)
     const [isRoleLoaded, setIsRoleLoaded] = useState(false);
     const [githubRepo, setGithubRepo] = useState(''); // Store the new course name
+    const [isSurveyPopupVisible, setIsSurveyPopupVisible] = useState(false);
+    const [isCEABPopupVisible, setIsCEABPopupVisible] = useState(false);
+    const [studentList, setStudentList] = useState([]);
 
     function openAddGithubRepoDialog(){
         setIsGithubDialogVisible(true);
     }
 
+    function survey() {
+        setIsSurveyPopupVisible(true);
+    }
+
+    function ceab() {
+        setIsCEABPopupVisible(true);
+    }
+
+
+    function closeDialogs() {
+        setIsGithubDialogVisible(false);
+        setIsSurveyPopupVisible(false);
+        setIsCEABPopupVisible(false);
+    }
 
     // Close dialog only if click is on backdrop
     function handleBackdropClick(event) {
@@ -52,10 +75,12 @@ export default function Metrics() {
     }
 
     useEffect(() => {
+        
         if (router.isReady) {
 
             const group_id = router.query.groupid;
             setGroupId(group_id);
+            
             console.log('Group ID:', group_id);
             fetchUsername(group_id);
             // try{
@@ -83,12 +108,35 @@ export default function Metrics() {
         }
       }, [groupId]);
 
-    // useEffect(() => {
-    //     if(selectedGraphType)
-    //     {
-    //         router.query.graphType = selectedGraphType
-    //         // router.push(router)
-    //     }
+//Function: handle show survey
+const showSurvey = async () => {
+    const groupData = {              
+      group_id: groupId
+    };
+    try {              
+      const response = await fetch('http://localhost:3001/show-survey' , {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(groupData),  // Send JSON data in request body
+      });
+      const result = await response.json();
+      if (response.ok) {
+        window.location.reload();
+        alert('show survey successfully!');
+        window.location.reload();
+      } else {
+        alert(`Error showing survey: ${result.reason}`);
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      alert('Error showing survey. Please try again later.');
+    }    
+  };
+//-------------------------------------------------
+
+
         
     //     console.log('GRAPH TYPE: ', router.query.graphType)
     // }, [selectedGraphType])   
@@ -251,7 +299,6 @@ export default function Metrics() {
         else{
             alert('please enter a repository')
         }
-
     }
 
     return (
@@ -273,17 +320,18 @@ export default function Metrics() {
             <div className="group-id">
                     {groupId ? `${groupId.split('_').pop().toUpperCase()} METRICS` : 'Loading Metrics...'}
             </div>
-
+            
             {isRoleLoaded && (
+  
                 <div className="metrics-controls">
                 <div className="right-buttons">
 
                     {/* Check if student  */}
                     {userRole === '0' && (
                     <>
-                           <button className="metrics-button" onClick={openJoyRatingDialog}>
-                            Joy Rating Input
-                           </button>
+                           <button className="metrics-button" onClick={openJoyRatingDialog}>Joy Rating Input</button>
+                           <button className="metrics-button" onClick={survey}>10 points Survey</button>
+                           <button className="metrics-button" onClick={ceab}>CEAB Survey</button>
                            <button className="metrics-button" onClick={openTruckFactorInput}>
                             Open Truck Factor Dialog
                             </button>
@@ -291,15 +339,18 @@ export default function Metrics() {
                            {isScrumMaster && 
                             (
                                 <>
-                                <button className="metrics-button" onClick={openTeamVelocityDialog}>
-                                Team Velocity Input
-                                </button>
+                                <button className="metrics-button" onClick={showSurvey}>Activate Survey</button>
+                                <button className="metrics-button" onClick={openTeamVelocityDialog}>Team Velocity Input</button>
                                 <button className="metrics-button" onClick={openAddGithubRepoDialog}>Add Github Repo</button>
                                 </>
                             )}
                             
                     </>
                     )}
+
+
+                    
+                    {/* Add checks once surveys are ready  */}
                 </div>
                 <select
                     className="metrics-dropdown"
@@ -348,25 +399,37 @@ export default function Metrics() {
                 )}
             </div>
 
-            {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible || isTruckFactorInputVisible) && (
+            {(isJoyRatingDialogVisible || isTeamVelocityDialogVisible || isGithubDialogVisible || isSurveyPopupVisible || isCEABPopupVisible || isTruckFactorInputVisible) && (
                 <div
                     id="metrics-dialog-backdrop"
                     onClick={handleBackdropClick}
-                    aria-hidden={!isJoyRatingDialogVisible && !isTeamVelocityDialogVisible && !isGithubDialogVisible && !isTruckFactorInputVisible}
+                    aria-hidden={!isJoyRatingDialogVisible && !isTeamVelocityDialogVisible && !isGithubDialogVisible && !isTruckFactorInputVisible && !isSurveyPopupVisible && !isCEABPopupVisible}
                     
                 >
                     {isJoyRatingDialogVisible && (
                         <div id="joy-rating-dialog" className="dialog">
                             <h2>Joy Rating Input</h2>
-                            <JoyRatingInput closeDialogs={closeDialogs} />
+                            <JoyRatingInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
                         </div>
                     )}
                     {isTeamVelocityDialogVisible && (
                         <div id="team-velocity-dialog" className="dialog">
                             <h2>Team Velocity Input</h2>
-                            <TeamVelocityInput closeDialogs={closeDialogs} />
+                            <TeamVelocityInput closeDialogs={closeDialogs}/>
                             <button onClick={closeDialogs}>Close</button>
+                        </div>
+                    )}
+                    {isSurveyPopupVisible &&  (
+                        <div id="joy-rating-dialog" className="dialog">
+                            <Survey10point closeDialogs={closeDialogs}/>
+                            <button onClick={() => setIsSurveyPopupVisible(false)}>Close</button>
+                        </div>
+                    )}
+                    {isCEABPopupVisible &&  (
+                        <div id="joy-rating-dialog" className="dialog">
+                            <SurveyCEAB closeDialogs={closeDialogs}/>
+                            <button onClick={() => setIsCEABPopupVisible(false)}>Close</button>
                         </div>
                     )}
                     {isTruckFactorInputVisible && (

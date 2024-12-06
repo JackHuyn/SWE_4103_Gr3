@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from 'app/ui/button';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
-import HandleLogout from '@/app/ui/logout';
 import '@/app/ui/stylesheets/courseDetails.css';
 import '@/app/ui/stylesheets/loading.css';
 import '@/app/ui/stylesheets/popup.css';
@@ -12,6 +11,7 @@ import '@/app/ui/stylesheets/coursePage.css';
 import '@/app/ui/stylesheets/homelogout.css'
 import { group } from 'console';
 import MoonLight from '@/app/ui/logo_module';
+import HandleLogout from '@/app/ui/logout';
 
 
 /**
@@ -32,14 +32,17 @@ export default function ProjectDetails(){
   const [newGroupName, setNewGroupName] = useState('');
   const [isaddGroupVisible, setIsAddGroupVisible] = useState(false);// Stores true or false depending on if the popup is visible
   const [isRemoveGroupVisible, setIsRemoveGroupVisible] = useState(false);
-  const [selectedGroups, setSelectedGroups] = useState([]);
+  const [isManageGroupVisible, setIsManageGroupVisible] = useState(false);
+  const [selectedGroups1, setSelectedGroups1] = useState([]);//for remove group
+  const [selectedGroups2, setSelectedGroups2] = useState([]);//for manage student-group
+  const [selectedGroups3, setSelectedGroups3] = useState([]);//for set scrum master
   const [removedGroups, setRemovedGroups] = useState([]);
   const [groupData, setgroupData] = useState([]);
+  const [studentList, setStudentList] = useState([]);
+  const [nGroups, setNGroups] = useState("1");
   const [userRole, setUserRole] = useState('')  
   const [loading,setLoading] = useState(true) // Loading state
   const inputRef = useRef(null); // Create a ref for the input field
-  const [nGroups, setNGroups] = useState("1");
-  
 
   useEffect(() => {
     setCourseId(router.query.courseid)
@@ -65,6 +68,7 @@ export default function ProjectDetails(){
             const data = await res.json();
             if(data.approved) {
               setGroupDetails(data);
+              setStudentList(data.students)
             }
           }
           else  {
@@ -91,9 +95,7 @@ const addGroup = () =>{
   setIsAddGroupVisible(true);
 };
 //Function: handle add group
-const handleAddGroup = async () => {
-  //console.log("The number found is : ", nGroups)  
-  //return          
+const handleAddGroup = async () => {            
   //Ensure localId cookie is valid
   const localId  = Cookies.get('localId')  
   if (!localId){
@@ -105,8 +107,6 @@ const handleAddGroup = async () => {
   };
   try {              
     //Need to have checks to ensure that the instructor is valid 
-
-    
     const response = await fetch('http://localhost:3001/add-group' , {
       method: 'POST',
       headers: {
@@ -114,7 +114,6 @@ const handleAddGroup = async () => {
       },
       body: JSON.stringify(groupData),  // Send JSON data in request body
     });
-
     const result = await response.json();
     if (response.ok) {
       window.location.reload();
@@ -135,8 +134,8 @@ const removeGroups = () =>{
   setIsRemoveGroupVisible(true);
 };
 //Function: handle checkbox change
-const handleCheckboxChange = (groupId) => {
-  setSelectedGroups((prevSelected) => {
+const handleCheckboxChange1 = (groupId) => {
+  setSelectedGroups1((prevSelected) => {
       if (prevSelected.includes(groupId)) {
           return prevSelected.filter((id) => id !== groupId);
       } else {
@@ -150,9 +149,9 @@ const handleRemoveGroups = async () => {
   if (!localId){
       window.location.href = "/auth/login"
   }
-  const groupsToRemove = groupDetails?.groups?.filter(group => selectedGroups.includes(group.group_id));
+  const groupsToRemove = groupDetails?.groups?.filter(group => selectedGroups1.includes(group.group_id));
   setRemovedGroups(groupsToRemove); // Store removed groups in the state
-  setSelectedGroups([]); // Clear the selected groups after removal
+  setSelectedGroups1([]); // Clear the selected groups after removal
   const removedList = {
       remove_list: groupsToRemove
   };
@@ -175,7 +174,63 @@ const handleRemoveGroups = async () => {
   alert('Error removing group. Please try again later.');
   }
 };
-
+//-------------------------------------------------
+//------------------ Manage Group -----------------
+//Function: set visibiliy of manageGroup popup
+const manageGroups = () =>{
+  setIsManageGroupVisible(true);
+};
+//Function: handle student-group checkbox change
+const handleCheckboxChange2 = (studentId, groupId) => {
+  setSelectedGroups2((prevSelected) => {
+    const newPair = JSON.stringify([studentId, groupId]);
+    if (prevSelected.some(pair => JSON.stringify(pair) === newPair)) {
+        return prevSelected.filter(pair => JSON.stringify(pair) !== newPair);
+    } else {
+          return [...prevSelected, [studentId, groupId]];
+      }
+  });
+};
+//Function: handle scrum master checkbox change
+const handleCheckboxChange3 = (studentId, groupId) => {
+  setSelectedGroups3((prevSelected) => {
+    const newPair = JSON.stringify([studentId, groupId]);
+    if (prevSelected.some(pair => JSON.stringify(pair) === newPair)) {
+        return prevSelected.filter(pair => JSON.stringify(pair) !== newPair);
+    } else {
+          return [...prevSelected, [studentId, groupId]];
+      }
+  });
+};
+//Function: handle manage groups
+const handleManageGroups = async () => {
+  const localId  = Cookies.get('localId')
+  if (!localId){
+      window.location.href = "/auth/login"
+  }
+  const manageList = {
+      manage_list: selectedGroups2,
+      master_list: selectedGroups3
+  };
+  try { 
+      const response = await fetch('http://localhost:3001/manage-groups' , {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json',},
+          body: JSON.stringify(manageList),
+      });
+      const result = await response.json();
+      if (response.ok) {
+          window.location.reload();
+          alert('managed successfully!');
+          window.location.reload();
+      } else {
+          alert(`Error managing groups: ${result.reason}`);
+      }
+  } catch (error) {
+  console.error('Error sending request:', error);
+  alert('Error managing group. Please try again later.');
+  }
+}
 
 const handleChangeNumber = (event) => {
   const value = event.target.value;
@@ -183,8 +238,6 @@ const handleChangeNumber = (event) => {
   setNGroups(value)
   
 };
-
-
 //-------------------------------------------------
 
   return (
@@ -217,8 +270,7 @@ const handleChangeNumber = (event) => {
                 <div className="options-menu">
                   <a onClick={addGroup}>Add Group</a>
                   <a onClick={removeGroups}>Remove Group</a>
-                  <a >Group Mambers//</a>
-                  <a >Set Scrum Masters//</a>
+                  <a onClick={manageGroups}>Group Mambers</a>
                 </div>
               </div>
             )}
@@ -243,25 +295,7 @@ const handleChangeNumber = (event) => {
         <div className="popup">
           <div className="popup_content">
             <h2>Add New Group</h2>
-            <p>Select the number of groups to add</p>
             <div className="popup_buttons">
-
-            <select
-        className="number-select"
-        //value = {nGroups}
-        onChange={handleChangeNumber}
-        //style={{ padding: "5px" }}
-      >
-        
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-          <option key={num} value={num}>
-            {num}
-          </option>
-        ))}
-      </select>
-      
-
-            
               <Button className="popup_button" onClick={handleAddGroup}>
                   Add
               </Button>
@@ -272,7 +306,7 @@ const handleChangeNumber = (event) => {
           </div>
         </div>
       )}
-      {/*Handle remove student*/}
+      {/*Handle remove group*/}
       {isRemoveGroupVisible && (
         <div className="popup">
           <div className="popup_content">
@@ -291,8 +325,8 @@ const handleChangeNumber = (event) => {
                     <div className="checkbox-wrapper">
                       <input
                         type="checkbox"
-                        onChange={() => handleCheckboxChange(group.group_id)}
-                        checked={selectedGroups.includes(group.group_id)}
+                        onChange={() => handleCheckboxChange1(group.group_id)}
+                        checked={selectedGroups1.includes(group.group_id)}
                       />
                     </div>
                   </div>
@@ -310,7 +344,60 @@ const handleChangeNumber = (event) => {
           </div>
         </div>
       )}          
-  
+      {/*Handle set students in group*/}
+      {isManageGroupVisible && (
+        <div className="popup">
+        <div className="popup_content">
+          <h1>Set Students in Groups</h1>
+          <div className="checkbox-list">
+            <div className="checkbox-header">
+              <div className="header-name">List</div>
+              {groupDetails?.groups?.map((group, index) => (
+                <div className="header-item">
+                  {group.group_name.match(/Group (.*)/)?.[1]||"N/A"}
+                </div>
+              ))}
+            </div>
+            {groupDetails?.students?.map((student, index1) => (
+                <div className="checkbox-item" key={index1}>
+                  <div className="checkbox-name">
+                    {student.first_name+" "+student.last_name}
+                  </div>
+                  {groupDetails?.groups?.map((group, index2) => (
+                    <div className="checkbox-column" key={index2}>
+                      {/*Manage Student in Group*/}
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange2(student.uid, group.group_id)}
+                        checked={selectedGroups2.some(
+                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
+                        )}
+                      />
+                      {/*Set Scrum Master*/}
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange3(student.uid, group.group_id)}
+                        checked={selectedGroups3.some(
+                          pair => JSON.stringify(pair) === JSON.stringify([student.uid, group.group_id])
+                        )}
+                      />
+                    </div>    
+                  ))}
+                </div>
+              ))}
+          </div>
+          <div className="popup_buttons">
+              <Button className="popup_button" onClick={handleManageGroups}>
+                  Ok
+              </Button>
+              <Button className="popup_button cancel_button" onClick={() => setIsManageGroupVisible(false)}>
+                  Cancel
+              </Button>
+            </div>
+        </div>
+      </div>
+      
+      )}      
         
     </div> 
   );  

@@ -42,7 +42,7 @@ export default function CourseDetails() {
   const [userRole, setUserRole] = useState('')
   const inputRef = useRef(null); // Create a ref for the input field
   const [loading, setLoading] = useState(true) // Loading state
-  const [error, setError] = useState("");
+  const [error, setError] = useState("");  
   //setUserRole('1')
 
 
@@ -235,8 +235,6 @@ const handleRemoveProject = async () => {
 const addStudent = () => {
     setIsStudentPopup1Visible(true);
 };
-
-
 //Function: handle add student
 const handleAddStudent = async () => {  
     if (newStudentFName && newStudentLName && newStudentEmail) {
@@ -334,7 +332,7 @@ if (projectData) {
         <div className="button-bar">
           {/* Home Button on the Left */}
           <Link href="/">
-                            <MoonLight></MoonLight>
+            <MoonLight></MoonLight>
           </Link>
 
           {/* Logout Button on the Right */}
@@ -354,13 +352,13 @@ if (projectData) {
           {/* Projects Section */}
 
           <div className="projects-section">
-
+          
             <div className="section-header">
               <h2>Projects</h2>
               {userRole === '1' && (
                 <div className="addandremove">
-                  <button className="add-button" onClick={addProject}> + </button>
-                  <button className="remove-button" onClick = {removeProject}> - </button>    
+                   <button className="add-button" onClick={addProject}> + </button>
+                   <button className="remove-button" onClick = {removeProject}> - </button>     
                 </div>
               )}
             </div>
@@ -390,6 +388,7 @@ if (projectData) {
                   <button className="options-button">⋮</button>
                   <div className="options-menu">
                     <a onClick={addStudent}>Add a Student</a>
+ 
                     <a onClick={removeStudents}>Remove Students</a>
                   </div>
                 </div>
@@ -407,9 +406,9 @@ if (projectData) {
             <p className="view-all"></p>
           </div>
         </div>
-   
-      {/*Handle add project*/}
-      {isProjectPopup1Visible && (
+
+        {/*Handle add project*/}
+        {isProjectPopup1Visible && (
           <div className="popup">
             <div className="popup_content">
               <h2>Add New Project</h2>
@@ -444,7 +443,7 @@ if (projectData) {
                       placeholder="Project Name"
                   />
                   <div className="popup_buttons">
-                      <button className="popup_button" onClick={handleRemoveProject}>
+                  <button className="popup_button" onClick={handleRemoveProject}>
                           Remove
                       </button>
                       <button className="popup_button cancel_button" onClick={() => setIsProjectPopup2Visible(false)}>
@@ -496,8 +495,7 @@ if (projectData) {
                       type="email"
                       value={newStudentEmail}
                       onChange={(e) => setNewStudentEmail(e.target.value)}
-                      placeholder="Email"
-                    />
+                      placeholder="Email"/>
                   </>
                 ) : (
                   <div className="file-upload-wrapper">
@@ -535,7 +533,6 @@ if (projectData) {
           </div>
         </div>
       )}
-
       {/*Handle remove student*/}
       {isStudentPopup3Visible && (
         <div className="popup">
@@ -553,18 +550,17 @@ if (projectData) {
                   </div>
                   <div className="checkbox-column">
                     <div className="checkbox-wrapper">
-                      <input
-                        type="checkbox"
-                        onChange={() => handleCheckboxChange(student.uid)}
-                        checked={selectedStudents.includes(student.uid)}
-                      />
-                    </div>
+                    <input
+                      type="checkbox"
+                      onChange={() => handleCheckboxChange(student.uid)}
+                      checked={selectedStudents.includes(student.uid)}
+                    /></div>
                   </div>
                 </div>
               ))}
             </div>
             <div className="popup_buttons">
-              <button className="popup_button" onClick={handleRemoveStudents}>
+            <button className="popup_button" onClick={handleRemoveStudents}>
                   Remove
               </button>
               <button className="popup_button cancel_button" onClick={() => setIsStudentPopup3Visible(false)}>
